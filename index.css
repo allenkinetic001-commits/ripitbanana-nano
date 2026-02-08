@@ -1,0 +1,28 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: #000;
+  width: 100%;
+}
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Calculate height based on aspect ratio 1782:4096 */
+  height: calc(100vw * (4096 / 1782));
+  z-index: 0;
+  background: url("https://s3-alpha-sig.figma.com/img/090d/e7a4/5e893fac844c6c55c6fbb7249bf27e9c?Expires=1771200000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=rbaCVSf7rqK7r9qwP18Np6ORC0mlYx2eyLlRdbfFAHQF2LDZNf1pVrGX5MvwuYK3sY8kySf4RQWUTLUtaPzHF~bnO3~sxeLDNKNvW4w86dM7sIvvEbqn5jibeeGPjkVRkGyS69jnJS6tseuSzUOrubSS8NSl3q2Oeu~gh1XCj~YX8a1nEBicesSobY0mqAO943fYp1P8lrNBrlTIUA-fUmma1-KBD7y7g0sYx5PGC~6BA7Vmu2k1lqZhW4LZvV6si-zPezJG7EDr2XrR42v6Hx78k1xnKBlkVgGNwTckUD583SO10JV8vPq94Txa5t0b8puF2uw0HnshCuHAQ526-A__")
+    no-repeat center top;
+  background-size: 100% 100%;
+}
+@media (min-width: 1782px) {
+  .background-image {
+    width: 1782px;
+    height: 4096px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

@@ -12,7 +12,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ onClose }) => {
           You wanna to delete this post?
         </h2>
         <p className="text-zinc-400 text-[11px] font-medium leading-tight px-2">
-          This post will no longer be visible<br />on Fairy
+          This post will no longer be visible<br />on the app
         </p>
       </div>
       

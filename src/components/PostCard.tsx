@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowBigUp, ArrowBigDown, Bookmark, MoreHorizontal, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils';
 
 interface PostProps {
@@ -15,8 +16,9 @@ interface PostProps {
   onPass?: () => void;
 }
 
-const PostCard = ({ username, avatar, image, caption, time, gameMode, onDelete, onPass }: PostProps) => {
+const PostCard = ({ id, username, avatar, image, caption, time, gameMode, onDelete, onPass }: PostProps) => {
   const [userVote, setUserVote] = useState<0 | 1 | -1>(0);
+  const navigate = useNavigate();
 
   const handleVote = (vote: 1 | -1) => {
     if (gameMode === 'vause' || gameMode === 'pley') {
@@ -100,7 +102,10 @@ const PostCard = ({ username, avatar, image, caption, time, gameMode, onDelete, 
               </button>
             </div>
             
-            <button className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-8 w-8 rounded-full transition-colors group">
+            <button 
+              onClick={() => navigate(`/post/${id}`)}
+              className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-8 w-8 rounded-full transition-colors group"
+            >
               <MessageCircle size={20} stroke="black" />
             </button>
           </div>

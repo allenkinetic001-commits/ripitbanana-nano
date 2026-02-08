@@ -6,6 +6,7 @@ import CreatePost from "./pages/CreatePost";
 import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
 import Pley from "./pages/Pley";
+import PostDetail from "./pages/PostDetail";
 import { ChallengeProvider } from "./contexts/ChallengeContext";
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/pley" element={<Pley />} />
+            <Route path="/post/:id" element={<PostDetail />} />
           </Route>
         </Routes>
       </Router>
