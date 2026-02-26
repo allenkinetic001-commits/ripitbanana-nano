@@ -1,11 +1,54 @@
 import React, { useState } from 'react';
 import { ArrowBigUp, ArrowBigDown, Bookmark, MoreHorizontal, Eye, MessageCircle } from 'lucide-react';
+import { useChallenge } from '../contexts/ChallengeContext';
+import { useNavigate } from 'react-router-dom';
+import { cn } from '../utils';
 
 const ModernDesignComponent: React.FC = () => {
   const [userVote, setUserVote] = useState<0 | 1 | -1>(0);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showAddedFeedback, setShowAddedFeedback] = useState(false);
+  const [quickComment, setQuickComment] = useState('');
+  const { addEnemy, enemies, addComment, userProfile, userSelection, majorityVariant } = useChallenge();
+  const navigate = useNavigate();
+
+  const gameMode = userSelection || majorityVariant;
+  const isEnemy = enemies.some(e => e.id === 999);
+
+  const handlePostComment = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!quickComment.trim()) return;
+    addComment(999, quickComment);
+    setQuickComment('');
+  };
+
+  const handleAddEnemy = () => {
+    if (isEnemy) return;
+    addEnemy({
+      id: 999, // Static ID for demo component
+      username: 'Modern Designer',
+      avatar: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Portrait+of+a+designer&image_size=square',
+      image: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Design+system+UI&image_size=square',
+      caption: '✨ Just finished working on this amazing design system!',
+      time: '15 min ago',
+      comments: []
+    });
+    setShowAddedFeedback(true);
+    setTimeout(() => setShowAddedFeedback(false), 1000);
+  };
 
   const handleVote = (vote: 1 | -1) => {
+    if (gameMode === 'vause' || gameMode === 'pley' || gameMode === 'kight') {
+      if (vote === 1) {
+        if (gameMode === 'kight' || gameMode === 'pley') return;
+        return;
+      }
+      if (vote === -1) {
+        setUserVote(vote);
+        return;
+      }
+    }
+
     if (userVote === vote) {
       setUserVote(0);
     } else {
@@ -23,14 +66,17 @@ const ModernDesignComponent: React.FC = () => {
       <div className="flex items-center justify-between p-6 bg-gradient-to-r from-purple-50 to-pink-50">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+            <div 
+              onClick={() => navigate('/user/Modern Designer')}
+              className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 cursor-pointer"
+            >
               <span className="text-white font-bold text-lg">MD</span>
             </div>
             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
               <div className="w-2 h-2 bg-white rounded-full"></div>
             </div>
           </div>
-          <div>
+          <div onClick={() => navigate('/user/Modern Designer')} className="cursor-pointer">
             <h3 className="font-bold text-gray-900 text-base group-hover:text-purple-600 transition-colors">Modern Designer</h3>
             <p className="text-gray-500 text-sm flex items-center gap-1">
               <span>15 min ago</span>
@@ -43,12 +89,18 @@ const ModernDesignComponent: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <button className="text-[#DC143C] hover:text-[#B22222] transition-all duration-300 group px-6 py-2.5 rounded-2xl hover:bg-red-50">
-            <span className="text-sm font-black tracking-wider">Add Enemy</span>
-          </button>
-          <button className="p-3 hover:bg-white/60 rounded-full transition-all duration-300 group-hover:scale-110">
-            <MoreHorizontal className="w-6 h-6 text-gray-400" />
-          </button>
+          {(!isEnemy || showAddedFeedback) && (
+            <button 
+              onClick={handleAddEnemy}
+              className={`transition-all duration-300 group px-6 py-2.5 rounded-2xl ${
+                showAddedFeedback ? "text-rose-600" : "text-[#DC143C] hover:bg-red-50"
+              }`}
+            >
+              <span className="text-sm font-black tracking-wider">
+                 {showAddedFeedback ? 'Added Enemy' : 'Add Enemy'}
+               </span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -96,9 +148,11 @@ const ModernDesignComponent: React.FC = () => {
       <div className="p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 rounded-full px-2 py-1 transition-all duration-300 ${
-              userVote === 1 ? 'bg-green-600' : userVote === -1 ? 'bg-[#DC143C]' : 'bg-gray-50'
-            }`}>
+          <div className={cn(
+            "flex items-center gap-2 rounded-full px-2 py-1 transition-all duration-300",
+            userVote === 1 ? "bg-green-600" : userVote === -1 ? "bg-[#DC143C]" : "bg-gray-50"
+          )}>
+            {(!gameMode || gameMode === 'vause') && (
               <button 
                 onClick={() => handleVote(1)}
                 className="p-1 transition-all duration-300 hover:scale-110"
@@ -110,20 +164,24 @@ const ModernDesignComponent: React.FC = () => {
                   strokeWidth={userVote !== 0 ? 0 : 2}
                 />
               </button>
-              <button 
-                onClick={() => handleVote(-1)}
-                className="p-1 transition-all duration-300 hover:scale-110"
-              >
-                <ArrowBigDown 
-                  className="w-7 h-7"
-                  fill="white"
-                  stroke={userVote !== 0 ? "none" : "black"}
-                  strokeWidth={userVote !== 0 ? 0 : 2}
-                />
-              </button>
-            </div>
+            )}
+            <button 
+              onClick={() => handleVote(-1)}
+              className="p-1 transition-all duration-300 hover:scale-110"
+            >
+              <ArrowBigDown 
+                className="w-7 h-7"
+                fill="white"
+                stroke={userVote !== 0 ? "none" : "black"}
+                strokeWidth={userVote !== 0 ? 0 : 2}
+              />
+            </button>
+          </div>
             
-            <button className="flex items-center justify-center bg-gray-50 hover:bg-gray-100 h-10 w-10 rounded-full transition-all duration-300 group hover:scale-110">
+            <button 
+              onClick={() => navigate('/post/999')}
+              className="flex items-center justify-center bg-gray-50 hover:bg-gray-100 h-10 w-10 rounded-full transition-all duration-300 group hover:scale-110"
+            >
               <MessageCircle size={20} stroke="black" />
             </button>
           </div>
@@ -159,8 +217,40 @@ const ModernDesignComponent: React.FC = () => {
             <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">#modern</span>
             <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">#creative</span>
           </div>
+
+          <form 
+            onSubmit={handlePostComment}
+            className="flex items-center gap-3 pt-4 border-t border-gray-100"
+          >
+            <div className="w-10 h-10 rounded-full border border-gray-200 overflow-hidden shrink-0">
+              <img src={userProfile.avatar} className="w-full h-full object-cover" alt="Me" />
+            </div>
+            <div className="flex-1 flex items-center gap-3">
+              <input 
+                type="text"
+                placeholder="Write a comment on this profile..."
+                className="flex-1 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 text-sm outline-none focus:border-purple-300 focus:bg-white transition-all"
+                value={quickComment}
+                onChange={(e) => setQuickComment(e.target.value)}
+              />
+              <button 
+                type="submit"
+                disabled={!quickComment.trim()}
+                className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${
+                  quickComment.trim() 
+                    ? "text-purple-600 hover:bg-purple-50" 
+                    : "text-gray-300 cursor-not-allowed"
+                }`}
+              >
+                Add Comment
+              </button>
+            </div>
+          </form>
           
-          <button className="text-gray-500 text-xs hover:text-gray-700 transition-colors font-medium">
+          <button 
+            onClick={() => navigate('/post/999')}
+            className="text-gray-500 text-xs hover:text-gray-700 transition-colors font-medium block pt-2"
+          >
             View all 23 comments →
           </button>
         </div>

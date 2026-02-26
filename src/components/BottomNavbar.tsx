@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Search, PlusSquare, Heart, User, LucideIcon } from 'lucide-react';
+import { Home, Search, Bell, User, LucideIcon } from 'lucide-react';
 import { cn } from '../utils';
 
 interface NavItemProps {
@@ -30,8 +30,7 @@ const BottomNavbar = () => {
       <div className="flex items-center justify-around h-full max-w-md mx-auto">
         <NavItem to="/" icon={Home} label="Home" />
         <NavItem to="/search" icon={Search} label="Search" />
-        <NavItem to="/create" icon={PlusSquare} label="Create" />
-        <NavItem to="/notifications" icon={Heart} label="Activity" />
+        <NavItem to="/notifications" icon={Bell} label="Notifications" />
         <NavItem to="/profile" icon={User} label="Profile" />
       </div>
     </nav>

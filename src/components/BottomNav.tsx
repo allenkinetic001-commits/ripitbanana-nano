@@ -1,27 +1,47 @@
-import React from 'react';
-import { Home, ThumbsUp, MessageCircle, Dog, User } from 'lucide-react';
+import { Home, Search, Bell, User } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useChallenge } from '../contexts/ChallengeContext';
+import { cn } from '../utils';
 
-const BottomNav: React.FC = () => {
+const BottomNav = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useChallenge();
+
+  const navItems = [
+    { icon: Home, label: t('nav_home'), path: '/' },
+    { icon: Search, label: t('nav_search'), path: '/search' },
+    { icon: Bell, label: t('nav_notifications'), path: '/notifications' },
+    { icon: User, label: t('nav_profile'), path: '/profile' },
+  ];
+
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-3 flex items-center justify-between pb-8 z-40 rounded-t-[20px] shadow-[0_-5px_20px_rgba(0,0,0,0.02)]">
-      <div className="p-2 rounded-xl">
-        <Home className="w-[26px] h-[26px] text-black fill-black" />
-      </div>
-      <div className="p-2 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer">
-        <ThumbsUp className="w-[26px] h-[26px] text-black stroke-[1.8]" />
-      </div>
-      <div className="p-2 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer relative">
-        <MessageCircle className="w-[26px] h-[26px] text-black stroke-[1.8]" />
-        <div className="absolute top-2.5 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
-      </div>
-      <div className="p-2 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer">
-        <Dog className="w-[26px] h-[26px] text-black stroke-[1.8]" />
-      </div>
-      <div className="p-2 rounded-xl hover:bg-zinc-50 transition-colors cursor-pointer">
-        <div className="w-[26px] h-[26px] rounded-full border-[1.8px] border-zinc-300 flex items-center justify-center">
-           <User className="w-4 h-4 text-zinc-300 fill-zinc-300" />
-        </div>
-      </div>
+    <div className="absolute bottom-0 w-full bg-white border-t border-zinc-100 px-6 py-2 flex justify-between items-center z-50">
+      {navItems.map((item) => {
+        const isActive = location.pathname === item.path;
+        return (
+          <button
+            key={item.path}
+            onClick={() => navigate(item.path)}
+            className={cn(
+              "flex flex-col items-center space-y-1 transition-colors relative",
+              isActive ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-600"
+            )}
+          >
+            <item.icon 
+              size={24} 
+              strokeWidth={isActive ? 2.5 : 2}
+              className={cn("transition-all duration-300", isActive && "scale-110")}
+            />
+            <span className={cn("text-[10px] font-medium transition-all", isActive ? "font-bold" : "font-medium")}>
+              {item.label}
+            </span>
+            {isActive && (
+              <span className="absolute -top-2 w-1 h-1 bg-zinc-900 rounded-full animate-in zoom-in" />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 };

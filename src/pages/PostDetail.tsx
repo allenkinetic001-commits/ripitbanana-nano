@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageCircle, Send, Heart, Bookmark, MoreHorizontal } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Send, Heart, Bookmark, MoreHorizontal, X } from 'lucide-react';
 import { posts } from '../data/posts';
 import { cn } from '../utils';
+import { useChallenge } from '../contexts/ChallengeContext';
 
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const post = posts.find(p => p.id === Number(id));
+  const { postComments, addComment } = useChallenge();
+  
+  const postId = Number(id);
+  const post = posts.find(p => p.id === postId);
   const [commentText, setCommentText] = useState('');
-  const [localComments, setLocalComments] = useState(post?.comments || []);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const localComments = postComments[postId] || [];
 
   if (!post) {
     return (
@@ -27,14 +32,10 @@ const PostDetail = () => {
 
   const handleSendComment = () => {
     if (!commentText.trim()) return;
-    const newComment = {
-      id: localComments.length + 1,
-      username: 'you',
-      text: commentText,
-      time: 'Just now'
-    };
-    setLocalComments([...localComments, newComment]);
+    const finalComment = replyingTo ? `@${replyingTo} ${commentText}` : commentText;
+    addComment(postId, finalComment);
     setCommentText('');
+    setReplyingTo(null);
   };
 
   return (
@@ -73,7 +74,12 @@ const PostDetail = () => {
                   <span className="text-[10px] text-zinc-400">{comment.time}</span>
                 </div>
                 <p className="text-sm text-zinc-700 mt-0.5">{comment.text}</p>
-                <button className="text-[10px] text-zinc-500 font-bold mt-1">Reply</button>
+                <button 
+                  onClick={() => setReplyingTo(comment.username)}
+                  className="text-[10px] text-zinc-500 font-bold mt-1 hover:text-purple-600 transition-colors"
+                >
+                  Reply
+                </button>
               </div>
               <button className="text-zinc-400">
                 <Heart size={12} />
@@ -90,6 +96,19 @@ const PostDetail = () => {
 
       {/* Comment Input */}
       <div className="sticky bottom-0 bg-white border-t border-zinc-100 p-4 safe-area-pb">
+        {replyingTo && (
+          <div className="flex items-center justify-between bg-zinc-50 px-3 py-2 mb-2 rounded-lg border border-zinc-100 animate-in fade-in slide-in-from-bottom-1 duration-200">
+            <p className="text-[10px] text-zinc-500 font-medium">
+              Replying to <span className="font-bold text-purple-600">@{replyingTo}</span>
+            </p>
+            <button 
+              onClick={() => setReplyingTo(null)}
+              className="text-zinc-400 hover:text-rose-500 transition-colors"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
         <div className="flex items-center gap-3 bg-zinc-100 rounded-2xl px-4 py-2">
           <input 
             type="text" 
@@ -107,7 +126,7 @@ const PostDetail = () => {
               !commentText.trim() && "opacity-30"
             )}
           >
-            Post
+            Add Comment
           </button>
         </div>
       </div>

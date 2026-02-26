@@ -3,7 +3,7 @@ import { Clock } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 
 const ChallengeTimer = () => {
-  const { timeLeft, isChallengeEnded, majorityVariant, majorityRankingRule } = useChallenge();
+  const { timeLeft, isChallengeEnded, majorityVariant, majorityRankingRule, t } = useChallenge();
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -25,7 +25,7 @@ const ChallengeTimer = () => {
           </div>
           {majorityVariant === 'kight' && majorityRankingRule && (
             <span className={`text-[8px] font-black uppercase leading-none mt-0.5 ${isChallengeEnded ? 'text-zinc-300' : 'text-purple-400'}`}>
-              Rule: {majorityRankingRule}
+              {t('timer_rule')}: {majorityRankingRule}
             </span>
           )}
         </div>
