@@ -1,39 +1,79 @@
+import { useState } from 'react';
 import { Home, Search, Bell, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 
+interface NavItem {
+  icon: any;
+  label: string;
+  path: string;
+  isImage?: boolean;
+  size?: string;
+}
+
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useChallenge();
+  const [clickedPath, setClickedPath] = useState<string | null>(null);
 
-  const navItems = [
-    { icon: Home, label: t('nav_home'), path: '/' },
-    { icon: Search, label: t('nav_search'), path: '/search' },
-    { icon: Bell, label: t('nav_notifications'), path: '/notifications' },
-    { icon: User, label: t('nav_profile'), path: '/profile' },
+  const handleNavClick = (path: string) => {
+    setClickedPath(path);
+    navigate(path);
+    setTimeout(() => setClickedPath(null), 300);
+  };
+
+  const navItems: NavItem[] = [
+    { icon: '/nav-home-v3.png', label: t('nav_home'), path: '/', isImage: true },
+    { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true, size: 'h-[53px] w-[53px]' },
+    { icon: '/nav-phone-v3.png', label: t('nav_notifications'), path: '/notifications', isImage: true },
+    { icon: '/nav-profile-v3.png', label: t('nav_profile'), path: '/profile', isImage: true },
   ];
 
   return (
     <div className="absolute bottom-0 w-full bg-white border-t border-zinc-100 px-6 py-2 flex justify-between items-center z-50">
       {navItems.map((item) => {
         const isActive = location.pathname === item.path;
+        const isBouncing = clickedPath === item.path;
         return (
           <button
             key={item.path}
-            onClick={() => navigate(item.path)}
+            onClick={() => handleNavClick(item.path)}
             className={cn(
-              "flex flex-col items-center space-y-1 transition-colors relative",
-              isActive ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-600"
+              "flex flex-col items-center transition-colors relative",
+              "text-zinc-900"
             )}
           >
-            <item.icon 
-              size={24} 
-              strokeWidth={isActive ? 2.5 : 2}
-              className={cn("transition-all duration-300", isActive && "scale-110")}
-            />
-            <span className={cn("text-[10px] font-medium transition-all", isActive ? "font-bold" : "font-medium")}>
+            <div className="h-14 flex items-center justify-center mb-1">
+              {item.isImage ? (
+                <img 
+                  src={item.icon as string} 
+                  alt={item.label}
+                  className={cn(
+                    item.size || "h-9 w-9",
+                    "object-contain transition-all duration-300", 
+                    isActive ? "scale-110" : "scale-100",
+                    isBouncing && "animate-nav-bounce",
+                    "opacity-100"
+                  )} 
+                />
+              ) : (
+                <div className={cn(isBouncing && "animate-nav-bounce")}>
+                  {(() => {
+                    const Icon = item.icon as any;
+                    return <Icon 
+                      size={24} 
+                      className={cn("transition-all duration-300", isActive && "scale-110")}
+                    />;
+                  })()}
+                </div>
+              )}
+            </div>
+            <span className={cn(
+              "text-[10px] font-medium transition-all", 
+              isActive ? "font-bold" : "font-black"
+            )}>
               {item.label}
             </span>
             {isActive && (

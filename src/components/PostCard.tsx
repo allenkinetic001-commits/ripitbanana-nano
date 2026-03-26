@@ -83,17 +83,24 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         </div>
         <div className="flex items-center space-x-2">
           {!isMe && (!isEnemy || showAddedFeedback) && (
-            <button 
-              onClick={handleAddEnemy}
-              className={cn(
-                "transition-all duration-300 group px-2 py-1 rounded-md",
-                showAddedFeedback ? "text-rose-600" : "text-[#DC143C] hover:bg-red-50"
-              )}
-            >
-              <span className="text-sm font-bold">
-                 {showAddedFeedback ? t('home_added_enemy') : t('home_add_enemy')}
-               </span>
-            </button>
+             <div className="flex items-center">
+              <img 
+                src="/nav-clink-v3.png" 
+                alt="Clink" 
+                className="h-[38px] w-auto object-contain mt-1 -mr-3 drop-shadow-sm"
+              />
+              <button 
+                onClick={handleAddEnemy}
+                className={cn(
+                  "transition-all duration-300 group px-2 py-1 rounded-md",
+                  showAddedFeedback ? "text-rose-600" : "text-[#DC143C] hover:bg-red-50"
+                )}
+              >
+                <span className="text-sm font-bold">
+                   {showAddedFeedback ? t('home_added_enemy') : t('home_add_enemy')}
+                 </span>
+              </button>
+            </div>
           )}
         </div>
       </div>

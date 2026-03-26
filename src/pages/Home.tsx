@@ -32,6 +32,7 @@ const Home = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileType, setFileType] = useState<'image' | 'video'>('image');
   const [captionText, setCaptionText] = useState('');
+  const [showMustache, setShowMustache] = useState(true);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -527,14 +528,20 @@ const Home = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
-        <div className="px-4 h-12 flex items-center justify-between">
-          <div className="w-10" /> {/* Spacer to keep title centered */}
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold font-serif">RipIt</h1>
+        <div className="px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-0">
+            <button 
+              onClick={() => setShowMustache(!showMustache)}
+              className="transition-all active:scale-95 hover:opacity-80"
+              title="Toggle Mustache"
+            >
+              <img src="/header-logo-banana.png" alt="Logo" className="h-[60px] w-auto object-contain" />
+            </button>
+            <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-4">
             <ChallengeTimer />
-            {!isChallengeEnded && (
+            {!isChallengeEnded && showMustache && (
               <button 
                 onClick={() => {
                   if (showPills) {
@@ -542,22 +549,26 @@ const Home = () => {
                   }
                   setShowPills(!showPills);
                 }}
-                className="flex items-center justify-center w-6 h-6 bg-purple-600 rounded-full text-white hover:bg-purple-700 transition-all active:scale-90 shadow-sm"
+                className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
               >
-                <Plus size={16} strokeWidth={3} />
+                <img 
+                  src={showPills ? "/nav-create-active.png" : "/nav-create-v3.png"} 
+                  alt="Create" 
+                  className="h-[44px] w-[44px] object-contain transition-all duration-300 transform" 
+                />
               </button>
             )}
             <button 
               onClick={() => navigate('/chat')}
               className="text-zinc-700 hover:text-purple-600 transition-colors"
             >
-              <MessageCircle size={24} />
+              <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" />
             </button>
             <button 
               onClick={() => fileInputRef.current?.click()}
               className="text-zinc-700 hover:text-purple-600 transition-colors"
             >
-              <Camera size={24} />
+              <img src="/nav-camera-v3.png" alt="Camera" className="h-[38px] w-[38px] object-contain" />
             </button>
             <input 
               type="file" 
@@ -567,16 +578,16 @@ const Home = () => {
               accept="image/*,video/*" 
             />
             <button 
-              className="text-zinc-700 hover:text-purple-600 transition-colors"
+              className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
               onClick={() => setShowPillsInfo(true)}
             >
-              <Info size={24} />
+              <img src="/nav-info-v3.png" alt="Info" className="h-[38px] w-[38px] object-contain" />
             </button>
             <button 
-              className="text-zinc-700 hover:text-purple-600 transition-colors"
+              className="text-zinc-700 transition-all active:scale-90 hover:opacity-70"
               onClick={() => setShowSearchModal(true)}
             >
-              <Search size={24} />
+              <img src="/header-search-v3.png" alt="Search" className="h-[26px] w-[26px] object-contain" />
             </button>
           </div>
         </div>
