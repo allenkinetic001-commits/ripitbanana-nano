@@ -493,16 +493,6 @@ const Home = () => {
                 </p>
               </div>
 
-              {/* Vause */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full">Vause</span>
-                </div>
-                <p className="text-sm text-zinc-400 leading-relaxed font-medium">
-                  A feature mode where users are judged by up or down votes. An upvote allows the user to pass and retain their profile, followers, and data. A downvote results in the complete deletion of the user’s profile, posts, and followers, forcing the user to start over from scratch.
-                </p>
-              </div>
-
               {/* Kight */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
@@ -754,69 +744,6 @@ const Home = () => {
                    )}
                  </button>
                </div>
-
-               {/* Vause Pill */}
-               <div className="flex flex-col items-center gap-2 flex-1 max-w-[120px] relative group">
-                 <div className="h-[48px] flex flex-col items-center justify-end w-full">
-                   {timeLeft > 0 && (
-                     <div className="flex items-center gap-1.5 bg-zinc-900 px-2 py-1 rounded-full border border-zinc-800 shadow-lg group/total cursor-help mb-1 animate-slide-in">
-                       <Users size={10} className="text-zinc-400" />
-                       <span className="text-[9px] font-black text-white leading-none">
-                         {Object.values(clickCounts).reduce((a, b) => a + b, 0)}
-                       </span>
-                     </div>
-                   )}
-                   {majorityVariant === 'vause' && timeLeft > 0 ? (
-                     <div className="flex flex-col items-center gap-1 w-full">
-                       {eliminationCounts.vause > 0 && (
-                         <div className="flex items-center gap-1.5 bg-rose-50/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-rose-100 shadow-[0_2px_10px_-3px_rgba(225,29,72,0.2)] animate-slide-in w-fit">
-                           <Skull size={10} className="text-rose-500 fill-rose-500" />
-                           <span className="text-[8px] font-black text-rose-600 uppercase tracking-tighter leading-none whitespace-nowrap">
-                             <span className="mr-1">{eliminationCounts.vause}</span>
-                             {t('home_eliminated')}
-                           </span>
-                         </div>
-                       )}
-                       {madeItCounts.vause > 0 && (
-                        <div className="flex items-center gap-1.5 bg-green-50/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-green-100 shadow-[0_2px_10px_-3px_rgba(22,163,74,0.2)] animate-slide-in w-fit">
-                          <Sparkles size={10} className="text-green-500 fill-green-500" />
-                          <span className="text-[8px] font-black text-green-600 uppercase tracking-tighter leading-none whitespace-nowrap">
-                            <span className="mr-1">{madeItCounts.vause}</span>
-                            {t('home_survivors')}
-                          </span>
-                        </div>
-                      )}
-                       <div className="flex items-center gap-1 bg-amber-50/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-200 shadow-sm animate-pulse w-fit">
-                         <Sparkles size={10} className="text-amber-500 fill-amber-500" />
-                         <span className="text-[9px] font-black font-serif text-amber-700 uppercase tracking-tight leading-none">{t('home_majority')}</span>
-                       </div>
-                     </div>
-                   ) : null}
-                 </div>
-                 <button 
-                   onClick={() => handleTabClick('vause')}
-                   className={`w-full py-3 border-2 rounded-2xl text-center text-[11px] uppercase tracking-[0.2em] font-black transition-all duration-500 relative overflow-hidden group/pill ${
-                     activeTab === 'vause' 
-                       ? 'bg-purple-600 border-purple-500 text-white shadow-[0_10px_25px_-5px_rgba(147,51,234,0.4)] scale-105 translate-y-[-4px]' 
-                       : userSelection === 'vause'
-                         ? 'bg-purple-50 border-purple-200 text-purple-600'
-                         : 'bg-zinc-50/50 border-zinc-200 text-zinc-400 hover:border-purple-300 hover:bg-purple-50/30 hover:text-purple-500 hover:translate-y-[-2px]'
-                   } ${userSelection && timeLeft > 0 ? 'cursor-not-allowed opacity-80' : ''}`}
-                 >
-                   <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/pill:translate-x-[100%] transition-transform duration-1000" />
-                   <span className="relative z-10 flex items-center justify-center gap-2">
-                     {activeTab === 'vause' && <Sparkles size={12} className="animate-spin-slow" />}
-                     VAUSE
-                   </span>
-                   {timeLeft > 0 && (
-                     <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                       <span className="bg-black/10 px-1.5 py-0.5 rounded text-[8px] font-bold backdrop-blur-sm">
-                         {clickCounts.vause}
-                       </span>
-                     </div>
-                   )}
-                </button>
-              </div>
 
               {/* Kight Pill */}
               <div className="flex flex-col items-center gap-2 flex-1 max-w-[120px] relative group">
@@ -1184,3 +1111,4 @@ const Home = () => {
 };
 
 export default Home;
+

@@ -8,7 +8,7 @@ import { cn, formatDate } from '../lib/utils';
 const VariantPill = ({ variant }: { variant: string | null }) => {
   if (!variant) return null;
   const colors: Record<string, string> = {
-    vause: "bg-purple-50 text-purple-600 border-purple-100",
+
     pley: "bg-blue-50 text-blue-600 border-blue-100",
     kight: "bg-amber-50 text-amber-600 border-amber-100",
   };
@@ -201,10 +201,10 @@ const Search = () => {
               </div>
               <div className="space-y-2">
                   <h2 className="text-5xl font-black text-rose-600 tracking-tighter uppercase leading-none">
-                    {currentVariant === 'vause' ? 'TOTAL V-TERMINATION' : currentVariant === 'pley' ? 'TOTAL P-TERMINATION' : currentVariant === 'kight' ? t('search_no_winners') : t('search_total_termination')}
+                    {currentVariant === 'pley' ? 'TOTAL P-TERMINATION' : t('search_no_winners')}
                   </h2>
                   <p className="text-zinc-400 text-xs font-bold tracking-[0.3em] uppercase">
-                    No profiles {currentVariant === 'vause' ? 'made it' : currentVariant === 'pley' ? 'pley' : currentVariant === 'kight' ? 'won the top ranking' : 'survived'} this round
+                    No profiles {currentVariant === 'pley' ? 'pley' : 'won the top ranking'} this round
                   </p>
                 </div>
               <button 
@@ -230,7 +230,7 @@ const Search = () => {
                 <div className="flex flex-col">
                   <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none">
                     {selectedRoundId 
-                      ? (selectedRound?.variant === 'vause' ? 'people that made it' : selectedRound?.variant === 'pley' ? 'people that pleyed' : selectedRound?.variant === 'kight' ? `Winner of ${selectedRound.rankingRule}` : 'people that survived') 
+                      ? (selectedRound?.variant === 'pley' ? 'people that pleyed' : `Winner of ${selectedRound?.rankingRule}`) 
                       : isChallengeEnded ? (survivors[0]?.variant === 'kight' ? `Winner of ${survivors[0].rankingRule}` : 'people that survived') : viewMode === 'hall_of_fame' ? 'Hall of Fame' : 'Round History'}
                   </h2>
                   <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1 flex items-center">
@@ -238,7 +238,7 @@ const Search = () => {
                       <>
                         {selectedRound.survivorCount} {selectedRound.survivorCount === 1 ? 'Person' : 'People'}
                         <span className="ml-1">
-                          {selectedRound.variant === 'vause' ? 'Made It' : selectedRound.variant === 'pley' ? 'Pleyed' : selectedRound.variant === 'kight' ? 'Winners' : 'Saved'}
+                          {selectedRound.variant === 'pley' ? 'Pleyed' : selectedRound.variant === 'kight' ? 'Winners' : 'Saved'}
                         </span>
                         <VariantPill variant={selectedRound.variant} />
                       </>
@@ -328,7 +328,7 @@ const Search = () => {
                         {(isHistoryView || isChallengeEnded) && <Clock size={10} className="text-amber-600" />}
                         <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
                           {isHistoryView 
-                            ? (survivor.variant === 'vause' ? 'MADE IT' : survivor.variant === 'pley' ? 'PLEYED' : survivor.variant === 'kight' ? `WINNER OF ${survivor.rankingRule}` : `${survivor.roundDurationLabel || 'LEGEND'}`) 
+                            ? (survivor.variant === 'pley' ? 'PLEYED' : `WINNER OF ${survivor.rankingRule}`) 
                             : (survivor.variant === 'kight' ? `WINNER OF ${survivor.rankingRule}` : 'SURVIVOR')}
                         </span>
                       </div>
@@ -378,11 +378,11 @@ const Search = () => {
                             {(survivor.survivalTime || !isHistoryView) && (
                               <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-zinc-400 uppercase tracking-tighter leading-none">
-                                  {survivor.variant === 'vause' ? 'MADE IT AT' : survivor.variant === 'pley' ? 'PLEYED AT' : survivor.variant === 'kight' ? 'WON AT' : 'SURVIVED AT'}
+                                  {survivor.variant === 'pley' ? 'PLEYED AT' : survivor.variant === 'kight' ? 'WON AT' : 'SURVIVED AT'}
                                 </span>
                                 <span className="text-[10px] font-black text-zinc-900 mt-0.5">
                                   {survivor.survivalTime || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                                  {(survivor.variant === 'vause' || survivor.variant === 'pley' || survivor.variant === 'kight') && (
+                                  {(survivor.variant === 'pley' || survivor.variant === 'kight') && (
                                     <span className="text-[8px] text-zinc-400 ml-1 italic font-bold">
                                       ({survivor.roundDurationLabel} Task)
                                     </span>
@@ -489,7 +489,7 @@ const Search = () => {
                         <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Outcome</span>
                         <div className="flex items-center mt-0.5">
                           <span className="text-sm font-black text-zinc-900">
-                            {log.survivorCount} {log.survivorCount === 1 ? 'Person' : 'People'} {log.variant === 'vause' ? 'Made It' : log.variant === 'pley' ? 'Pleyed' : log.variant === 'kight' ? `won ${log.rankingRule}` : 'Survived'}
+                            {log.survivorCount} {log.survivorCount === 1 ? 'Person' : 'People'} {log.variant === 'pley' ? 'Pleyed' : log.variant === 'kight' ? `won ${log.rankingRule}` : 'Survived'}
                           </span>
                           <VariantPill variant={log.variant} />
                         </div>

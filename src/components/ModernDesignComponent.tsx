@@ -38,9 +38,8 @@ const ModernDesignComponent: React.FC = () => {
   };
 
   const handleVote = (vote: 1 | -1) => {
-    if (gameMode === 'vause' || gameMode === 'pley' || gameMode === 'kight') {
+    if (gameMode === 'pley' || gameMode === 'kight') {
       if (vote === 1) {
-        if (gameMode === 'kight' || gameMode === 'pley') return;
         return;
       }
       if (vote === -1) {
@@ -152,7 +151,7 @@ const ModernDesignComponent: React.FC = () => {
             "flex items-center gap-2 rounded-full px-2 py-1 transition-all duration-300",
             userVote === 1 ? "bg-green-600" : userVote === -1 ? "bg-[#DC143C]" : "bg-gray-50"
           )}>
-            {(!gameMode || gameMode === 'vause') && (
+            {!gameMode && (
               <button 
                 onClick={() => handleVote(1)}
                 className="p-1 transition-all duration-300 hover:scale-110"

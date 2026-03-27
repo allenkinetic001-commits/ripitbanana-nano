@@ -51,11 +51,9 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
       return;
     }
 
-    if (gameMode === 'vause' || gameMode === 'pley' || gameMode === 'kight') {
+    if (gameMode === 'pley' || gameMode === 'kight') {
       if (vote === 1) {
-        if (gameMode === 'kight' || gameMode === 'pley') return; // Downvotes only in Kight and Pley
-        if (onPass) onPass();
-        return;
+        return; // Downvotes only in Kight and Pley
       }
       if (vote === -1) {
         if (onDelete) onDelete();
@@ -134,7 +132,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
               "flex items-center space-x-1 rounded-full px-1 transition-all duration-300",
               userVote === 1 ? "bg-green-600" : userVote === -1 ? "bg-[#DC143C]" : "bg-zinc-100"
             )}>
-              {(!gameMode || gameMode === 'vause') && (
+              {!gameMode && (
                 <button 
                   onClick={() => handleVote(1)}
                   className={cn(
