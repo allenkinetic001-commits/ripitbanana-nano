@@ -121,7 +121,7 @@ const Chat = () => {
     }
     return {
       'Sarah_X': [
-        { id: 1, sender: 'Sarah_X', text: 'Hey! Are you ready for the Kight round?', time: '10:30 AM', isMe: false, status: 'read' },
+        { id: 1, sender: 'Sarah_X', text: 'Hey! Are you ready for the challenge?', time: '10:30 AM', isMe: false, status: 'read' },
         { id: 2, sender: 'Me', text: 'Always ready! Setting my Top 5 now.', time: '10:32 AM', isMe: true, status: 'read' },
       ]
     };

@@ -359,10 +359,10 @@ const Home = () => {
                 </p>
               </div>
 
-              {/* Kight */}
+              {/*  */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full">Kight</span>
+                  <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full"></span>
                 </div>
                 <p className="text-sm text-zinc-400 leading-relaxed font-medium">
                   A high-stakes game mode where users can only receive downvotes. Before the round begins, players select the ranking rule they want—Top 1, Top 5, Top 10, or Top 20. The final rule is determined by majority vote, with the first player’s choice acting as a temporary default until the majority is established. At the end of the round, any player who fails to make it into the selected top ranking has their profile, followers, and posts reset to zero, while their account remains intact.

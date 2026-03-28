@@ -38,7 +38,7 @@ const ModernDesignComponent: React.FC = () => {
   };
 
   const handleVote = (vote: 1 | -1) => {
-    if (gameMode === 'pley' || gameMode === 'kight') {
+    if (gameMode === 'pley'') {
       if (vote === 1) {
         return;
       }

@@ -233,10 +233,7 @@ const SettingsPage = () => {
 
 
 
-                    <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
-                        <span className="font-bold text-zinc-900 block mb-1">{t('about_kight_title')}</span>
-                        <p>{t('about_kight_desc')}</p>
-                    </div>
+                    
                 </div>
 
                 <p>{t('about_desc2')}</p>
@@ -683,15 +680,7 @@ const SettingsPage = () => {
 
 
 
-                <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
-                  <span className="font-bold text-zinc-900 block mb-1">{t('model_kight_title')}</span>
-                  <ul className="space-y-1 list-disc list-inside marker:text-red-500">
-                    <li>{t('model_kight_item1')}</li>
-                    <li>{t('model_kight_item2')}</li>
-                    <li>{t('model_kight_item3')}</li>
-                    <li>{t('model_kight_item4')}</li>
-                  </ul>
-                </div>
+                
               </div>
 
               {/* Personalization */}

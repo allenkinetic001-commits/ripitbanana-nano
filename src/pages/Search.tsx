@@ -10,7 +10,6 @@ const VariantPill = ({ variant }: { variant: string | null }) => {
   const colors: Record<string, string> = {
 
     pley: "bg-blue-50 text-blue-600 border-blue-100",
-    kight: "bg-amber-50 text-amber-600 border-amber-100",
   };
   const colorClass = colors[variant] || "bg-zinc-50 text-zinc-600 border-zinc-100";
   
@@ -35,11 +34,8 @@ const Search = () => {
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
   const [selectedRoundId, setSelectedRoundId] = useState<string | null>(null);
 
-  const handleJoinNextTask = () => {
-    startNewChallenge();
-    // The Home component will handle the default 'kight' state on mount
+    // The Home component will handle the default 'pley' state on mount
     navigate('/');
-  };
 
   const currentVariant = useMemo(() => {
     // Try to get variant from current survivors or context
@@ -201,10 +197,10 @@ const Search = () => {
               </div>
               <div className="space-y-2">
                   <h2 className="text-5xl font-black text-rose-600 tracking-tighter uppercase leading-none">
-                    {currentVariant === 'pley' ? 'TOTAL P-TERMINATION' : t('search_no_winners')}
+                    TOTAL P-TERMINATION
                   </h2>
                   <p className="text-zinc-400 text-xs font-bold tracking-[0.3em] uppercase">
-                    No profiles {currentVariant === 'pley' ? 'pley' : 'won the top ranking'} this round
+                    No profiles pleyed this round
                   </p>
                 </div>
               <button 
@@ -230,20 +226,20 @@ const Search = () => {
                 <div className="flex flex-col">
                   <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none">
                     {selectedRoundId 
-                      ? (selectedRound?.variant === 'pley' ? 'people that pleyed' : `Winner of ${selectedRound?.rankingRule}`) 
-                      : isChallengeEnded ? (survivors[0]?.variant === 'kight' ? `Winner of ${survivors[0].rankingRule}` : 'people that survived') : viewMode === 'hall_of_fame' ? 'Hall of Fame' : 'Round History'}
+                      ? (selectedRound?.variant === 'pley' ? 'people that pleyed' : 'people that survived') 
+                      : isChallengeEnded ? 'people that survived' : viewMode === 'hall_of_fame' ? 'Hall of Fame' : 'Round History'}
                   </h2>
                   <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1 flex items-center">
                     {selectedRoundId && selectedRound ? (
                       <>
                         {selectedRound.survivorCount} {selectedRound.survivorCount === 1 ? 'Person' : 'People'}
                         <span className="ml-1">
-                          {selectedRound.variant === 'pley' ? 'Pleyed' : selectedRound.variant === 'kight' ? 'Winners' : 'Saved'}
+                          {selectedRound.variant === 'pley' ? 'Pleyed' : 'Saved'}
                         </span>
                         <VariantPill variant={selectedRound.variant} />
                       </>
                     ) : isChallengeEnded ? (
-                      survivors[0]?.variant === 'kight' ? `Verified Winners` : (survivors.length === 1 ? 'The Ultimate Survivor' : `${survivors.length} Profiles Remaining`)
+                      (survivors.length === 1 ? 'The Ultimate Survivor' : `${survivors.length} Profiles Remaining`)
                     ) : viewMode === 'hall_of_fame' ? (
                       `${displaySurvivors.length} Total Winners Displayed`
                     ) : (
@@ -328,8 +324,8 @@ const Search = () => {
                         {(isHistoryView || isChallengeEnded) && <Clock size={10} className="text-amber-600" />}
                         <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
                           {isHistoryView 
-                            ? (survivor.variant === 'pley' ? 'PLEYED' : `WINNER OF ${survivor.rankingRule}`) 
-                            : (survivor.variant === 'kight' ? `WINNER OF ${survivor.rankingRule}` : 'SURVIVOR')}
+                            ? (survivor.variant === 'pley' ? 'PLEYED' : 'SURVIVED') 
+                            : 'SURVIVOR'}
                         </span>
                       </div>
                     </div>
@@ -378,11 +374,11 @@ const Search = () => {
                             {(survivor.survivalTime || !isHistoryView) && (
                               <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-zinc-400 uppercase tracking-tighter leading-none">
-                                  {survivor.variant === 'pley' ? 'PLEYED AT' : survivor.variant === 'kight' ? 'WON AT' : 'SURVIVED AT'}
+                                  {survivor.variant === 'pley' ? 'PLEYED AT' : 'SURVIVED AT'}
                                 </span>
                                 <span className="text-[10px] font-black text-zinc-900 mt-0.5">
                                   {survivor.survivalTime || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                                  {(survivor.variant === 'pley' || survivor.variant === 'kight') && (
+                                  {survivor.variant === 'pley' && (
                                     <span className="text-[8px] text-zinc-400 ml-1 italic font-bold">
                                       ({survivor.roundDurationLabel} Task)
                                     </span>
@@ -439,7 +435,7 @@ const Search = () => {
                             <p className="text-[11px] text-zinc-500 leading-relaxed italic">
                               {isHistoryView 
                                 ? "This legend has secured a spot in the Hall of Fame." 
-                                : (survivor.variant === 'kight' ? `Congratulations to the winner! This profile has officially secured a spot in the ${survivor.rankingRule}.` : "Congratulations to the survivor! This profile has officially passed the universal selection protocol.")}
+                                : "Congratulations to the survivor! This profile has officially passed the universal selection protocol."}
                             </p>
                           </div>
                         </div>
@@ -489,7 +485,7 @@ const Search = () => {
                         <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Outcome</span>
                         <div className="flex items-center mt-0.5">
                           <span className="text-sm font-black text-zinc-900">
-                            {log.survivorCount} {log.survivorCount === 1 ? 'Person' : 'People'} {log.variant === 'pley' ? 'Pleyed' : log.variant === 'kight' ? `won ${log.rankingRule}` : 'Survived'}
+                            {log.survivorCount} {log.survivorCount === 1 ? 'Person' : 'People'} {log.variant === 'pley' ? 'Pleyed' : 'Survived'}
                           </span>
                           <VariantPill variant={log.variant} />
                         </div>
