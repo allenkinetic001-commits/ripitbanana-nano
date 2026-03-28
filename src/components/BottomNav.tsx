@@ -98,6 +98,15 @@ const BottomNav = () => {
                     isActive ? "scale-110" : "scale-100"
                   )} 
                 />
+              ) : item.path === '/profile' ? (
+                <img 
+                  src="/nav-profile-text.png" 
+                  alt="Profile" 
+                  className={cn(
+                    "h-full w-auto object-contain transition-all duration-300", 
+                    isActive ? "scale-110" : "scale-100"
+                  )} 
+                />
               ) : (
                 <span className={cn(
                   "text-[10px] font-medium transition-all translate-y-1", 
