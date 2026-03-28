@@ -391,7 +391,7 @@ const Home = () => {
               className="transition-all active:scale-95 hover:opacity-80 flex items-center gap-2"
               title="Toggle Menu"
             >
-              <img src="/header-logo-cheers.png" alt="Logo" className="h-[40px] w-auto object-contain" />
+              <img src="/header-logo-spaghetti.png" alt="Logo" className="h-[40px] w-auto object-contain" />
               <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain" />
             </button>
           </div>
