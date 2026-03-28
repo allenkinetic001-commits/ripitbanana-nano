@@ -103,10 +103,7 @@ const UserDetail = () => {
                 if (userPosts[0]) addEnemy(userPosts[0]);
               }
             }}
-            className={cn(
-              "flex-1 flex items-center justify-center transition-all active:scale-95",
-              isEnemy ? "opacity-30 grayscale" : "hover:opacity-80 drop-shadow-sm transition-opacity"
-            )}
+            className="flex-1 flex items-center justify-center transition-all active:scale-95 hover:opacity-80 drop-shadow-sm transition-opacity"
           >
             <img 
               src="/add-enemy.png" 

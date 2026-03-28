@@ -38,7 +38,7 @@ const ModernDesignComponent: React.FC = () => {
   };
 
   const handleVote = (vote: 1 | -1) => {
-    if (gameMode === 'pley'') {
+    if (gameMode === 'pley') {
       if (vote === 1) {
         return;
       }
@@ -90,10 +90,7 @@ const ModernDesignComponent: React.FC = () => {
         <div className="flex items-center gap-4">
             <button 
               onClick={handleAddEnemy}
-              className={cn(
-                "transition-all duration-300 transform",
-                isEnemy ? "opacity-40 grayscale cursor-not-allowed" : "hover:opacity-80 active:scale-95 drop-shadow-sm"
-              )}
+              className="transition-all duration-300 transform hover:opacity-80 active:scale-95 drop-shadow-sm"
             >
               <img 
                 src="/add-enemy.png" 

@@ -84,10 +84,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
              <div className="flex items-center">
               <button 
                 onClick={handleAddEnemy}
-                className={cn(
-                  "transition-all duration-300 transform",
-                  isEnemy ? "opacity-40 grayscale cursor-not-allowed" : "hover:opacity-80 active:scale-95 drop-shadow-sm"
-                )}
+                className="transition-all duration-300 transform hover:opacity-80 active:scale-95 drop-shadow-sm"
               >
                 <img 
                   src="/add-enemy.png" 

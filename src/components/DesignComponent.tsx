@@ -74,10 +74,7 @@ const DesignComponent: React.FC = () => {
         <div className="flex items-center gap-2">
             <button 
               onClick={handleAddEnemy}
-              className={cn(
-                "transition-all duration-300 transform",
-                isEnemy ? "opacity-40 grayscale cursor-not-allowed" : "hover:opacity-80 active:scale-95 drop-shadow-sm"
-              )}
+              className="transition-all duration-300 transform hover:opacity-80 active:scale-95 drop-shadow-sm"
             >
               <img 
                 src="/add-enemy.png" 
