@@ -186,7 +186,7 @@ const DesignComponent: React.FC = () => {
                   quickComment.trim() ? "opacity-100 hover:opacity-80" : "opacity-30 cursor-not-allowed grayscale"
                 )}
               >
-                <img src="/btn-post-comment.png" alt="Post" className="h-[36px] w-auto object-contain" />
+                <img src="/btn-post-comment.png" alt="Post" className="h-[44px] w-auto object-contain" />
               </button>
             </div>
           </form>
