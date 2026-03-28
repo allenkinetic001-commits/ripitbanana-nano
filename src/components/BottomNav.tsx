@@ -70,14 +70,27 @@ const BottomNav = () => {
                 </div>
               )}
             </div>
-            <span className={cn(
-              "text-[10px] font-medium transition-all", 
-              isActive ? "font-bold" : "font-black"
-            )}>
-              {item.label}
-            </span>
+            <div className="h-4 flex items-center justify-center">
+              {item.path === '/' ? (
+                <img 
+                  src="/nav-home-text.png" 
+                  alt="Home" 
+                  className={cn(
+                    "h-full w-auto object-contain transition-all duration-300", 
+                    isActive ? "scale-110" : "scale-100 font-extrabold"
+                  )} 
+                />
+              ) : (
+                <span className={cn(
+                  "text-[10px] font-medium transition-all", 
+                  isActive ? "font-bold text-zinc-900" : "font-black text-zinc-500"
+                )}>
+                  {item.label}
+                </span>
+              )}
+            </div>
             {isActive && (
-              <span className="absolute -top-2 w-1 h-1 bg-zinc-900 rounded-full animate-in zoom-in" />
+              <span className="absolute -bottom-1 w-1 h-1 bg-zinc-900 rounded-full animate-in zoom-in" />
             )}
           </button>
         );
