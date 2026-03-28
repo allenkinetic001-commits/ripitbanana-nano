@@ -89,6 +89,15 @@ const BottomNav = () => {
                     isActive ? "scale-110" : "scale-100"
                   )} 
                 />
+              ) : item.path === '/notifications' ? (
+                <img 
+                  src="/nav-activity-text.png" 
+                  alt="Activity" 
+                  className={cn(
+                    "h-full w-auto object-contain transition-all duration-300", 
+                    isActive ? "scale-110" : "scale-100"
+                  )} 
+                />
               ) : (
                 <span className={cn(
                   "text-[10px] font-medium transition-all translate-y-1", 
