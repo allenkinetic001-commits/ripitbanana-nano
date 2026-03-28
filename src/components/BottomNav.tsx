@@ -80,9 +80,18 @@ const BottomNav = () => {
                     isActive ? "scale-110" : "scale-100 font-extrabold"
                   )} 
                 />
+              ) : item.path === '/search' ? (
+                <img 
+                  src="/nav-search-text.png" 
+                  alt="Search" 
+                  className={cn(
+                    "h-full w-auto object-contain transition-all duration-300", 
+                    isActive ? "scale-110" : "scale-100"
+                  )} 
+                />
               ) : (
                 <span className={cn(
-                  "text-[10px] font-medium transition-all", 
+                  "text-[10px] font-medium transition-all translate-y-1", 
                   isActive ? "font-bold text-zinc-900" : "font-black text-zinc-500"
                 )}>
                   {item.label}
