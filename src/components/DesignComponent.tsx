@@ -182,11 +182,11 @@ const DesignComponent: React.FC = () => {
                 type="submit"
                 disabled={!quickComment.trim()}
                 className={cn(
-                  "text-[10px] font-black transition-all px-2 py-1.5 rounded-lg",
-                  quickComment.trim() ? "text-purple-600 hover:bg-purple-50" : "text-zinc-300 cursor-not-allowed"
+                  "transition-all active:scale-95",
+                  quickComment.trim() ? "opacity-100 hover:opacity-80" : "opacity-30 cursor-not-allowed grayscale"
                 )}
               >
-                Add Comment
+                <img src="/btn-post-comment.png" alt="Post" className="h-[36px] w-auto object-contain" />
               </button>
             </div>
           </form>

@@ -217,11 +217,11 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                 type="submit"
                 disabled={!quickComment.trim()}
                 className={cn(
-                  "text-xs font-black transition-all px-2 py-1.5 rounded-lg",
-                  quickComment.trim() ? "text-purple-600 hover:bg-purple-50" : "text-zinc-300 cursor-not-allowed"
+                  "transition-all active:scale-95",
+                  quickComment.trim() ? "opacity-100 hover:opacity-80" : "opacity-30 cursor-not-allowed grayscale"
                 )}
               >
-                {t('post_add_comment')}
+                <img src="/btn-post-comment.png" alt="Post" className="h-[36px] w-auto object-contain" />
               </button>
             </div>
           </form>

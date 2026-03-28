@@ -233,13 +233,12 @@ const ModernDesignComponent: React.FC = () => {
               <button 
                 type="submit"
                 disabled={!quickComment.trim()}
-                className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${
-                  quickComment.trim() 
-                    ? "text-purple-600 hover:bg-purple-50" 
-                    : "text-gray-300 cursor-not-allowed"
-                }`}
+                className={cn(
+                  "transition-all active:scale-95",
+                  quickComment.trim() ? "opacity-100 hover:opacity-80" : "opacity-30 cursor-not-allowed grayscale"
+                )}
               >
-                Add Comment
+                <img src="/btn-post-comment.png" alt="Post" className="h-[44px] w-auto object-contain" />
               </button>
             </div>
           </form>
