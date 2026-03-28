@@ -384,14 +384,14 @@ const Home = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
-        <div className="px-4 h-16 flex items-center justify-between">
+        <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setShowMustache(!showMustache)}
               className="transition-all active:scale-95 hover:opacity-80 flex items-center gap-2"
               title="Toggle Menu"
             >
-              <img src="/header-logo-spaghetti.png" alt="Logo" className="h-[40px] w-auto object-contain" />
+              <img src="/header-logo-spaghetti.png" alt="Logo" className="h-[100px] w-auto object-contain" />
               <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain" />
             </button>
           </div>
