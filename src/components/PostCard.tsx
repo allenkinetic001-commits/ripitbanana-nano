@@ -80,19 +80,19 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           <span className="text-sm font-semibold group-hover:text-purple-600 transition-colors">{username}</span>
         </div>
         <div className="flex items-center space-x-2">
-          {!isMe && (!isEnemy || showAddedFeedback) && (
+          {!isMe && (
              <div className="flex items-center">
               <button 
                 onClick={handleAddEnemy}
                 className={cn(
-                  "transition-all duration-300 transform active:scale-95",
-                  showAddedFeedback ? "opacity-50 grayscale" : "hover:opacity-80"
+                  "transition-all duration-300 transform",
+                  isEnemy ? "opacity-40 grayscale cursor-not-allowed" : "hover:opacity-80 active:scale-95 drop-shadow-sm"
                 )}
               >
                 <img 
                   src="/add-enemy.png" 
-                  alt={showAddedFeedback ? t('home_added_enemy') : t('home_add_enemy')} 
-                  className="h-[34px] w-auto object-contain shadow-sm rounded-lg"
+                  alt={isEnemy ? t('home_added_enemy') : t('home_add_enemy')} 
+                  className="h-[34px] w-auto object-contain rounded-xl"
                 />
               </button>
             </div>
