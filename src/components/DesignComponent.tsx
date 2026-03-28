@@ -79,7 +79,7 @@ const DesignComponent: React.FC = () => {
               <img 
                 src="/add-enemy.png" 
                 alt={isEnemy ? 'Added Enemy' : 'Add Enemy'} 
-                className="h-[34px] w-auto object-contain rounded-xl"
+                className="h-[44px] w-auto object-contain rounded-xl"
               />
             </button>
         </div>

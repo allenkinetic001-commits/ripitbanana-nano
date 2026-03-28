@@ -108,7 +108,7 @@ const UserDetail = () => {
             <img 
               src="/add-enemy.png" 
               alt={isEnemy ? 'Enemy Marked' : 'Mark Enemy'} 
-              className="h-[38px] w-auto object-contain" 
+              className="h-[48px] w-auto object-contain" 
             />
           </button>
         </div>

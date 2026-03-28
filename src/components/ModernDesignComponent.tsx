@@ -95,7 +95,7 @@ const ModernDesignComponent: React.FC = () => {
               <img 
                 src="/add-enemy.png" 
                 alt={isEnemy ? 'Added Enemy' : 'Add Enemy'} 
-                className="h-[40px] w-auto object-contain rounded-xl"
+                className="h-[50px] w-auto object-contain rounded-xl"
               />
             </button>
         </div>

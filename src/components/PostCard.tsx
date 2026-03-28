@@ -89,7 +89,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                 <img 
                   src="/add-enemy.png" 
                   alt={isEnemy ? t('home_added_enemy') : t('home_add_enemy')} 
-                  className="h-[34px] w-auto object-contain rounded-xl"
+                  className="h-[44px] w-auto object-contain rounded-xl"
                 />
               </button>
             </div>
