@@ -312,9 +312,9 @@ const Home = () => {
               </button>
               <button
                 onClick={handleCreatePost}
-                className="px-6 py-2 rounded-full text-sm font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-95"
+                className="px-6 py-2 rounded-full bg-purple-600 hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-95 flex items-center justify-center"
               >
-                {t('home_upload_post')}
+                <img src="/pill-post-btn.png" alt="Post" className="h-[18px] w-auto object-contain brightness-0 invert" />
               </button>
             </div>
           </div>
@@ -407,12 +407,12 @@ const Home = () => {
                   }
                   setShowPills(!showPills);
                 }}
-                className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
+                className="flex items-center justify-center transition-all active:scale-95 hover:opacity-80 px-4 py-2 bg-purple-600 rounded-full shadow-lg shadow-purple-200"
               >
                 <img 
-                  src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"} 
-                  alt="Create" 
-                  className="h-[44px] w-[44px] object-contain transition-all duration-300 transform" 
+                  src="/pill-post-btn.png" 
+                  alt="Post" 
+                  className="h-[18px] w-auto object-contain brightness-0 invert" 
                 />
               </button>
             )}
