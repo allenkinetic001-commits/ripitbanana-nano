@@ -391,7 +391,7 @@ const Home = () => {
               className="transition-all active:scale-95 hover:opacity-80 flex items-center gap-0"
               title="Toggle Menu"
             >
-              <img src="/header-logo-spaghetti.png" alt="Logo" className="h-[60px] w-auto object-contain" />
+              <img src="/header-logo-hydrant.png" alt="Logo" className="h-[60px] w-auto object-contain" />
               <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain -ml-6" />
             </button>
           </div>
@@ -410,7 +410,7 @@ const Home = () => {
                 className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
               >
                 <img 
-                  src={showPills ? "/nav-create-active.png" : "/nav-create-v3.png"} 
+                  src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"} 
                   alt="Create" 
                   className="h-[44px] w-[44px] object-contain transition-all duration-300 transform" 
                 />
