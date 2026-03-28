@@ -13,12 +13,10 @@ const Home = () => {
     timeLeft, isActive, clickCounts, eliminationCounts, madeItCounts,
     userSelection, isChallengeEnded, survivors,
     showPills, setShowPills, activeTab, setActiveTab,
-    kightRankingVotes, userKightRanking, hasVotedKightRanking,
-    majorityVariant, majorityRankingRule,
+    majorityVariant,
     setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
     setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
-    setUserSelection, setIsChallengeEnded, setKightRankingVotes,
-    setKightFirstRankingVoteTime, setUserKightRanking, setHasVotedKightRanking,
+    setUserSelection, setIsChallengeEnded,
     setSurvivors, startNewChallenge, getVariantDisplayName, userProfile,
     allPosts, setAllPosts, wallPosts, addWallPost,
     visiblePosts, setVisiblePosts,
@@ -89,8 +87,7 @@ const Home = () => {
   const [showInfo, setShowPillsInfo] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [kightWarning, setKightWarning] = useState<string | null>(null);
-  const [rankingError, setRankingError] = useState<string | null>(null);
+
 
   // Sync pills visibility with global state and selection
   useEffect(() => {
@@ -139,41 +136,6 @@ const Home = () => {
     if (isActive && !isChallengeEnded) {
       const activeMode = userSelection || majorityVariant;
       
-      // Kight specific completion logic: Round ends when remaining posts match the Top N rule
-      if (activeMode === 'kight' && majorityRankingRule) {
-        const topN = parseInt(majorityRankingRule.replace('Top ', ''));
-        // We only auto-end if it's strictly LESS than topN (e.g. timeout or accidental double click)
-        // or if it's 0. If it's EQUAL to topN, we let the user click to trigger the end.
-        if (visiblePosts.length < topN || (visiblePosts.length === 0)) {
-          const remainingSurvivors = visiblePosts.map(p => ({ 
-            id: p.id,
-            username: p.username, 
-            avatar: p.avatar,
-            image: p.image,
-            caption: p.caption,
-            time: p.time,
-            comments: p.comments
-          }));
-          
-          setSurvivors(prev => {
-            // Only add those not already in survivors to avoid duplicates
-            const existingIds = new Set(prev.map(s => s.id));
-            const uniqueNew = remainingSurvivors.filter(s => !existingIds.has(s.id));
-            return [...prev, ...uniqueNew];
-          });
-          
-          setMadeItCounts(prev => ({
-            ...prev,
-            kight: (prev.kight || 0) + remainingSurvivors.length
-          }));
-
-          setIsActive(false);
-          setIsChallengeEnded(true);
-          setTimeLeft(0);
-          return;
-        }
-      }
-
       if (visiblePosts.length === 0) {
         setIsActive(false);
         setIsChallengeEnded(true);
@@ -184,7 +146,7 @@ const Home = () => {
         setIsChallengeEnded(true);
       }
     }
-  }, [visiblePosts.length, isActive, isChallengeEnded, timeLeft, setSurvivors, setIsActive, setIsChallengeEnded, setTimeLeft, userSelection, majorityVariant, setMadeItCounts, majorityRankingRule]);
+  }, [visiblePosts.length, isActive, isChallengeEnded, timeLeft, setSurvivors, setIsActive, setIsChallengeEnded, setTimeLeft, userSelection, majorityVariant, setMadeItCounts]);
 
   const handleTabClick = (tab: string) => {
     if (timeLeft > 0) {
@@ -195,19 +157,6 @@ const Home = () => {
         ...prev,
         [tab]: prev[tab] + 1
       }));
-
-      if (tab === 'kight' && userKightRanking) {
-        const ruleKey = `Top ${userKightRanking}`;
-        setKightRankingVotes(prev => ({
-          ...prev,
-          [ruleKey]: (prev[ruleKey] || 0) + 1
-        }));
-        setKightFirstRankingVoteTime(prev => {
-          if (!prev[ruleKey]) return { ...prev, [ruleKey]: Date.now() };
-          return prev;
-        });
-        setHasVotedKightRanking(true);
-      }
 
       setVariantFirstClickTime(prev => {
         if (!prev[tab]) return { ...prev, [tab]: Date.now() };
@@ -255,48 +204,6 @@ const Home = () => {
   const handleDeletePost = (postId: number) => {
     const activeMode = userSelection || majorityVariant;
     
-    // Kight specific: prevent deletion if we are already at the Top N limit
-    if (activeMode === 'kight' && majorityRankingRule) {
-      const topN = parseInt(majorityRankingRule.replace('Top ', ''));
-      if (visiblePosts.length <= topN) {
-        setKightWarning(`Only ${topN} remain since you set it on ${majorityRankingRule}`);
-        
-        // Add remaining posts to survivors before ending
-        const remainingSurvivors = visiblePosts.map(p => ({ 
-          id: p.id,
-          username: p.username, 
-          avatar: p.avatar,
-          image: p.image,
-          caption: p.caption,
-          time: p.time,
-          comments: p.comments
-        }));
-        
-        setSurvivors(prev => {
-          const existingIds = new Set(prev.map(s => s.id));
-          const uniqueNew = remainingSurvivors.filter(s => !existingIds.has(s.id));
-          return [...prev, ...uniqueNew];
-        });
-
-        // Update MadeIt counts
-        if (activeMode && Object.prototype.hasOwnProperty.call(madeItCounts, activeMode)) {
-          setMadeItCounts(prev => ({
-            ...prev,
-            [activeMode]: (prev[activeMode] || 0) + remainingSurvivors.length
-          }));
-        }
-
-        // Auto-end the game after a short delay so they see the message
-        setTimeout(() => {
-          setIsActive(false);
-          setIsChallengeEnded(true);
-          setTimeLeft(0);
-          setKightWarning(null);
-        }, 2000);
-        return;
-      }
-    }
-
     setVisiblePosts(prev => prev.filter(post => post.id !== postId));
     
     // Track eliminations for the current active mode
@@ -310,47 +217,6 @@ const Home = () => {
 
   const handlePassPost = (postId: number) => {
     const activeMode = userSelection || majorityVariant;
-
-    // Kight specific: end game if we are already at the Top N limit
-    if (activeMode === 'kight' && majorityRankingRule) {
-      const topN = parseInt(majorityRankingRule.replace('Top ', ''));
-      if (visiblePosts.length <= topN) {
-        setKightWarning(`Only ${topN} remain since you set it on ${majorityRankingRule}`);
-        
-        // Add remaining posts to survivors before ending
-        const remainingSurvivors = visiblePosts.map(p => ({ 
-          id: p.id,
-          username: p.username, 
-          avatar: p.avatar,
-          image: p.image,
-          caption: p.caption,
-          time: p.time,
-          comments: p.comments
-        }));
-        
-        setSurvivors(prev => {
-          const existingIds = new Set(prev.map(s => s.id));
-          const uniqueNew = remainingSurvivors.filter(s => !existingIds.has(s.id));
-          return [...prev, ...uniqueNew];
-        });
-
-        // Update MadeIt counts
-        if (activeMode && Object.prototype.hasOwnProperty.call(madeItCounts, activeMode)) {
-          setMadeItCounts(prev => ({
-            ...prev,
-            [activeMode]: (prev[activeMode] || 0) + remainingSurvivors.length
-          }));
-        }
-
-        setTimeout(() => {
-          setIsActive(false);
-          setIsChallengeEnded(true);
-          setTimeLeft(0);
-          setKightWarning(null);
-        }, 2000);
-        return;
-      }
-    }
 
     const passedPost = visiblePosts.find(p => p.id === postId);
     setVisiblePosts(prev => prev.filter(post => post.id !== postId));
@@ -745,56 +611,6 @@ const Home = () => {
                  </button>
                </div>
 
-              {/* Kight Pill */}
-              <div className="flex flex-col items-center gap-2 flex-1 max-w-[120px] relative group">
-                <div className="h-[48px] flex flex-col items-center justify-end w-full">
-                  {majorityVariant === 'kight' && timeLeft > 0 ? (
-                    <div className="flex flex-col items-center gap-1 w-full">
-                      {eliminationCounts.kight > 0 && (
-                        <div className="flex items-center gap-1.5 bg-rose-50/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-rose-100 shadow-[0_2px_10px_-3px_rgba(225,29,72,0.2)] animate-slide-in w-fit">
-                          <Skull size={10} className="text-rose-500 fill-rose-500" />
-                          <span className="text-[8px] font-black text-rose-600 uppercase tracking-tighter leading-none whitespace-nowrap">
-                            <span className="mr-1">{eliminationCounts.kight}</span>
-                            {t('home_eliminated')}
-                          </span>
-                        </div>
-                      )}
-                      {madeItCounts.kight > 0 && (
-                        <div className="flex items-center gap-1.5 bg-green-50/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-green-100 shadow-[0_2px_10px_-3px_rgba(22,163,74,0.2)] animate-slide-in w-fit">
-                          <Sparkles size={10} className="text-green-500 fill-green-500" />
-                          <span className="text-[8px] font-black text-green-600 uppercase tracking-tighter leading-none whitespace-nowrap">
-                            <span className="mr-1">{madeItCounts.kight}</span>
-                            {t('home_survivors')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-                <button 
-                  onClick={() => handleTabClick('kight')}
-                  className={`w-full py-3 border-2 rounded-2xl text-center text-[11px] uppercase tracking-[0.2em] font-black transition-all duration-500 relative overflow-hidden group/pill ${
-                    activeTab === 'kight' 
-                      ? 'bg-amber-500 border-amber-400 text-white shadow-[0_10px_25px_-5px_rgba(245,158,11,0.4)] scale-105 translate-y-[-4px]' 
-                      : userSelection === 'kight'
-                        ? 'bg-amber-50 border-amber-200 text-amber-600'
-                        : 'bg-zinc-50/50 border-zinc-200 text-zinc-400 hover:border-amber-300 hover:bg-amber-50/30 hover:text-amber-500 hover:translate-y-[-2px]'
-                  } ${userSelection && timeLeft > 0 ? 'cursor-not-allowed opacity-80' : ''}`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/pill:translate-x-[100%] transition-transform duration-1000" />
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    {activeTab === 'kight' && <Users size={12} className="animate-bounce" />}
-                    Kight
-                  </span>
-                  {timeLeft > 0 && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                      <span className="bg-black/10 px-1.5 py-0.5 rounded text-[8px] font-bold backdrop-blur-sm">
-                        {clickCounts.kight}
-                      </span>
-                    </div>
-                  )}
-                </button>
-              </div>
             </>
           ) : (
             <div className="flex-1" /> // Spacer when pills are hidden
@@ -855,98 +671,12 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Kight Ranking Rule Selection */}
-            {activeTab === 'kight' && (
-              <div className="flex flex-col gap-4 bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Users size={18} className="text-purple-600" />
-                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{t('home_select_ranking')}</span>
-                  </div>
-                  {majorityRankingRule && (
-                    <div className="flex items-center gap-2 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 animate-pulse">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      <span className="text-[10px] font-black text-amber-700 uppercase tracking-tight">{t('home_majority')}: {majorityRankingRule}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between px-2">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase">{t('home_select_rule')}</span>
-                    <div className="flex flex-col items-center">
-                      <span className="text-2xl font-black text-zinc-900 leading-none">Top {userKightRanking}</span>
-                      <span className="text-[8px] font-bold text-purple-500 uppercase tracking-widest mt-1">{t('home_current_choice')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 gap-2">
-                    {[1, 5, 10, 20].map((val) => (
-                      <button
-                        key={val}
-                        disabled={hasVotedKightRanking && timeLeft > 0}
-                        onClick={() => {
-                          if (val > visiblePosts.length) {
-                            setRankingError(`Users are not up to ${val}`);
-                            setTimeout(() => setRankingError(null), 3000);
-                            return;
-                          }
-                          setUserKightRanking(val);
-                          setRankingError(null);
-                        }}
-                        className={`py-3 rounded-xl text-xs font-black transition-all relative overflow-hidden ${
-                          userKightRanking === val
-                            ? "bg-purple-600 text-white shadow-lg scale-105"
-                            : val > visiblePosts.length
-                              ? "bg-zinc-100 border border-zinc-200 text-zinc-300 cursor-not-allowed opacity-60"
-                              : "bg-white border border-zinc-200 text-zinc-500 hover:border-purple-200 hover:text-purple-500"
-                        } ${hasVotedKightRanking && timeLeft > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-                      >
-                        <span>{val}</span>
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {rankingError && (
-                    <div className="px-2 animate-in fade-in slide-in-from-top-1 duration-300">
-                      <p className="text-[10px] font-black text-rose-500 uppercase tracking-tighter italic">
-                        {rankingError}
-                      </p>
-                    </div>
-                  )}
-                  
-                  {/* Community Breakdown (Top 3 rules) */}
-                  {Object.keys(kightRankingVotes).length > 0 && (
-                    <div className="flex flex-col gap-1.5 mt-2">
-                      <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest px-1">{t('home_community_votes')}</span>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(kightRankingVotes)
-                          .sort((a, b) => b[1] - a[1])
-                          .slice(0, 3)
-                          .map(([rule, votes]) => (
-                            <div key={rule} className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-zinc-200 shadow-sm">
-                              <span className="text-[9px] font-black text-zinc-900">{rule}</span>
-                              <div className="w-[1px] h-2 bg-zinc-200" />
-                              <span className="text-[9px] font-bold text-purple-500">{votes}</span>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             <div className="flex justify-end items-center gap-3">
               {(userSelection && timeLeft > 0) ? (
                 <span className="text-[10px] font-bold text-zinc-400 italic">{t('home_selection_locked')}</span>
-              ) : (activeTab === 'kight' && userKightRanking > visiblePosts.length) ? (
-                <span className="text-[10px] font-black text-rose-500 uppercase tracking-tighter animate-pulse">
-                  Need {userKightRanking} users to play
-                </span>
               ) : null}
               <button 
-                disabled={(!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0) || (activeTab === 'kight' && userKightRanking > visiblePosts.length)}
+                disabled={(!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)}
                 onClick={() => {
                   const totalSeconds = (hours * 3600) + (minutes * 60);
                   if (totalSeconds > 0) {
@@ -959,20 +689,6 @@ const Home = () => {
                         ...prev,
                         [activeTab]: prev[activeTab] + 1
                       }));
-
-                      // Add Kight ranking vote if applicable
-                      if (activeTab === 'kight' && userKightRanking) {
-                        const ruleKey = `Top ${userKightRanking}`;
-                        setKightRankingVotes(prev => ({
-                          ...prev,
-                          [ruleKey]: (prev[ruleKey] || 0) + 1
-                        }));
-                        setKightFirstRankingVoteTime(prev => {
-                          if (!prev[ruleKey]) return { ...prev, [ruleKey]: Date.now() };
-                          return prev;
-                        });
-                        setHasVotedKightRanking(true);
-                      }
 
                       setVariantFirstClickTime(prev => {
                         if (!prev[activeTab]) return { ...prev, [activeTab]: Date.now() };
@@ -991,35 +707,19 @@ const Home = () => {
                     setMinutes(0);
                   }}
                 className={`px-6 py-2 rounded-full text-sm font-bold shadow-lg transition-all transform ${
-                  (!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0) || (activeTab === 'kight' && userKightRanking > visiblePosts.length)
+                  (!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)
                     ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed shadow-none scale-100'
                     : 'bg-purple-600 text-white hover:bg-purple-700 hover:scale-105 active:scale-95'
                 }`}
               >
                 {userSelection && timeLeft > 0 
                   ? t('home_submitted')
-                  : (activeTab === 'kight' && userKightRanking > visiblePosts.length)
-                    ? t('home_invalid_ranking')
-                    : t('home_submit')}
+                  : t('home_submit')}
               </button>
             </div>
           </div>
         )}
       </header>
-
-      {/* Kight Warning Overlay */}
-      {kightWarning && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center px-6 pointer-events-none">
-          <div className="bg-zinc-900 text-white px-6 py-4 rounded-2xl shadow-2xl animate-in fade-in zoom-in duration-300 flex items-center gap-3 border border-zinc-800">
-            <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center flex-shrink-0">
-              <Skull size={20} className="text-rose-500" />
-            </div>
-            <p className="font-black uppercase tracking-tight text-sm italic">
-              {kightWarning}
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto pb-20">
@@ -1043,7 +743,7 @@ const Home = () => {
                 <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
                 <p className="text-zinc-400 font-black uppercase tracking-[0.4em] text-[10px]">
                   {isChallengeEnded 
-                    ? (majorityVariant === 'kight' ? t('home_winner_complete') : t('home_universal_complete')) 
+                    ? t('home_universal_complete') 
                     : t('home_all_judged')}
                 </p>
               </div>
@@ -1096,7 +796,7 @@ const Home = () => {
                 setVisiblePosts(allPosts);
                 setHours(0);
                 setMinutes(0);
-                setActiveTab('kight');
+                setActiveTab('pley');
                 setShowPills(true);
               }}
               className="mt-8 text-zinc-400 font-bold uppercase tracking-widest text-[10px] hover:text-zinc-900 transition-colors"

@@ -77,12 +77,7 @@ interface ChallengeContextType {
   setAllPosts: React.Dispatch<React.SetStateAction<any[]>>;
   visiblePosts: any[];
   setVisiblePosts: React.Dispatch<React.SetStateAction<any[]>>;
-  kightRankingVotes: Record<string, number>;
-  kightFirstRankingVoteTime: Record<string, number>;
-  userKightRanking: number;
-  hasVotedKightRanking: boolean;
   majorityVariant: string | null;
-  majorityRankingRule: string | null;
   survivors: Survivor[];
   survivorHistory: Survivor[];
   roundHistory: RoundRecord[];
@@ -99,10 +94,6 @@ interface ChallengeContextType {
   setVariantFirstClickTime: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setUserSelection: (selection: string | null) => void;
   setIsChallengeEnded: (ended: boolean) => void;
-  setKightRankingVotes: React.Dispatch<React.SetStateAction<Record<string, number>>>;
-  setKightFirstRankingVoteTime: React.Dispatch<React.SetStateAction<Record<string, number>>>;
-  setUserKightRanking: (ranking: number) => void;
-  setHasVotedKightRanking: (voted: boolean) => void;
   setSurvivors: React.Dispatch<React.SetStateAction<Survivor[]>>;
   setSurvivorHistory: React.Dispatch<React.SetStateAction<Survivor[]>>;
   setRoundHistory: React.Dispatch<React.SetStateAction<RoundRecord[]>>;
@@ -253,7 +244,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It isn’t one-size-fits-all.',
     'pers_desc': 'Your profile evolves with how you survive.',
     'pers_item1': 'Custom vibes & themes',
-    'pers_item2': 'Mode-based visuals (Pley, Kight each hit different)',
+    'pers_item2': 'Mode-based visuals (Pley hits different)',
     'pers_item3': 'Dynamic titles that flex your status',
     'pers_item4': 'Follower energy that builds your presence',
     'pers_footer1': 'The more you play, the more your identity shifts.',
@@ -263,11 +254,9 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'About Rip It',
     'about_tagline': 'Tagline: Survive. Reset. Evolve.',
-    'about_desc1': 'Rip It is a high-stakes social survival platform designed for bold players. Compete in modes like Pley and Kight to test your strategy, resilience, and social skills.',
+    'about_desc1': 'Rip It is a high-stakes social survival platform designed for bold players. Compete in Pley mode to test your strategy, resilience, and social skills.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Survival mode with high-risk elimination.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Extreme mode for those who dare to risk it all.',
     'about_desc2': 'Rip It combines social interaction, competition, and dynamic personalization to create a unique, viral, and adrenaline-pumping experience.',
     'about_footer': 'We’re here to make your profile, status, and survival story matter—win, reset, or evolve.',
     'about_close': 'Close',
@@ -290,11 +279,6 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Only down votes matter',
     'model_pley_item3': 'Timed rounds (user sets duration)',
     'model_pley_item4': 'Last standing users gain recognition',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Extreme survival mode',
-    'model_kight_item2': 'Only down votes',
-    'model_kight_item3': 'Full reset if voted down',
-    'model_kight_item4': 'Voluntary for high-risk thrill-seekers',
     'model_pers_title': '3️⃣ Personalization (Non-IP Specific)',
     'model_pers_item1': 'Custom display name & profile theme',
     'model_pers_item2': 'Mode-based visual experience',
@@ -341,7 +325,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. What Rip It Is',
     'terms_s1_desc': 'Rip It is a high-stakes social survival app where users participate in timed challenges, public voting, and competitive modes.',
     'terms_s1_list_title': 'We provide tools for:',
-    'terms_s1_i1': 'Mode-based survival experiences (Pley, Kight)',
+    'terms_s1_i1': 'Mode-based survival experiences (Pley, Pley)',
     'terms_s1_i2': 'Public voting and recognition',
     'terms_s1_i3': 'Profile personalization and status tracking',
     'terms_s1_disclaimer': 'Rip It does not guarantee outcomes, survival, or ranking.',
@@ -351,7 +335,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Provide accurate information',
     'terms_s2_i4': 'Be responsible for your account and activity',
     'terms_s3_title': '3. Modes & Voting Rules',
-    'terms_s3_i1': 'Pley and Kight have unique mechanics affecting profile status and progression.',
+    'terms_s3_i1': 'Pley and Pley have unique mechanics affecting profile status and progression.',
     'terms_s3_i2': 'Votes may affect user progress, profile reset, or temporary restrictions.',
     'terms_s3_i3': 'Timers, rounds, and outcomes are determined by the app and participating users.',
     'terms_s3_i4': 'Users participate at their own discretion.',
@@ -515,7 +499,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It은 모두에게 똑같은 경험을 제공하지 않습니다.',
     'pers_desc': '당신의 프로필은 생존 방식에 따라 진화합니다.',
     'pers_item1': '커스텀 분위기 및 테마',
-    'pers_item2': '모드 기반 비주얼 (Pley, Kight마다 느낌이 다름)',
+    'pers_item2': '모드 기반 비주얼 (Pley, Pley마다 느낌이 다름)',
     'pers_item3': '당신의 상태를 뽐낼 수 있는 역동적인 타이틀',
     'pers_item4': '당신의 존재감을 높여주는 팔로워 에너지',
     'pers_footer1': '더 많이 플레이할수록 당신의 정체성도 변화합니다.',
@@ -525,11 +509,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Rip It 정보',
     'about_tagline': '슬로건: 생존. 리셋. 진화.',
-    'about_desc1': 'Rip It은 대담한 플레이어들을 위해 설계된 고위험 사회적 생존 플랫폼입니다. Pley, Kight와 같은 모드에서 경쟁하며 전략, 회복력, 사회적 기술을 테스트하세요.',
+    'about_desc1': 'Rip It은 대담한 플레이어들을 위해 설계된 고위험 사회적 생존 플랫폼입니다. Pley, Pley와 같은 모드에서 경쟁하며 전략, 회복력, 사회적 기술을 테스트하세요.',
     'about_pley_title': 'Pley',
     'about_pley_desc': '고위험 탈락이 있는 생존 모드.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': '모든 것을 걸 용기가 있는 사람들을 위한 극한 모드.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': '모든 것을 걸 용기가 있는 사람들을 위한 극한 모드.',
     'about_desc2': 'Rip It은 사회적 상호작용, 경쟁, 역동적인 개인화를 결합하여 독특하고 바이럴하며 아드레날린이 솟구치는 경험을 제공합니다.',
     'about_footer': '우리는 당신의 프로필, 상태, 생존 이야기가 중요하게 느껴지도록 여기 있습니다—승리하거나, 리셋되거나, 진화하세요.',
     'about_close': '닫기',
@@ -552,11 +536,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': '다운 투표만 중요함',
     'model_pley_item3': '시간 제한 라운드 (사용자가 기간 설정)',
     'model_pley_item4': '마지막까지 살아남은 사용자가 인정을 받음',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': '극한 생존 모드',
-    'model_kight_item2': '다운 투표만 가능',
-    'model_kight_item3': '투표 결과에 따라 완전 리셋',
-    'model_kight_item4': '고위험 스릴을 즐기는 사람들을 위한 자발적 참여',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': '극한 생존 모드',
+    'model_Pley_item2': '다운 투표만 가능',
+    'model_Pley_item3': '투표 결과에 따라 완전 리셋',
+    'model_Pley_item4': '고위험 스릴을 즐기는 사람들을 위한 자발적 참여',
     'model_pers_title': '3️⃣ 개인화 (비 IP 특정)',
     'model_pers_item1': '커스텀 표시 이름 및 프로필 테마',
     'model_pers_item2': '모드 기반 시각적 경험',
@@ -603,7 +587,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Rip It이란 무엇인가',
     'terms_s1_desc': 'Rip It은 사용자가 시간 제한 챌린지, 공개 투표 및 경쟁 모드에 참여하는 고위험 사회적 생존 앱입니다.',
     'terms_s1_list_title': '우리는 다음을 위한 도구를 제공합니다:',
-    'terms_s1_i1': '모드 기반 생존 경험 (Pley, Kight)',
+    'terms_s1_i1': '모드 기반 생존 경험 (Pley, Pley)',
     'terms_s1_i2': '공개 투표 및 인정',
     'terms_s1_i3': '프로필 개인화 및 상태 추적',
     'terms_s1_disclaimer': 'Rip It은 결과, 생존 또는 순위를 보장하지 않습니다.',
@@ -613,7 +597,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': '정확한 정보 제공',
     'terms_s2_i4': '당신의 계정 및 활동에 대한 책임',
     'terms_s3_title': '3. 모드 및 투표 규칙',
-    'terms_s3_i1': 'Pley, Kight는 프로필 상태 및 진행에 영향을 미치는 고유한 메커니즘을 가집니다.',
+    'terms_s3_i1': 'Pley, Pley는 프로필 상태 및 진행에 영향을 미치는 고유한 메커니즘을 가집니다.',
     'terms_s3_i2': '투표는 사용자 진행, 프로필 리셋 또는 일시적 제한에 영향을 미칠 수 있습니다.',
     'terms_s3_i3': '타이머, 라운드 및 결과는 앱과 참여 사용자에 의해 결정됩니다.',
     'terms_s3_i4': '사용자는 자신의 재량에 따라 참여합니다.',
@@ -776,7 +760,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip Itは一律の体験ではありません。',
     'pers_desc': 'プロフィールはあなたの生き残り方とともに進化します。',
     'pers_item1': 'カスタムバイブス＆テーマ',
-    'pers_item2': 'モード別ビジュアル (Pley, Kightはそれぞれ異なる感覚)',
+    'pers_item2': 'モード別ビジュアル (Pley, Pleyはそれぞれ異なる感覚)',
     'pers_item3': 'ステータスを示すダイナミックな称号',
     'pers_item4': '存在感を高めるフォロワーのエネルギー',
     'pers_footer1': 'プレイすればするほど、あなたのアイデンティティは変化します。',
@@ -786,11 +770,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Rip Itについて',
     'about_tagline': 'スローガン: 生存. リセット. 進化.',
-    'about_desc1': 'Rip Itは、大胆なプレイヤーのために設計されたハイリスクなソーシャルサバイバルプラットフォームです。Pley、Kightなどのモードで競い合い、戦略、回復力、ソーシャルスキルをテストしましょう。',
+    'about_desc1': 'Rip Itは、大胆なプレイヤーのために設計されたハイリスクなソーシャルサバイバルプラットフォームです。Pley、Pleyなどのモードで競い合い、戦略、回復力、ソーシャルスキルをテストしましょう。',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'ハイリスクな脱落があるサバイバルモード。',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'すべてを賭ける勇気がある人のための極限モード。',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'すべてを賭ける勇気がある人のための極限モード。',
     'about_desc2': 'Rip Itは、ソーシャルインタラクション、競争、ダイナミックなパーソナライゼーションを組み合わせ、ユニークでバイラル、そしてアドレナリンを刺激する体験を提供します。',
     'about_footer': '私たちは、あなたのプロフィール、ステータス、そしてサバイバルストーリーを大切にするためにここにいます。勝利し、リセットし、進化しましょう。',
     'about_close': '閉じる',
@@ -813,11 +797,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'ダウン投票のみが重要',
     'model_pley_item3': '時間制限ラウンド（ユーザーが期間を設定）',
     'model_pley_item4': '最後まで残ったユーザーが認知を得る',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': '極限サバイバルモード',
-    'model_kight_item2': 'ダウン投票のみ',
-    'model_kight_item3': '投票により完全リ셋',
-    'model_kight_item4': 'ハイリスクなスリルを求める人のための自発的参加',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': '極限サバイバルモード',
+    'model_Pley_item2': 'ダウン投票のみ',
+    'model_Pley_item3': '投票により完全リ셋',
+    'model_Pley_item4': 'ハイリスクなスリルを求める人のための自発的参加',
     'model_pers_title': '3️⃣ パーソナライゼーション（非IP固有）',
     'model_pers_item1': 'カスタム表示名とプロフィールテーマ',
     'model_pers_item2': 'モードベースの視覚体験',
@@ -864,7 +848,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Rip Itとは何か',
     'terms_s1_desc': 'Rip Itは、ユーザーが時間制限のあるチャレンジ、公開投票、競争モードに参加するハイリスクなソーシャルサバイバルアプリです。',
     'terms_s1_list_title': '以下のためのツールを提供します:',
-    'terms_s1_i1': 'モードベースのサバイバル体験（Pley, Kight）',
+    'terms_s1_i1': 'モードベースのサバイバル体験（Pley, Pley）',
     'terms_s1_i2': '公開投票と認知',
     'terms_s1_i3': 'プロフィールのパーソナライゼーションとステータスの追跡',
     'terms_s1_disclaimer': 'Rip Itは、結果、生存、またはランキングを保証しません。',
@@ -874,7 +858,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': '正確な情報を提供すること',
     'terms_s2_i4': '自身のアカウントと活動に責任を持つこと',
     'terms_s3_title': '3. モードと投票ルール',
-    'terms_s3_i1': 'Pley, Kightには、プロフィールのステータスや進行に影響を与える独自のメカニズムがあります。',
+    'terms_s3_i1': 'Pley, Pleyには、プロフィールのステータスや進行に影響を与える独自のメカニズムがあります。',
     'terms_s3_i2': '投票は、ユーザーの進行、プロフィールのリセット、または一時的な制限に影響を与える場合があります。',
     'terms_s3_i3': 'タイマー、ラウンド、結果は、アプリと参加ユーザーによって決定されます。',
     'terms_s3_i4': 'ユーザーは自身の裁量で参加します。',
@@ -1044,7 +1028,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It n’est pas à taille unique.',
     'pers_desc': 'Votre profil évolue avec votre façon de survivre.',
     'pers_item1': 'Vibes et thèmes personnalisés',
-    'pers_item2': 'Visuels par mode (Pley, Kight sont tous différents)',
+    'pers_item2': 'Visuels par mode (Pley, Pley sont tous différents)',
     'pers_item3': 'Titres dynamiques qui affichent votre statut',
     'pers_item4': 'Énergie des followers qui renforce votre présence',
     'pers_footer1': 'Plus vous jouez, plus votre identité change.',
@@ -1054,11 +1038,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'À propos de Rip It',
     'about_tagline': 'Slogan : Survivre. Réinitialiser. Évoluer.',
-    'about_desc1': 'Rip It est une plateforme de survie sociale à enjeux élevés conçue pour les joueurs audacieux. Participez à des modes comme Pley, Vause et Kight pour tester votre stratégie, votre résilience et vos compétences sociales.',
+    'about_desc1': 'Rip It est une plateforme de survie sociale à enjeux élevés conçue pour les joueurs audacieux. Participez à des modes comme Pley, Pley et Pley pour tester votre stratégie, votre résilience et vos compétences sociales.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Mode survie avec élimination à haut risque.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Mode extrême pour ceux qui osent tout risquer.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Mode extrême pour ceux qui osent tout risquer.',
     'about_desc2': 'Rip It combine interaction sociale, compétition et personnalisation dynamique pour créer une expérience unique, virale et pleine d\'adrénaline.',
     'about_footer': 'Nous sommes ici pour que votre profil, votre statut et votre histoire de survie comptent — gagnez, réinitialisez ou évoluez.',
     'about_close': 'Fermer',
@@ -1081,11 +1065,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Seuls les votes négatifs comptent',
     'model_pley_item3': 'Tours chronométrés (l\'utilisateur définit la durée)',
     'model_pley_item4': 'Les derniers utilisateurs debout gagnent en reconnaissance',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Mode de survie extrême',
-    'model_kight_item2': 'Uniquement des votes négatifs',
-    'model_kight_item3': 'Réinitialisation complète si voté contre',
-    'model_kight_item4': 'Volontaire pour les amateurs de sensations fortes à haut risque',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Mode de survie extrême',
+    'model_Pley_item2': 'Uniquement des votes négatifs',
+    'model_Pley_item3': 'Réinitialisation complète si voté contre',
+    'model_Pley_item4': 'Volontaire pour les amateurs de sensations fortes à haut risque',
     'model_pers_title': '3️⃣ Personnalisation (non spécifique à l\'IP)',
     'model_pers_item1': 'Nom d\'affichage et thème de profil personnalisés',
     'model_pers_item2': 'Expérience visuelle basée sur le mode',
@@ -1132,7 +1116,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Ce qu\'est Rip It',
     'terms_s1_desc': 'Rip It est une application de survie sociale à enjeux élevés où les utilisateurs participent à des défis chronométrés, des votes publics et des modes compétitifs.',
     'terms_s1_list_title': 'Nous fournissons des outils pour :',
-    'terms_s1_i1': 'Expériences de survie basées sur les modes (Pley, Kight)',
+    'terms_s1_i1': 'Expériences de survie basées sur les modes (Pley, Pley)',
     'terms_s1_i2': 'Vote public et reconnaissance',
     'terms_s1_i3': 'Personnalisation du profil et suivi du statut',
     'terms_s1_disclaimer': 'Rip It ne garantit pas les résultats, la survie ou le classement.',
@@ -1142,7 +1126,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Fournir des informations exactes',
     'terms_s2_i4': 'Être responsable de votre compte et de votre activité',
     'terms_s3_title': '3. Modes et règles de vote',
-    'terms_s3_i1': 'Pley, Vause et Kight ont des mécanismes uniques affectant le statut et la progression du profil.',
+    'terms_s3_i1': 'Pley, Pley et Pley ont des mécanismes uniques affectant le statut et la progression du profil.',
     'terms_s3_i2': 'Les votes peuvent affecter la progression de l\'utilisateur, la réinitialisation du profil ou des restrictions temporaires.',
     'terms_s3_i3': 'Les minuteurs, les tours et les résultats sont déterminés par l\'application et les utilisateurs participants.',
     'terms_s3_i4': 'Les utilisateurs participent à leur propre discrétion.',
@@ -1297,7 +1281,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It सबके लिए एक जैसा नहीं है।',
     'pers_desc': 'आपकी प्रोफ़ाइल आपके जीवित रहने के तरीके के साथ विकसित होती है।',
     'pers_item1': 'कस्टम वाइब्स और थीम',
-    'pers_item2': 'मोड-आधारित दृश्य (Pley, Kight हर एक का अहसास अलग है)',
+    'pers_item2': 'मोड-आधारित दृश्य (Pley, Pley हर एक का अहसास अलग है)',
     'pers_item3': 'गतिशील शीर्षक जो आपकी स्थिति को दर्शाते हैं',
     'pers_item4': 'अनुयायी ऊर्जा जो आपकी उपस्थिति का निर्माण करती है',
     'pers_footer1': 'जितना अधिक आप खेलेंगे, उतनी ही आपकी पहचान बदलेगी।',
@@ -1307,11 +1291,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Rip It के बारे में',
     'about_tagline': 'टैगलाइन: जीवित रहें। रीसेट करें। विकसित हों।',
-    'about_desc1': 'Rip It साहसी खिलाड़ियों के लिए डिज़ाइन किया गया एक उच्च-दांव वाला सामाजिक अस्तित्व मंच है। अपनी रणनीति, लचीलापन और सामाजिक कौशल का परीक्षण करने के लिए Pley, Vause और Kight जैसे मोड में प्रतिस्पर्धा करें।',
+    'about_desc1': 'Rip It साहसी खिलाड़ियों के लिए डिज़ाइन किया गया एक उच्च-दांव वाला सामाजिक अस्तित्व मंच है। अपनी रणनीति, लचीलापन और सामाजिक कौशल का परीक्षण करने के लिए Pley, Pley और Pley जैसे मोड में प्रतिस्पर्धा करें।',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'उच्च जोखिम वाले निष्कासन के साथ उत्तरजीविता मोड।',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'उन लोगों के लिए चरम मोड जो सब कुछ जोखिम में डालने की हिम्मत रखते हैं।',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'उन लोगों के लिए चरम मोड जो सब कुछ जोखिम में डालने की हिम्मत रखते हैं।',
     'about_desc2': 'Rip It एक अनूठा, वायरल और एड्रेनालाईन-पंपिंग अनुभव बनाने के लिए सामाजिक संपर्क, प्रतिस्पर्धा और गतिशील निजीकरण को जोड़ता है।',
     'about_footer': 'हम यहाँ आपकी प्रोफ़ाइल, स्थिति और उत्तरजीविता की कहानी को महत्वपूर्ण बनाने के लिए हैं—जीतें, रीसेट करें या विकसित हों।',
     'about_close': 'बंद करें',
@@ -1334,11 +1318,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'केवल डाउन वोट मायने रखते हैं',
     'model_pley_item3': 'समयबद्ध राउंड (उपयोगकर्ता अवधि निर्धारित करता है)',
     'model_pley_item4': 'अंतिम खड़े उपयोगकर्ताओं को पहचान मिलती है',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'चरम उत्तरजीविता मोड',
-    'model_kight_item2': 'केवल डाउन वोट',
-    'model_kight_item3': 'डाउन वोट होने पर पूर्ण रीसेट',
-    'model_kight_item4': 'उच्च जोखिम वाले रोमांच चाहने वालों के लिए स्वैच्छिक',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'चरम उत्तरजीविता मोड',
+    'model_Pley_item2': 'केवल डाउन वोट',
+    'model_Pley_item3': 'डाउन वोट होने पर पूर्ण रीसेट',
+    'model_Pley_item4': 'उच्च जोखिम वाले रोमांच चाहने वालों के लिए स्वैच्छिक',
     'model_pers_title': '3️⃣ निजीकरण (गैर-IP विशिष्ट)',
     'model_pers_item1': 'कस्टम डिस्प्ले नाम और प्रोफ़ाइल थीम',
     'model_pers_item2': 'मोड-आधारित दृश्य अनुभव',
@@ -1385,7 +1369,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Rip It क्या है',
     'terms_s1_desc': 'Rip It एक उच्च-दांव वाला सामाजिक अस्तित्व ऐप है जहां उपयोगकर्ता समयबद्ध चुनौतियों, सार्वजनिक मतदान और प्रतिस्पर्धी मोड में भाग लेते हैं।',
     'terms_s1_list_title': 'हम इनके लिए उपकरण प्रदान करते हैं:',
-    'terms_s1_i1': 'मोड-आधारित उत्तरजीविता अनुभव (Pley, Kight)',
+    'terms_s1_i1': 'मोड-आधारित उत्तरजीविता अनुभव (Pley, Pley)',
     'terms_s1_i2': 'सार्वजनिक मतदान और मान्यता',
     'terms_s1_i3': 'प्रोफ़ाइल निजीकरण और स्थिति ट्रैकिंग',
     'terms_s1_disclaimer': 'Rip It परिणामों, उत्तरजीविता या रैंकिंग की गारंटी नहीं देता है।',
@@ -1395,7 +1379,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'सटीक जानकारी प्रदान करें',
     'terms_s2_i4': 'अपने खाते और गतिविधि के लिए जिम्मेदार बनें',
     'terms_s3_title': '3. मोड और वोटिंग नियम',
-    'terms_s3_i1': 'Pley, Vause और Kight में प्रोफ़ाइल स्थिति और प्रगति को प्रभावित करने वाली अनूठी विशेषताएं हैं।',
+    'terms_s3_i1': 'Pley, Pley और Pley में प्रोफ़ाइल स्थिति और प्रगति को प्रभावित करने वाली अनूठी विशेषताएं हैं।',
     'terms_s3_i2': 'वोट उपयोगकर्ता की प्रगति, प्रोफ़ाइल रीसेट या अस्थायी प्रतिबंधों को प्रभावित कर सकते हैं।',
     'terms_s3_i3': 'टाइमर, राउंड और परिणाम ऐप और भाग लेने वाले उपयोगकर्ताओं द्वारा निर्धारित किए जाते हैं।',
     'terms_s3_i4': 'उपयोगकर्ता अपने विवेक से भाग लेते हैं।',
@@ -1550,7 +1534,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It 不是千篇一律的。',
     'pers_desc': '你的个人资料随你的生存方式而进化。',
     'pers_item1': '自定义氛围与主题',
-    'pers_item2': '基于模式的视觉效果 (Pley, Kight 各不相同)',
+    'pers_item2': '基于模式的视觉效果 (Pley, Pley 各不相同)',
     'pers_item3': '展示你地位的动态称号',
     'pers_item4': '增强你存在感的粉丝能量',
     'pers_footer1': '你玩得越多，你的身份就越会转变。',
@@ -1560,11 +1544,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': '关于 Rip It',
     'about_tagline': '口号：生存。重置。进化。',
-    'about_desc1': 'Rip It 是一个为大胆玩家设计的高风险社交生存平台。在 Pley、Vause 和 Kight 等模式中竞争，测试你的策略、韧性和社交技巧。',
+    'about_desc1': 'Rip It 是一个为大胆玩家设计的高风险社交生存平台。在 Pley、Pley 和 Pley 等模式中竞争，测试你的策略、韧性和社交技巧。',
     'about_pley_title': 'Pley',
     'about_pley_desc': '具有高风险淘汰机制的生存模式。',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': '为敢于冒险的人准备的极端模式。',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': '为敢于冒险的人准备的极端模式。',
     'about_desc2': 'Rip It 结合了社交互动、竞争和动态个性化，创造出独特、病毒式且令人肾上腺素飙升的体验。',
     'about_footer': '我们在这里是为了让你的资料、地位和生存故事变得重要——获胜、重置或进化。',
     'about_close': '关闭',
@@ -1587,11 +1571,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': '只有反对票重要',
     'model_pley_item3': '计时回合（用户设置时长）',
     'model_pley_item4': '最后站着的用户获得认可',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': '极端生存模式',
-    'model_kight_item2': '只有反对票',
-    'model_kight_item3': '如果被投反对票则完全重置',
-    'model_kight_item4': '自愿参加的高风险寻求刺激者',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': '极端生存模式',
+    'model_Pley_item2': '只有反对票',
+    'model_Pley_item3': '如果被投反对票则完全重置',
+    'model_Pley_item4': '自愿参加的高风险寻求刺激者',
     'model_pers_title': '3️⃣ 个性化（非特定 IP）',
     'model_pers_item1': '自定义显示名称和个人资料主题',
     'model_pers_item2': '基于模式的视觉体验',
@@ -1638,7 +1622,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. 什么是 Rip It',
     'terms_s1_desc': 'Rip It 是一款高风险社交生存应用，用户参与计时挑战、公开投票和竞争模式。',
     'terms_s1_list_title': '我们提供的工具用于：',
-    'terms_s1_i1': '基于模式的生存体验（Pley、Kight）',
+    'terms_s1_i1': '基于模式的生存体验（Pley、Pley）',
     'terms_s1_i2': '公开投票和认可',
     'terms_s1_i3': '个人资料个性化和状态跟踪',
     'terms_s1_disclaimer': 'Rip It 不保证结果、生存或排名。',
@@ -1648,7 +1632,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': '提供准确的信息',
     'terms_s2_i4': '对你的账户和活动负责',
     'terms_s3_title': '3. 模式和投票规则',
-    'terms_s3_i1': 'Pley、Vause 和 Kight 具有影响资料状态和进度的独特机制。',
+    'terms_s3_i1': 'Pley、Pley 和 Pley 具有影响资料状态和进度的独特机制。',
     'terms_s3_i2': '投票可能会影响用户进度、资料重置或临时限制。',
     'terms_s3_i3': '计时器、回合和结果由应用和参与用户决定。',
     'terms_s4_title': '4. 声誉、地位和得分',
@@ -1811,7 +1795,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It ist nicht für alle gleich.',
     'pers_desc': 'Dein Profil entwickelt sich mit der Art und Weise, wie du überlebst.',
     'pers_item1': 'Eigene Vibes & Themen',
-    'pers_item2': 'Modus-basierte Visuals (Pley, Kight fühlen sich alle anders an)',
+    'pers_item2': 'Modus-basierte Visuals (Pley, Pley fühlen sich alle anders an)',
     'pers_item3': 'Dynamische Titel, die deinen Status zeigen',
     'pers_item4': 'Follower-Energie, die deine Präsenz aufbaut',
     'pers_footer1': 'Je mehr du spielst, desto mehr verändert sich deine Identität.',
@@ -1821,11 +1805,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Über Rip It',
     'about_tagline': 'Slogan: Überleben. Zurücksetzen. Entwickeln.',
-    'about_desc1': 'Rip It ist eine hochriskante soziale Überlebensplattform für mutige Spieler. Tritt in Modi wie Pley, Vause und Kight an, um deine Strategie, Belastbarkeit und sozialen Fähigkeiten zu testen.',
+    'about_desc1': 'Rip It ist eine hochriskante soziale Überlebensplattform für mutige Spieler. Tritt in Modi wie Pley, Pley und Pley an, um deine Strategie, Belastbarkeit und sozialen Fähigkeiten zu testen.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Überlebensmodus mit hohem Eliminationsrisiko.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Extremer Modus für diejenigen, die alles riskieren wollen.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Extremer Modus für diejenigen, die alles riskieren wollen.',
     'about_desc2': 'Rip It kombiniert soziale Interaktion, Wettbewerb und dynamische Personalisierung, um ein einzigartiges, virales und adrenalingeladenes Erlebnis zu schaffen.',
     'about_footer': 'Wir sind hier, um dein Profil, deinen Status und deine Überlebensgeschichte wichtig zu machen – gewinne, setze zurück oder entwickle dich weiter.',
     'about_close': 'Schließen',
@@ -1848,11 +1832,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Nur Down-Votes zählen',
     'model_pley_item3': 'Zeitgesteuerte Runden (Nutzer legt Dauer fest)',
     'model_pley_item4': 'Die letzten verbleibenden Nutzer erhalten Anerkennung',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Extremer Überlebensmodus',
-    'model_kight_item2': 'Nur Down-Votes',
-    'model_kight_item3': 'Vollständiger Reset bei Down-Vote',
-    'model_kight_item4': 'Freiwillig für Abenteuerlustige mit hohem Risiko',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Extremer Überlebensmodus',
+    'model_Pley_item2': 'Nur Down-Votes',
+    'model_Pley_item3': 'Vollständiger Reset bei Down-Vote',
+    'model_Pley_item4': 'Freiwillig für Abenteuerlustige mit hohem Risiko',
     'model_pers_title': '3️⃣ Personalisierung (nicht IP-spezifisch)',
     'model_pers_item1': 'Eigener Anzeigename & Profilthema',
     'model_pers_item2': 'Modus-basiertes visuelles Erlebnis',
@@ -1899,7 +1883,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Was Rip It ist',
     'terms_s1_desc': 'Rip It ist eine hochriskante soziale Überlebens-App, bei der Nutzer an zeitgesteuerten Herausforderungen, öffentlichen Abstimmungen und Wettbewerbsmodi teilnehmen.',
     'terms_s1_list_title': 'Wir bieten Tools für:',
-    'terms_s1_i1': 'Modus-basierte Überlebenserlebnisse (Pley, Kight)',
+    'terms_s1_i1': 'Modus-basierte Überlebenserlebnisse (Pley, Pley)',
     'terms_s1_i2': 'Öffentliche Abstimmung und Anerkennung',
     'terms_s1_i3': 'Profil-Personalisierung und Status-Tracking',
     'terms_s1_disclaimer': 'Rip It garantiert keine Ergebnisse, kein Überleben oder Ranking.',
@@ -1909,7 +1893,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Genaue Informationen bereitstellen',
     'terms_s2_i4': 'Verantwortlich für dein Konto und deine Aktivitäten sein',
     'terms_s3_title': '3. Modi & Abstimmungsregeln',
-    'terms_s3_i1': 'Pley, Vause und Kight haben einzigartige Mechaniken, die Profilstatus und Fortschritt beeinflussen.',
+    'terms_s3_i1': 'Pley, Pley und Pley haben einzigartige Mechaniken, die Profilstatus und Fortschritt beeinflussen.',
     'terms_s3_i2': 'Stimmen können den Fortschritt des Nutzers, den Profil-Reset oder temporäre Einschränkungen beeinflussen.',
     'terms_s3_i3': 'Timer, Runden und Ergebnisse werden von der App und den teilnehmenden Nutzern bestimmt.',
     'terms_s3_i4': 'Nutzer nehmen nach eigenem Ermessen teil.',
@@ -2073,7 +2057,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It не однаковий для всіх.',
     'pers_desc': 'Ваш профіль еволюціонує разом із тим, як ви виживаєте.',
     'pers_item1': 'Власні вайби та теми',
-    'pers_item2': 'Візуальні ефекти на основі режимів (Pley, Kight — кожен відчувається по-різному)',
+    'pers_item2': 'Візуальні ефекти на основі режимів (Pley, Pley — кожен відчувається по-різному)',
     'pers_item3': 'Динамічні титули, що підкреслюють ваш статус',
     'pers_item4': 'Енергія фоловерів, що будує вашу присутність',
     'pers_footer1': 'Чим більше ви граєте, тим більше змінюється ваша ідентичність.',
@@ -2083,11 +2067,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Про Rip It',
     'about_tagline': 'Слоган: Виживай. Скидай. Еволюціонуй.',
-    'about_desc1': 'Rip It — це соціальна платформа для виживання з високими ставками, створена для сміливих гравців. Змагайтеся в таких режимах, як Pley, Vause та Kight, щоб перевірити свою стратегію, стійкість та соціальні навички.',
+    'about_desc1': 'Rip It — це соціальна платформа для виживання з високими ставками, створена для сміливих гравців. Змагайтеся в таких режимах, як Pley, Pley та Pley, щоб перевірити свою стратегію, стійкість та соціальні навички.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Режим виживання з високим ризиком вибування.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Екстремальний режим для тих, хто наважується ризикнути всім.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Екстремальний режим для тих, хто наважується ризикнути всім.',
     'about_desc2': 'Rip It поєднує соціальну взаємодію, конкуренцію та динамічну персоналізацію для створення унікального, вірального та сповненого адреналіну досвіду.',
     'about_footer': 'Ми тут, щоб зробити ваш профіль, статус та історію виживання важливими — перемагайте, скидайте або еволюціонуйте.',
     'about_close': 'Закрити',
@@ -2110,11 +2094,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Мають значення лише голоси "проти"',
     'model_pley_item3': 'Раунди на час (користувач встановлює тривалість)',
     'model_pley_item4': 'Останні користувачі, що залишилися, отримують визнання',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Екстремальний режим виживання',
-    'model_kight_item2': 'Тільки голоси "проти"',
-    'model_kight_item3': 'Повне скидання у разі голосування "проти"',
-    'model_kight_item4': 'Добровільно для тих, хто шукає гострих відчуттів з високим ризиком',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Екстремальний режим виживання',
+    'model_Pley_item2': 'Тільки голоси "проти"',
+    'model_Pley_item3': 'Повне скидання у разі голосування "проти"',
+    'model_Pley_item4': 'Добровільно для тих, хто шукає гострих відчуттів з високим ризиком',
     'model_pers_title': '3️⃣ Персоналізація (без прив\'язки до IP)',
     'model_pers_item1': 'Власне відображуване ім\'я та тема профілю',
     'model_pers_item2': 'Візуальний досвід на основі режимів',
@@ -2161,7 +2145,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Що таке Rip It',
     'terms_s1_desc': 'Rip It — це соціальний додаток для виживання з високими ставками, де користувачі беруть участь у викликах на час, публічних голосуваннях та конкурентних режимах.',
     'terms_s1_list_title': 'Ми надаємо інструменти для:',
-    'terms_s1_i1': 'Досвіду виживання на основі режимів (Pley, Kight)',
+    'terms_s1_i1': 'Досвіду виживання на основі режимів (Pley, Pley)',
     'terms_s1_i2': 'Публічного голосування та визнання',
     'terms_s1_i3': 'Персоналізації профілю та відстеження статусу',
     'terms_s1_disclaimer': 'Rip It не гарантує результатів, виживання або рейтингу.',
@@ -2171,7 +2155,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Надавати точну інформацію',
     'terms_s2_i4': 'Бути відповідальним за свій обліковий запис і діяльність',
     'terms_s3_title': '3. Режими та правила голосування',
-    'terms_s3_i1': 'Pley, Vause та Kight мають унікальну механіку, що впливає на статус і прогрес профілю.',
+    'terms_s3_i1': 'Pley, Pley та Pley мають унікальну механіку, що впливає на статус і прогрес профілю.',
     'terms_s3_i2': 'Голоси можуть впливати на прогрес користувача, скидання профілю або тимчасові обмеження.',
     'terms_s3_i3': 'Таймери, раунди та результати визначаються додатком та користувачами-учасниками.',
     'terms_s3_i4': 'Користувачі беруть участь на власний розсуд.',
@@ -2335,7 +2319,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It не одинаков для всех.',
     'pers_desc': 'Ваш профиль эволюционирует вместе с тем, как вы выживаете.',
     'pers_item1': 'Свои вайбы и темы',
-    'pers_item2': 'Визуальные эффекты на основе режимов (Pley, Kight — каждый ощущается по-разному)',
+    'pers_item2': 'Визуальные эффекты на основе режимов (Pley, Pley — каждый ощущается по-разному)',
     'pers_item3': 'Динамические титулы, подчеркивающие ваш статус',
     'pers_item4': 'Энергия фолловеров, строящая ваше присутствие',
     'pers_footer1': 'Чем больше вы играете, тем больше меняется ваша идентичность.',
@@ -2345,11 +2329,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'О Rip It',
     'about_tagline': 'Слоган: Выживай. Сбрасывай. Эволюционируй.',
-    'about_desc1': 'Rip It — это социальная платформа для выживания с высокими ставками, созданная для смелых игроков. Соревнуйтесь в таких режимах, как Pley, Vause и Kight, чтобы проверить свою стратегию, стойкость и социальные навыки.',
+    'about_desc1': 'Rip It — это социальная платформа для выживания с высокими ставками, созданная для смелых игроков. Соревнуйтесь в таких режимах, как Pley, Pley и Pley, чтобы проверить свою стратегию, стойкость и социальные навыки.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Режим выживания с высоким риском выбывания.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Экстремальный режим для тех, кто осмеливается рискнуть всем.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Экстремальный режим для тех, кто осмеливается рискнуть всем.',
     'about_desc2': 'Rip It сочетает социальное взаимодействие, конкуренцию и динамическую персонализацию для создания уникального, вирального и полного адреналина опыта.',
     'about_footer': 'Мы здесь, чтобы сделать ваш профиль, статус и историю выживания важными — побеждайте, сбрасывайте или эволюционируйте.',
     'about_close': 'Закрыть',
@@ -2372,11 +2356,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Имеют значение только голоса "против"',
     'model_pley_item3': 'Раунды на время (пользователь устанавливает длительность)',
     'model_pley_item4': 'Последние оставшиеся пользователи получают признание',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Экстремальный режим выживания',
-    'model_kight_item2': 'Только голоса "против"',
-    'model_kight_item3': 'Полный сброс в случае голосования "против"',
-    'model_kight_item4': 'Добровольно для тех, кто ищет острых ощущений с высоким риском',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Экстремальный режим выживания',
+    'model_Pley_item2': 'Только голоса "против"',
+    'model_Pley_item3': 'Полный сброс в случае голосования "против"',
+    'model_Pley_item4': 'Добровольно для тех, кто ищет острых ощущений с высоким риском',
     'model_pers_title': '3️⃣ Персонализация (без привязки к IP)',
     'model_pers_item1': 'Собственное отображаемое имя и тема профиля',
     'model_pers_item2': 'Визуальный опыт на основе режимов',
@@ -2423,7 +2407,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Что такое Rip It',
     'terms_s1_desc': 'Rip It — это социальное приложение для выживания с высокими ставками, где пользователи участвуют в испытаниях на время, публичных голосованиях и конкурентных режимах.',
     'terms_s1_list_title': 'Мы предоставляем инструменты для:',
-    'terms_s1_i1': 'Опыта выживания на основе режимов (Pley, Kight)',
+    'terms_s1_i1': 'Опыта выживания на основе режимов (Pley, Pley)',
     'terms_s1_i2': 'Публичного голосования и признания',
     'terms_s1_i3': 'Персонализации профиля и отслеживания статуса',
     'terms_s1_disclaimer': 'Rip It не гарантирует результатов, выживания или рейтинга.',
@@ -2433,7 +2417,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Предоставлять точную информацию',
     'terms_s2_i4': 'Нести ответственность за свою учетную запись и деятельность',
     'terms_s3_title': '3. Режимы и правила голосования',
-    'terms_s3_i1': 'Pley, Vause и Kight имеют уникальную механику, влияющую на статус и прогресс профиля.',
+    'terms_s3_i1': 'Pley, Pley и Pley имеют уникальную механику, влияющую на статус и прогресс профиля.',
     'terms_s3_i2': 'Голоса могут влиять на прогресс пользователя, сброс профиля или временные ограничения.',
     'terms_s3_i3': 'Таймеры, раунды и результаты определяются приложением и участвующими пользователями.',
     'terms_s3_i4': 'Пользователи участвуют по своему усмотрению.',
@@ -2583,7 +2567,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It non è uguale per tutti.',
     'pers_desc': 'Il tuo profilo si evolve con il modo in cui sopravvivi.',
     'pers_item1': 'Vibrazioni e temi personalizzati',
-    'pers_item2': 'Effetti visivi basati sulla modalità (Pley, Kight colpiscono in modo diverso)',
+    'pers_item2': 'Effetti visivi basati sulla modalità (Pley, Pley colpiscono in modo diverso)',
     'pers_item3': 'Titoli dinamici che mostrano il tuo status',
     'pers_item4': 'Energia dei follower che costruisce la tua presenza',
     'pers_footer1': 'Più giochi, più la tua identità cambia.',
@@ -2591,11 +2575,11 @@ const translations: Record<string, Record<string, string>> = {
     'pers_button': 'Capito',
     'about_title': 'Informazioni su Rip It',
     'about_tagline': 'Tagline: Sopravvivi. Resetta. Evolvi.',
-    'about_desc1': 'Rip It è una piattaforma di sopravvivenza sociale ad alta posta in gioco progettata per giocatori audaci. Competi in modalità come Pley, Vause e Kight per testare la tua strategia, resilienza e abilità sociali.',
+    'about_desc1': 'Rip It è una piattaforma di sopravvivenza sociale ad alta posta in gioco progettata per giocatori audaci. Competi in modalità come Pley, Pley e Pley per testare la tua strategia, resilienza e abilità sociali.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Modalità sopravvivenza con eliminazione ad alto rischio.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Modalità estrema per chi osa rischiare tutto.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Modalità estrema per chi osa rischiare tutto.',
     'about_desc2': 'Rip It combina interazione sociale, competizione e personalizzazione dinamica per creare un\'esperienza unica, virale e adrenalinica.',
     'about_footer': 'Siamo qui per dare importanza al tuo profilo, al tuo status e alla tua storia di sopravvivenza—vinci, resetta o evolvi.',
     'about_close': 'Chiudi',
@@ -2614,11 +2598,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Contano solo i voti negativi',
     'model_pley_item3': 'Round a tempo (l\'utente imposta la durata)',
     'model_pley_item4': 'Gli ultimi utenti rimasti ottengono riconoscimento',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Modalità sopravvivenza estrema',
-    'model_kight_item2': 'Solo voti negativi',
-    'model_kight_item3': 'Reset completo se votato contro',
-    'model_kight_item4': 'Volontario per chi cerca il brivido ad alto rischio',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Modalità sopravvivenza estrema',
+    'model_Pley_item2': 'Solo voti negativi',
+    'model_Pley_item3': 'Reset completo se votato contro',
+    'model_Pley_item4': 'Volontario per chi cerca il brivido ad alto rischio',
     'model_pers_title': '3️⃣ Personalizzazione (Non specifica per IP)',
     'model_pers_item1': 'Nome visualizzato e tema del profilo personalizzati',
     'model_pers_item2': 'Esperienza visiva basata sulla modalità',
@@ -2661,7 +2645,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Cos\'è Rip It',
     'terms_s1_desc': 'Rip It è un\'app di sopravvivenza sociale ad alta posta in gioco dove gli utenti partecipano a sfide a tempo, votazioni pubbliche e modalità competitive.',
     'terms_s1_list_title': 'Forniamo strumenti per:',
-    'terms_s1_i1': 'Esperienze di sopravvivenza basate sulla modalità (Pley, Kight)',
+    'terms_s1_i1': 'Esperienze di sopravvivenza basate sulla modalità (Pley, Pley)',
     'terms_s1_i2': 'Votazione pubblica e riconoscimento',
     'terms_s1_i3': 'Personalizzazione del profilo e tracciamento dello status',
     'terms_s1_disclaimer': 'Rip It non garantisce risultati, sopravvivenza o classifica.',
@@ -2671,7 +2655,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Fornire informazioni accurate',
     'terms_s2_i4': 'Essere responsabile del proprio account e della propria attività',
     'terms_s3_title': '3. Modalità e regole di voto',
-    'terms_s3_i1': 'Pley, Vause e Kight hanno meccaniche uniche che influenzano lo status del profilo e la progressione.',
+    'terms_s3_i1': 'Pley, Pley e Pley hanno meccaniche uniche che influenzano lo status del profilo e la progressione.',
     'terms_s3_i2': 'I voti possono influenzare la progressione dell\'utente, il reset del profilo o restrizioni temporanee.',
     'terms_s3_i3': 'I timer, i round e i risultati sono determinati dall\'app e dagli utenti partecipanti.',
     'terms_s3_i4': 'Gli utenti partecipano a propria discrezione.',
@@ -2821,7 +2805,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It não é para todos os tamanhos.',
     'pers_desc': 'Seu perfil evolui conforme você sobrevive.',
     'pers_item1': 'Vibrações e temas personalizados',
-    'pers_item2': 'Visuais baseados no modo (Pley, Kight cada um bate diferente)',
+    'pers_item2': 'Visuais baseados no modo (Pley, Pley cada um bate diferente)',
     'pers_item3': 'Títulos dinâmicos que mostram seu status',
     'pers_item4': 'Energia de seguidores que constrói sua presença',
     'pers_footer1': 'Quanto mais você joga, mais sua identidade muda.',
@@ -2829,11 +2813,11 @@ const translations: Record<string, Record<string, string>> = {
     'pers_button': 'Entendi',
     'about_title': 'Sobre o Rip It',
     'about_tagline': 'Tagline: Sobreviva. Resete. Evolua.',
-    'about_desc1': 'Rip It é uma plataforma de sobrevivência social de alto risco projetada para jogadores ousados. Compita em modos como Pley, Vause e Kight para testar sua estratégia, resiliência e habilidades sociais.',
+    'about_desc1': 'Rip It é uma plataforma de sobrevivência social de alto risco projetada para jogadores ousados. Compita em modos como Pley, Pley e Pley para testar sua estratégia, resiliência e habilidades sociais.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Modo sobrevivência com eliminação de alto risco.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Modo extremo para quem ousa arriscar tudo.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Modo extremo para quem ousa arriscar tudo.',
     'about_desc2': 'Rip It combina interação social, competição e personalização dinâmica para criar uma experiência única, viral e cheia de adrenalina.',
     'about_footer': 'Estamos aqui para fazer seu perfil, status e história de sobrevivência importarem—vença, resete ou evolua.',
     'about_close': 'Fechar',
@@ -2852,11 +2836,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Apenas votos negativos importam',
     'model_pley_item3': 'Rodadas cronometradas (o usuário define a duração)',
     'model_pley_item4': 'Últimos usuários de pé ganham reconhecimento',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Modo de sobrevivência extrema',
-    'model_kight_item2': 'Apenas votos negativos',
-    'model_kight_item3': 'Reset total se votado negativamente',
-    'model_kight_item4': 'Voluntário para quem busca emoções de alto risco',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Modo de sobrevivência extrema',
+    'model_Pley_item2': 'Apenas votos negativos',
+    'model_Pley_item3': 'Reset total se votado negativamente',
+    'model_Pley_item4': 'Voluntário para quem busca emoções de alto risco',
     'model_pers_title': '3️⃣ Personalização (Não Específica de IP)',
     'model_pers_item1': 'Nome de exibição e tema de perfil personalizados',
     'model_pers_item2': 'Experiência visual baseada no modo',
@@ -2899,7 +2883,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. O que é o Rip It',
     'terms_s1_desc': 'Rip It é um app de sobrevivência social de alto risco onde os usuários participam de desafios cronometrados, votação pública e modos competitivos.',
     'terms_s1_list_title': 'Fornecemos ferramentas para:',
-    'terms_s1_i1': 'Experiências de sobrevivência baseadas no modo (Pley, Kight)',
+    'terms_s1_i1': 'Experiências de sobrevivência baseadas no modo (Pley, Pley)',
     'terms_s1_i2': 'Votação pública e reconhecimento',
     'terms_s1_i3': 'Personalização de perfil e rastreamento de status',
     'terms_s1_disclaimer': 'O Rip It não garante resultados, sobrevivência ou classificação.',
@@ -2909,7 +2893,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Fornecer informações precisas',
     'terms_s2_i4': 'Ser responsável por sua conta e atividade',
     'terms_s3_title': '3. Modos e Regras de Votação',
-    'terms_s3_i1': 'Pley, Vause e Kight têm mecânicas únicas que afetam o status e a progressão do perfil.',
+    'terms_s3_i1': 'Pley, Pley e Pley têm mecânicas únicas que afetam o status e a progressão do perfil.',
     'terms_s3_i2': 'Os votos podem afetar a progressão do usuário, reset de perfil ou restrições temporárias.',
     'terms_s3_i3': 'Timers, rodadas e resultados são determinados pelo app e usuários participantes.',
     'terms_s3_i4': 'Usuários participam por sua própria conta e risco.',
@@ -3059,7 +3043,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It không dành cho tất cả mọi người.',
     'pers_desc': 'Hồ sơ của bạn phát triển theo cách bạn sống sót.',
     'pers_item1': 'Cảm hứng & chủ đề tùy chỉnh',
-    'pers_item2': 'Hình ảnh theo chế độ (Pley, Kight mỗi cái một vẻ)',
+    'pers_item2': 'Hình ảnh theo chế độ (Pley, Pley mỗi cái một vẻ)',
     'pers_item3': 'Danh hiệu năng động thể hiện vị thế của bạn',
     'pers_item4': 'Năng lượng từ người theo dõi xây dựng sự hiện diện của bạn',
     'pers_footer1': 'Bạn càng chơi nhiều, danh tính của bạn càng thay đổi.',
@@ -3067,11 +3051,11 @@ const translations: Record<string, Record<string, string>> = {
     'pers_button': 'Đã hiểu',
     'about_title': 'Giới thiệu về Rip It',
     'about_tagline': 'Slogan: Sống sót. Đặt lại. Tiến hóa.',
-    'about_desc1': 'Rip It là một nền tảng sống sót xã hội với rủi ro cao được thiết kế cho những người chơi táo bạo. Cạnh tranh trong các chế độ như Pley, Vause và Kight để kiểm tra chiến lược, khả năng phục hồi và kỹ năng xã hội của bạn.',
+    'about_desc1': 'Rip It là một nền tảng sống sót xã hội với rủi ro cao được thiết kế cho những người chơi táo bạo. Cạnh tranh trong các chế độ như Pley, Pley và Pley để kiểm tra chiến lược, khả năng phục hồi và kỹ năng xã hội của bạn.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Chế độ sống sót với rủi ro bị loại cao.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Chế độ khắc nghiệt cho những ai dám mạo hiểm tất cả.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Chế độ khắc nghiệt cho những ai dám mạo hiểm tất cả.',
     'about_desc2': 'Rip It kết hợp tương tác xã hội, cạnh tranh và cá nhân hóa năng động để tạo ra một trải nghiệm độc đáo, lan truyền và đầy kịch tính.',
     'about_footer': 'Chúng tôi ở đây để làm cho hồ sơ, vị thế và câu chuyện sống sót của bạn trở nên quan trọng—thắng, đặt lại hoặc tiến hóa.',
     'about_close': 'Đóng',
@@ -3090,11 +3074,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Chỉ số phiếu bầu xuống mới quan trọng',
     'model_pley_item3': 'Các vòng chơi có thời gian (người dùng đặt thời lượng)',
     'model_pley_item4': 'Những người dùng cuối cùng trụ lại sẽ được công nhận',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Chế độ sống sót khắc nghiệt',
-    'model_kight_item2': 'Chỉ bình chọn xuống',
-    'model_kight_item3': 'Đặt lại hoàn toàn nếu bị bình chọn xuống',
-    'model_kight_item4': 'Tự nguyện cho những người tìm kiếm cảm giác mạnh rủi ro cao',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Chế độ sống sót khắc nghiệt',
+    'model_Pley_item2': 'Chỉ bình chọn xuống',
+    'model_Pley_item3': 'Đặt lại hoàn toàn nếu bị bình chọn xuống',
+    'model_Pley_item4': 'Tự nguyện cho những người tìm kiếm cảm giác mạnh rủi ro cao',
     'model_pers_title': '3️⃣ Cá nhân hóa (Không theo IP cụ thể)',
     'model_pers_item1': 'Tên hiển thị & chủ đề hồ sơ tùy chỉnh',
     'model_pers_item2': 'Trải nghiệm hình ảnh theo chế độ',
@@ -3137,7 +3121,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Rip It là gì',
     'terms_s1_desc': 'Rip It là một ứng dụng sống sót xã hội với rủi ro cao, nơi người dùng tham gia vào các thử thách có thời gian, bình chọn công khai và các chế độ cạnh tranh.',
     'terms_s1_list_title': 'Chúng tôi cung cấp các công cụ cho:',
-    'terms_s1_i1': 'Trải nghiệm sống sót theo chế độ (Pley, Kight)',
+    'terms_s1_i1': 'Trải nghiệm sống sót theo chế độ (Pley, Pley)',
     'terms_s1_i2': 'Bình chọn và công nhận công khai',
     'terms_s1_i3': 'Cá nhân hóa hồ sơ và theo dõi vị thế',
     'terms_s1_disclaimer': 'Rip It không đảm bảo kết quả, sự sống sót hay xếp hạng.',
@@ -3147,7 +3131,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Cung cấp thông tin chính xác',
     'terms_s2_i4': 'Chịu trách nhiệm về tài khoản và hoạt động của mình',
     'terms_s3_title': '3. Quy tắc chế độ & bình chọn',
-    'terms_s3_i1': 'Pley, Vause và Kight có các cơ chế độc đáo ảnh hưởng đến vị thế và sự tiến triển của hồ sơ.',
+    'terms_s3_i1': 'Pley, Pley và Pley có các cơ chế độc đáo ảnh hưởng đến vị thế và sự tiến triển của hồ sơ.',
     'terms_s3_i2': 'Phiếu bầu có thể ảnh hưởng đến sự tiến triển của người dùng, đặt lại hồ sơ hoặc các hạn chế tạm thời.',
     'terms_s3_i3': 'Bộ đếm thời gian, vòng chơi và kết quả được quyết định bởi ứng dụng và người dùng tham gia.',
     'terms_s3_i4': 'Người dùng tham gia theo quyết định của riêng mình.',
@@ -3297,7 +3281,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It ไม่ใช่แอปที่เหมือนกันสำหรับทุกคน',
     'pers_desc': 'โปรไฟล์ของคุณจะพัฒนาไปตามวิธีที่คุณอยู่รอด',
     'pers_item1': 'บรรยากาศและธีมที่กำหนดเอง',
-    'pers_item2': 'ภาพตามโหมด (Pley, Kight ให้ความรู้สึกที่แตกต่างกัน)',
+    'pers_item2': 'ภาพตามโหมด (Pley, Pley ให้ความรู้สึกที่แตกต่างกัน)',
     'pers_item3': 'ชื่อเรื่องแบบไดนามิกที่อวดสถานะของคุณ',
     'pers_item4': 'พลังจากผู้ติดตามที่สร้างตัวตนของคุณ',
     'pers_footer1': 'ยิ่งคุณเล่นมากเท่าไหร่ ตัวตนของคุณก็จะยิ่งเปลี่ยนไปมากเท่านั้น',
@@ -3305,11 +3289,11 @@ const translations: Record<string, Record<string, string>> = {
     'pers_button': 'รับทราบ',
     'about_title': 'เกี่ยวกับ Rip It',
     'about_tagline': 'สโลแกน: อยู่รอด. รีเซ็ต. พัฒนา.',
-    'about_desc1': 'Rip It เป็นแพลตฟอร์มการเอาชีวิตรอดทางสังคมที่มีความเสี่ยงสูง ออกแบบมาสำหรับผู้เล่นที่กล้าหาญ แข่งขันในโหมดต่างๆ เช่น Pley, Vause และ Kight เพื่อทดสอบกลยุทธ์ ความยืดหยุ่น และทักษะทางสังคมของคุณ',
+    'about_desc1': 'Rip It เป็นแพลตฟอร์มการเอาชีวิตรอดทางสังคมที่มีความเสี่ยงสูง ออกแบบมาสำหรับผู้เล่นที่กล้าหาญ แข่งขันในโหมดต่างๆ เช่น Pley, Pley และ Pley เพื่อทดสอบกลยุทธ์ ความยืดหยุ่น และทักษะทางสังคมของคุณ',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'โหมดเอาชีวิตรอดที่มีความเสี่ยงสูงที่จะถูกคัดออก',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'โหมดสุดขีดสำหรับผู้ที่กล้าเสี่ยงทุกอย่าง',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'โหมดสุดขีดสำหรับผู้ที่กล้าเสี่ยงทุกอย่าง',
     'about_desc2': 'Rip It ผสมผสานการมีปฏิสัมพันธ์ทางสังคม การแข่งขัน และการปรับแต่งส่วนบุคคลแบบไดนามิก เพื่อสร้างประสบการณ์ที่ไม่เหมือนใคร เป็นไวรัล และตื่นเต้นเร้าใจ',
     'about_footer': 'เราอยู่ที่นี่เพื่อให้โปรไฟล์ สถานะ และเรื่องราวการเอาชีวิตรอดของคุณมีความสำคัญ—ชนะ รีเซ็ต หรือพัฒนา',
     'about_close': 'ปิด',
@@ -3328,11 +3312,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'เฉพาะคะแนนโหวตลงเท่านั้นที่สำคัญ',
     'model_pley_item3': 'รอบเวลาที่กำหนด (ผู้ใช้กำหนดระยะเวลา)',
     'model_pley_item4': 'ผู้ใช้ที่ยืนหยัดเป็นคนสุดท้ายจะได้รับการยอมรับ',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'โหมดเอาชีวิตรอดสุดขีด',
-    'model_kight_item2': 'โหวตลงเท่านั้น',
-    'model_kight_item3': 'รีเซ็ตทั้งหมดหากถูกโหวตลง',
-    'model_kight_item4': 'สมัครใจสำหรับผู้ที่แสวงหาความตื่นเต้นที่มีความเสี่ยงสูง',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'โหมดเอาชีวิตรอดสุดขีด',
+    'model_Pley_item2': 'โหวตลงเท่านั้น',
+    'model_Pley_item3': 'รีเซ็ตทั้งหมดหากถูกโหวตลง',
+    'model_Pley_item4': 'สมัครใจสำหรับผู้ที่แสวงหาความตื่นเต้นที่มีความเสี่ยงสูง',
     'model_pers_title': '3️⃣ การปรับแต่ง (ไม่เฉพาะเจาะจง IP)',
     'model_pers_item1': 'ชื่อที่แสดงและธีมโปรไฟล์ที่กำหนดเอง',
     'model_pers_item2': 'ประสบการณ์ภาพตามโหมด',
@@ -3375,7 +3359,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Rip It คืออะไร',
     'terms_s1_desc': 'Rip It เป็นแอปเอาชีวิตรอดทางสังคมที่มีความเสี่ยงสูง ซึ่งผู้ใช้จะมีส่วนร่วมในชาเลนจ์ที่มีกำหนดเวลา การโหวตสาธารณะ และโหมดการแข่งขัน',
     'terms_s1_list_title': 'เรามีเครื่องมือสำหรับ:',
-    'terms_s1_i1': 'ประสบการณ์การเอาชีวิตรอดตามโหมด (Pley, Kight)',
+    'terms_s1_i1': 'ประสบการณ์การเอาชีวิตรอดตามโหมด (Pley, Pley)',
     'terms_s1_i2': 'การโหวตสาธารณะและการได้รับการยอมรับ',
     'terms_s1_i3': 'การปรับแต่งโปรไฟล์และการติดตามสถานะ',
     'terms_s1_disclaimer': 'Rip It ไม่รับประกันผลลัพธ์ การเอาชีวิตรอด หรืออันดับ',
@@ -3385,7 +3369,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'ให้ข้อมูลที่ถูกต้อง',
     'terms_s2_i4': 'รับผิดชอบต่อบัญชีและกิจกรรมของคุณ',
     'terms_s3_title': '3. กฎของโหมดและการโหวต',
-    'terms_s3_i1': 'Pley, Vause และ Kight มีกลไกเฉพาะตัวที่ส่งผลต่อสถานะโปรไฟล์และความก้าวหน้า',
+    'terms_s3_i1': 'Pley, Pley และ Pley มีกลไกเฉพาะตัวที่ส่งผลต่อสถานะโปรไฟล์และความก้าวหน้า',
     'terms_s3_i2': 'คะแนนโหวตอาจส่งผลต่อความก้าวหน้าของผู้ใช้ การรีเซ็ตโปรไฟล์ หรือข้อจำกัดชั่วคราว',
     'terms_s3_i3': 'ตัวจับเวลา รอบ และผลลัพธ์จะถูกกำหนดโดยแอปและผู้ใช้ที่เข้าร่วม',
     'terms_s3_i4': 'ผู้ใช้เข้าร่วมตามดุลยพินิจของตนเอง',
@@ -3549,7 +3533,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It ليس مقاساً واحداً يناسب الجميع.',
     'pers_desc': 'يتطور ملفك الشخصي مع الطريقة التي تنجو بها.',
     'pers_item1': 'أجواء وثيمات مخصصة',
-    'pers_item2': 'مرئيات قائمة على الوضع (Pley، Vause، Kight كل منها له طابع مختلف)',
+    'pers_item2': 'مرئيات قائمة على الوضع (Pley، Pley، Pley كل منها له طابع مختلف)',
     'pers_item3': 'ألقاب ديناميكية تبرز مكانتك',
     'pers_item4': 'طاقة المتابعين التي تبني حضورك',
     'pers_footer1': 'كلما لعبت أكثر، تغيرت هويتك أكثر.',
@@ -3559,11 +3543,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'حول Rip It',
     'about_tagline': 'الشعار: انجُ. أعد الضبط. تطور.',
-    'about_desc1': 'Rip It هي منصة تواصل اجتماعي للبقاء على قيد الحياة ذات مخاطر عالية مصممة للاعبين الجريئين. تنافس في أوضاع مثل Pley و Vause و Kight لاختبار استراتيجيتك ومرونتك ومهاراتك الاجتماعية.',
+    'about_desc1': 'Rip It هي منصة تواصل اجتماعي للبقاء على قيد الحياة ذات مخاطر عالية مصممة للاعبين الجريئين. تنافس في أوضاع مثل Pley و Pley و Pley لاختبار استراتيجيتك ومرونتك ومهاراتك الاجتماعية.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'وضع البقاء مع مخاطر عالية للاستبعاد.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'الوضع المتطرف لأولئك الذين يجرؤون على المخاطرة بكل شيء.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'الوضع المتطرف لأولئك الذين يجرؤون على المخاطرة بكل شيء.',
     'about_desc2': 'يجمع Rip It بين التفاعل الاجتماعي والمنافسة والتخصيص الديناميكي لخلق تجربة فريدة وانتشار واسع وإثارة للأدرينالين.',
     'about_footer': 'نحن هنا لنجعل ملفك الشخصي ومكانتك وقصة بقائك ذات أهمية — فز، أو أعد الضبط، أو تطور.',
     'about_close': 'إغلاق',
@@ -3586,11 +3570,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'فقط التصويت السلبي هو المهم',
     'model_pley_item3': 'جولات موقوتة (يحدد المستخدم المدة)',
     'model_pley_item4': 'آخر المستخدمين الباقين يحصلون على التقدير',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'وضع البقاء المتطرف',
-    'model_kight_item2': 'تصويت سلبي فقط',
-    'model_kight_item3': 'إعادة ضبط كاملة في حالة التصويت السلبي',
-    'model_kight_item4': 'تطوعي للباحثين عن الإثارة والمخاطر العالية',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'وضع البقاء المتطرف',
+    'model_Pley_item2': 'تصويت سلبي فقط',
+    'model_Pley_item3': 'إعادة ضبط كاملة في حالة التصويت السلبي',
+    'model_Pley_item4': 'تطوعي للباحثين عن الإثارة والمخاطر العالية',
     'model_pers_title': '3️⃣ التخصيص (غير مرتبط بملكية فكرية محددة)',
     'model_pers_item1': 'اسم عرض وثيم ملف شخصي مخصص',
     'model_pers_item2': 'تجربة بصرية قائمة على الوضع',
@@ -3637,7 +3621,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. ما هو Rip It',
     'terms_s1_desc': 'Rip It هو تطبيق تواصل اجتماعي للبقاء على قيد الحياة حيث يشارك المستخدمون في تحديات موقوتة، وتصويت عام، وأوضاع تنافسية.',
     'terms_s1_list_title': 'نحن نوفر أدوات لـ:',
-    'terms_s1_i1': 'تجارب البقاء القائمة على الأوضاع (Pley، Vause، Kight)',
+    'terms_s1_i1': 'تجارب البقاء القائمة على الأوضاع (Pley، Pley، Pley)',
     'terms_s1_i2': 'التصويت العام والتقدير',
     'terms_s1_i3': 'تخصيص الملف الشخصي وتتبع الحالة',
     'terms_s1_disclaimer': 'Rip It لا يضمن النتائج أو البقاء أو التصنيف.',
@@ -3647,7 +3631,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'تقديم معلومات دقيقة',
     'terms_s2_i4': 'تكون مسؤولاً عن حسابك ونشاطك',
     'terms_s3_title': '3. الأوضاع وقواعد التصويت',
-    'terms_s3_i1': 'تمتلك أوضاع Pley و Vause و Kight ميكانيكيات فريدة تؤثر على حالة الملف الشخصي والتقدم.',
+    'terms_s3_i1': 'تمتلك أوضاع Pley و Pley و Pley ميكانيكيات فريدة تؤثر على حالة الملف الشخصي والتقدم.',
     'terms_s3_i2': 'قد تؤثر الأصوات على تقدم المستخدم، أو إعادة ضبط الملف الشخصي، أو القيود المؤقتة.',
     'terms_s3_i3': 'يتم تحديد المؤقتات والجولات والنتائج بواسطة التطبيق والمستخدمين المشاركين.',
     'terms_s3_i4': 'يشارك المستخدمون بناءً على تقديرهم الخاص.',
@@ -3811,7 +3795,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It tidak sama untuk semua orang.',
     'pers_desc': 'Profil Anda berkembang seiring cara Anda bertahan hidup.',
     'pers_item1': 'Vibe & tema kustom',
-    'pers_item2': 'Visual berbasis mode (Pley, Kight masing-masing terasa berbeda)',
+    'pers_item2': 'Visual berbasis mode (Pley, Pley masing-masing terasa berbeda)',
     'pers_item3': 'Gelar dinamis yang memamerkan status Anda',
     'pers_item4': 'Energi pengikut yang membangun kehadiran Anda',
     'pers_footer1': 'Semakin banyak Anda bermain, semakin identitas Anda bergeser.',
@@ -3821,11 +3805,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Tentang Rip It',
     'about_tagline': 'Tagline: Bertahan. Reset. Evolusi.',
-    'about_desc1': 'Rip It adalah platform bertahan hidup sosial berisiko tinggi yang dirancang untuk pemain yang berani. Bersaing dalam mode seperti Pley, Vause, dan Kight untuk menguji strategi, ketahanan, dan keterampilan sosial Anda.',
+    'about_desc1': 'Rip It adalah platform bertahan hidup sosial berisiko tinggi yang dirancang untuk pemain yang berani. Bersaing dalam mode seperti Pley, Pley, dan Pley untuk menguji strategi, ketahanan, dan keterampilan sosial Anda.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Mode bertahan hidup dengan risiko eliminasi tinggi.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Mode ekstrem bagi mereka yang berani mempertaruhkan segalanya.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Mode ekstrem bagi mereka yang berani mempertaruhkan segalanya.',
     'about_desc2': 'Rip It menggabungkan interaksi sosial, kompetisi, dan personalisasi dinamis untuk menciptakan pengalaman yang unik, viral, dan memacu adrenalin.',
     'about_footer': 'Kami di sini untuk membuat profil, status, dan cerita bertahan hidup Anda berarti—menang, reset, atau berevolusi.',
     'about_close': 'Tutup',
@@ -3848,11 +3832,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Hanya suara turun yang penting',
     'model_pley_item3': 'Babak berwaktu (pengguna mengatur durasi)',
     'model_pley_item4': 'Pengguna terakhir yang bertahan mendapatkan pengakuan',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Mode bertahan hidup ekstrem',
-    'model_kight_item2': 'Hanya suara turun',
-    'model_kight_item3': 'Reset penuh jika suara turun',
-    'model_kight_item4': 'Sukarela bagi pencari sensasi berisiko tinggi',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Mode bertahan hidup ekstrem',
+    'model_Pley_item2': 'Hanya suara turun',
+    'model_Pley_item3': 'Reset penuh jika suara turun',
+    'model_Pley_item4': 'Sukarela bagi pencari sensasi berisiko tinggi',
     'model_pers_title': '3️⃣ Personalisasi (Non-IP Spesifik)',
     'model_pers_item1': 'Nama tampilan & tema profil kustom',
     'model_pers_item2': 'Pengalaman visual berbasis mode',
@@ -3899,7 +3883,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Apa Itu Rip It',
     'terms_s1_desc': 'Rip It adalah aplikasi bertahan hidup sosial berisiko tinggi di mana pengguna berpartisipasi dalam tantangan berwaktu, voting publik, dan mode kompetitif.',
     'terms_s1_list_title': 'Kami menyediakan alat untuk:',
-    'terms_s1_i1': 'Pengalaman bertahan hidup berbasis mode (Pley, Kight)',
+    'terms_s1_i1': 'Pengalaman bertahan hidup berbasis mode (Pley, Pley)',
     'terms_s1_i2': 'Voting publik dan pengakuan',
     'terms_s1_i3': 'Personalisasi profil dan pelacakan status',
     'terms_s1_disclaimer': 'Rip It tidak menjamin hasil, pertahanan hidup, atau peringkat.',
@@ -3909,7 +3893,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Berikan informasi yang akurat',
     'terms_s2_i4': 'Bertanggung jawab atas akun dan aktivitas Anda',
     'terms_s3_title': '3. Aturan Mode & Voting',
-    'terms_s3_i1': 'Pley, Vause, dan Kight memiliki mekanik unik yang memengaruhi status dan perkembangan profil.',
+    'terms_s3_i1': 'Pley, Pley, dan Pley memiliki mekanik unik yang memengaruhi status dan perkembangan profil.',
     'terms_s3_i2': 'Suara dapat memengaruhi perkembangan pengguna, reset profil, atau pembatasan sementara.',
     'terms_s3_i3': 'Timer, babak, dan hasil ditentukan oleh aplikasi dan pengguna yang berpartisipasi.',
     'terms_s3_i4': 'Pengguna berpartisipasi atas diskresi mereka sendiri.',
@@ -4073,7 +4057,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It سب کے لیے ایک جیسا نہیں ہے۔',
     'pers_desc': 'آپ کا پروفائل اس بات کے ساتھ تیار ہوتا ہے کہ آپ کس طرح بچتے ہیں۔',
     'pers_item1': 'حسب ضرورت وائبز اور تھیمز',
-    'pers_item2': 'موڈ پر مبنی بصری (Pley، Vause، Kight ہر ایک کا احساس مختلف ہے)',
+    'pers_item2': 'موڈ پر مبنی بصری (Pley، Pley، Pley ہر ایک کا احساس مختلف ہے)',
     'pers_item3': 'متحرک عنوانات جو آپ کی حیثیت کو ظاہر کرتے ہیں',
     'pers_item4': 'فالوور انرجی جو آپ کی موجودگی کو بناتی ہے',
     'pers_footer1': 'جتنا زیادہ آپ کھیلیں گے، اتنا ہی آپ کی شناخت بدلے گی۔',
@@ -4083,11 +4067,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Rip It کے بارے میں',
     'about_tagline': 'ٹیگ لائن: بچیں۔ ری سیٹ کریں۔ تیار ہوں۔',
-    'about_desc1': 'Rip It ایک اعلی داؤ والا سماجی بقا کا پلیٹ فارم ہے جو دلیر کھلاڑیوں کے لیے ڈیزائن کیا گیا ہے۔ اپنی حکمت عملی، لچک اور سماجی مہارتوں کو جانچنے کے لیے Pley، Vause، اور Kight جیسے طریقوں میں مقابلہ کریں۔',
+    'about_desc1': 'Rip It ایک اعلی داؤ والا سماجی بقا کا پلیٹ فارم ہے جو دلیر کھلاڑیوں کے لیے ڈیزائن کیا گیا ہے۔ اپنی حکمت عملی، لچک اور سماجی مہارتوں کو جانچنے کے لیے Pley، Pley، اور Pley جیسے طریقوں میں مقابلہ کریں۔',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'اعلی خطرے کے اخراج کے ساتھ بقا کا موڈ۔',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'ان لوگوں کے لیے انتہائی موڈ جو سب کچھ خطرے میں ڈالنے کی ہمت رکھتے ہیں۔',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'ان لوگوں کے لیے انتہائی موڈ جو سب کچھ خطرے میں ڈالنے کی ہمت رکھتے ہیں۔',
     'about_desc2': 'Rip It سماجی تعامل، مقابلے اور متحرک تخصیص کو یکجا کر کے ایک منفرد، وائرل اور ایڈونچر سے بھرپور تجربہ تخلیق کرتا ہے۔',
     'about_footer': 'ہم یہاں آپ کے پروفائل، حیثیت اور بقا کی کہانی کو اہم بنانے کے لیے ہیں—جیتیں، ری سیٹ کریں یا تیار ہوں۔',
     'about_close': 'بند کریں',
@@ -4110,11 +4094,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'صرف ڈاؤن ووٹ اہمیت رکھتے ہیں',
     'model_pley_item3': 'وقتی راؤنڈز (صارف دورانیہ مقرر کرتا ہے)',
     'model_pley_item4': 'آخری کھڑے صارفین کو پہچان ملتی ہے',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'انتہائی بقا کا موڈ',
-    'model_kight_item2': 'صرف ڈاؤن ووٹ',
-    'model_kight_item3': 'ڈاؤن ووٹ ہونے پر مکمل ری سیٹ',
-    'model_kight_item4': 'اعلی خطرے کے سنسنی کے متلاشیوں کے لیے رضاکارانہ',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'انتہائی بقا کا موڈ',
+    'model_Pley_item2': 'صرف ڈاؤن ووٹ',
+    'model_Pley_item3': 'ڈاؤن ووٹ ہونے پر مکمل ری سیٹ',
+    'model_Pley_item4': 'اعلی خطرے کے سنسنی کے متلاشیوں کے لیے رضاکارانہ',
     'model_pers_title': '3️⃣ تخصیص (غیر IP مخصوص)',
     'model_pers_item1': 'حسب ضرورت ڈسپلے نام اور پروفائل تھیم',
     'model_pers_item2': 'موڈ پر مبنی بصری تجربہ',
@@ -4161,7 +4145,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Rip It کیا ہے',
     'terms_s1_desc': 'Rip It ایک اعلی داؤ والا سماجی بقا کا ایپ ہے جہاں صارف وقتی چیلنجوں، عوامی ووٹنگ اور مسابقتی طریقوں میں حصہ لیتے ہیں۔',
     'terms_s1_list_title': 'ہم ان کے لیے ٹولز فراہم کرتے ہیں:',
-    'terms_s1_i1': 'موڈ پر مبنی بقا کے تجربات (Pley، Vause، Kight)',
+    'terms_s1_i1': 'موڈ پر مبنی بقا کے تجربات (Pley، Pley، Pley)',
     'terms_s1_i2': 'عوامی ووٹنگ اور پہچان',
     'terms_s1_i3': 'پروفائل کی تخصیص اور حیثیت کی ٹریکنگ',
     'terms_s1_disclaimer': 'Rip It نتائج، بقا یا رینکنگ کی ضمانت نہیں دیتا۔',
@@ -4171,7 +4155,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'درست معلومات فراہم کریں',
     'terms_s2_i4': 'اپنے اکاؤنٹ اور سرگرمی کے ذمہ دار بنیں',
     'terms_s3_title': '3. موڈز اور ووٹنگ کے قواعد',
-    'terms_s3_i1': 'Pley، Vause، اور Kight کے منفرد میکانکس ہیں جو پروفائل کی حیثیت اور ترقی کو متاثر کرتے ہیں۔',
+    'terms_s3_i1': 'Pley، Pley، اور Pley کے منفرد میکانکس ہیں جو پروفائل کی حیثیت اور ترقی کو متاثر کرتے ہیں۔',
     'terms_s3_i2': 'ووٹ صارف کی ترقی، پروفائل ری سیٹ، یا عارضی پابندیوں کو متاثر کر سکتے ہیں۔',
     'terms_s3_i3': 'ٹائمرز، راؤنڈز اور نتائج کا تعین ایپ اور شریک صارفین کرتے ہیں۔',
     'terms_s3_i4': 'صارفین اپنی صوابدید پر شرکت کرتے ہیں۔',
@@ -4335,7 +4319,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It برای همه یکسان نیست.',
     'pers_desc': 'پروفایل شما با نحوه بقای شما تکامل می‌یابد.',
     'pers_item1': 'تم‌ها و حال و هوای سفارشی',
-    'pers_item2': 'بصری‌های مبتنی بر حالت (Pley، Vause، Kight هر کدام حس متفاوتی دارند)',
+    'pers_item2': 'بصری‌های مبتنی بر حالت (Pley، Pley، Pley هر کدام حس متفاوتی دارند)',
     'pers_item3': 'عناوین پویا که وضعیت شما را نشان می‌دهند',
     'pers_item4': 'انرژی دنبال‌کنندگان که حضور شما را می‌سازد',
     'pers_footer1': 'هر چه بیشتر بازی کنید، هویت شما بیشتر تغییر می‌کند.',
@@ -4345,11 +4329,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'درباره Rip It',
     'about_tagline': 'شعار: زنده بمان. ری‌ست شو. تکامل یاب.',
-    'about_desc1': 'Rip It یک پلتفرم بقای اجتماعی با ریسک بالاست که برای بازیکنان جسور طراحی شده است. در حالت‌هایی مانند Pley، Vause و Kight رقابت کنید تا استراتژی، انعطاف‌پذیری و مهارت‌های اجتماعی خود را آزمایش کنید.',
+    'about_desc1': 'Rip It یک پلتفرم بقای اجتماعی با ریسک بالاست که برای بازیکنان جسور طراحی شده است. در حالت‌هایی مانند Pley، Pley و Pley رقابت کنید تا استراتژی، انعطاف‌پذیری و مهارت‌های اجتماعی خود را آزمایش کنید.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'حالت بقا با حذف با ریسک بالا.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'حالت افراطی برای کسانی که جرات ریسک کردن همه چیز را دارند.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'حالت افراطی برای کسانی که جرات ریسک کردن همه چیز را دارند.',
     'about_desc2': 'Rip It تعامل اجتماعی، رقابت و شخصی‌سازی پویا را ترکیب می‌کند تا تجربه‌ای منحصر به فرد، ویروسی و پر از آدرنالین ایجاد کند.',
     'about_footer': 'ما اینجا هستیم تا پروفایل، وضعیت و داستان بقای شما مهم باشد—ببرید، ری‌ست شوید یا تکامل یابید.',
     'about_close': 'بستن',
@@ -4372,11 +4356,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'فقط رای‌های منفی مهم هستند',
     'model_pley_item3': 'راندهای زمان‌دار (کاربر مدت زمان را تعیین می‌کند)',
     'model_pley_item4': 'آخرین کاربران باقی‌مانده شناسایی می‌شوند',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'حالت بقای افراطی',
-    'model_kight_item2': 'فقط رای منفی',
-    'model_kight_item3': 'ری‌ست کامل در صورت رای منفی',
-    'model_kight_item4': 'داوطلبانه برای جویندگان هیجان با ریسک بالا',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'حالت بقای افراطی',
+    'model_Pley_item2': 'فقط رای منفی',
+    'model_Pley_item3': 'ری‌ست کامل در صورت رای منفی',
+    'model_Pley_item4': 'داوطلبانه برای جویندگان هیجان با ریسک بالا',
     'model_pers_title': '3️⃣ شخصی‌سازی (غیر IP اختصاصی)',
     'model_pers_item1': 'نام نمایشی و تم پروفایل سفارشی',
     'model_pers_item2': 'تجربه بصری مبتنی بر حالت',
@@ -4423,7 +4407,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '۱. Rip It چیست',
     'terms_s1_desc': 'Rip It یک اپلیکیشن بقای اجتماعی با ریسک بالاست که در آن کاربران در چالش‌های زمان‌دار، رای‌گیری عمومی و حالت‌های رقابتی شرکت می‌کنند.',
     'terms_s1_list_title': 'ما ابزارهایی برای موارد زیر فراهم می‌کنیم:',
-    'terms_s1_i1': 'تجربه‌های بقای مبتنی بر حالت (Pley، Vause، Kight)',
+    'terms_s1_i1': 'تجربه‌های بقای مبتنی بر حالت (Pley، Pley، Pley)',
     'terms_s1_i2': 'رای‌گیری عمومی و شناسایی',
     'terms_s1_i3': 'شخصی‌سازی پروفایل و پیگیری وضعیت',
     'terms_s1_disclaimer': 'Rip It نتایج، بقا یا رتبه‌بندی را تضمین نمی‌کند.',
@@ -4433,7 +4417,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'اطلاعات دقیق ارائه دهد',
     'terms_s2_i4': 'مسئول حساب و فعالیت خود باشد',
     'terms_s3_title': '۳. حالت‌ها و قوانین رای‌گیری',
-    'terms_s3_i1': 'Pley، Vause و Kight دارای مکانیک‌های منحصر به فردی هستند که بر وضعیت و پیشرفت پروفایل تاثیر می‌گذارند.',
+    'terms_s3_i1': 'Pley، Pley و Pley دارای مکانیک‌های منحصر به فردی هستند که بر وضعیت و پیشرفت پروفایل تاثیر می‌گذارند.',
     'terms_s3_i2': 'رای‌ها ممکن است بر پیشرفت کاربر، ری‌ست پروفایل یا محدودیت‌های موقت تاثیر بگذارند.',
     'terms_s3_i3': 'تایمرها، راندها و نتایج توسط اپلیکیشن و کاربران شرکت‌کننده تعیین می‌شوند.',
     'terms_s3_i4': 'کاربران با صلاحدید خود مشارکت می‌کنند.',
@@ -4597,7 +4581,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Rip It no es igual para todos.',
     'pers_desc': 'Tu perfil evoluciona con tu forma de sobrevivir.',
     'pers_item1': 'Vibras y temas personalizados',
-    'pers_item2': 'Visuales basados en modo (Pley, Kight son diferentes)',
+    'pers_item2': 'Visuales basados en modo (Pley, Pley son diferentes)',
     'pers_item3': 'Títulos dinámicos que muestran tu estatus',
     'pers_item4': 'Energía de seguidores que construye tu presencia',
     'pers_footer1': 'Cuanto más juegas, más cambia tu identidad.',
@@ -4607,11 +4591,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Acerca de Rip It',
     'about_tagline': 'Eslogan: Sobrevive. Reinicia. Evoluciona.',
-    'about_desc1': 'Rip It es una plataforma de supervivencia social de alto riesgo diseñada para jugadores audaces. Compite en modos como Pley, Vause y Kight para poner a prueba tu estrategia, resistencia y habilidades sociales.',
+    'about_desc1': 'Rip It es una plataforma de supervivencia social de alto riesgo diseñada para jugadores audaces. Compite en modos como Pley, Pley y Pley para poner a prueba tu estrategia, resistencia y habilidades sociales.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Modo de supervivencia con eliminación de alto riesgo.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Modo extremo para quienes se atreven a arriesgarlo todo.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Modo extremo para quienes se atreven a arriesgarlo todo.',
     'about_desc2': 'Rip It combina interacción social, competencia y personalización dinámica para crear una experiencia única, viral y llena de adrenalina.',
     'about_footer': 'Estamos aquí para que tu perfil, estatus e historia de supervivencia importen: gana, reinicia o evoluciona.',
     'about_close': 'Cerrar',
@@ -4634,11 +4618,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Solo cuentan los votos negativos',
     'model_pley_item3': 'Rondas cronometradas (el usuario establece la duración)',
     'model_pley_item4': 'Los últimos usuarios en pie ganan reconocimiento',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Modo de supervivencia extremo',
-    'model_kight_item2': 'Solo votos negativos',
-    'model_kight_item3': 'Reinicio total si se vota en contra',
-    'model_kight_item4': 'Voluntario para buscadores de emociones de alto riesgo',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Modo de supervivencia extremo',
+    'model_Pley_item2': 'Solo votos negativos',
+    'model_Pley_item3': 'Reinicio total si se vota en contra',
+    'model_Pley_item4': 'Voluntario para buscadores de emociones de alto riesgo',
     'model_pers_title': '3️⃣ Personalización (No específica de IP)',
     'model_pers_item1': 'Nombre de usuario y tema de perfil personalizados',
     'model_pers_item2': 'Experiencia visual basada en el modo',
@@ -4685,7 +4669,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Qué es Rip It',
     'terms_s1_desc': 'Rip It es una aplicación de supervivencia social de alto riesgo donde los usuarios participan en desafíos cronometrados, votaciones públicas y modos competitivos.',
     'terms_s1_list_title': 'Proporcionamos herramientas para:',
-    'terms_s1_i1': 'Experiencias de supervivencia basadas en modos (Pley, Kight)',
+    'terms_s1_i1': 'Experiencias de supervivencia basadas en modos (Pley, Pley)',
     'terms_s1_i2': 'Votación pública y reconocimiento',
     'terms_s1_i3': 'Personalización del perfil y seguimiento del estatus',
     'terms_s1_disclaimer': 'Rip It no garantiza resultados, supervivencia o ranking.',
@@ -4695,7 +4679,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Proporcionar información precisa',
     'terms_s2_i4': 'Ser responsable de tu cuenta y actividad',
     'terms_s3_title': '3. Modos y Reglas de Votación',
-    'terms_s3_i1': 'Pley, Vause y Kight tienen mecánicas únicas que afectan el estatus y la progresión del perfil.',
+    'terms_s3_i1': 'Pley, Pley y Pley tienen mecánicas únicas que afectan el estatus y la progresión del perfil.',
     'terms_s3_i2': 'Los votos pueden afectar el progreso del usuario, el reinicio del perfil o restricciones temporales.',
     'terms_s3_i3': 'Los temporizadores, las rondas y los resultados son determinados por la aplicación y los usuarios participantes.',
     'terms_s3_i4': 'Los usuarios participan bajo su propia discreción.',
@@ -4860,7 +4844,7 @@ const translations: Record<string, Record<string, string>> = {
     'pers_subtitle': 'Ang Rip It ay hindi para sa lahat.',
     'pers_desc': 'Nagbabago ang iyong profile depende sa kung paano ka nabubuhay.',
     'pers_item1': 'Mga custom vibes at tema',
-    'pers_item2': 'Mga visual base sa mode (Magkakaiba ang Pley, Vause, at Kight)',
+    'pers_item2': 'Mga visual base sa mode (Magkakaiba ang Pley, Pley, at Pley)',
     'pers_item3': 'Mga dynamic titles na nagpapakita ng iyong status',
     'pers_item4': 'Follower energy na nagpapatibay sa iyong presensya',
     'pers_footer1': 'Habang lalo kang naglalaro, lalong nagbabago ang iyong pagkakakilanlan.',
@@ -4870,11 +4854,11 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'Tungkol sa Rip It',
     'about_tagline': 'Tagline: Mabuhay. Mag-reset. Mag-evolve.',
-    'about_desc1': 'Ang Rip It ay isang high-stakes social survival platform na ginawa para sa mga matatapang na manlalaro. Sumali sa mga mode tulad ng Pley, Vause, at Kight para subukan ang iyong stratehiya, tatag, at social skills.',
+    'about_desc1': 'Ang Rip It ay isang high-stakes social survival platform na ginawa para sa mga matatapang na manlalaro. Sumali sa mga mode tulad ng Pley, Pley, at Pley para subukan ang iyong stratehiya, tatag, at social skills.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Survival mode na may mataas na tsansa ng pagkakatanggal.',
-    'about_kight_title': 'Kight',
-    'about_kight_desc': 'Extreme mode para sa mga nangangahas na isugal ang lahat.',
+    'about_Pley_title': 'Pley',
+    'about_Pley_desc': 'Extreme mode para sa mga nangangahas na isugal ang lahat.',
     'about_desc2': 'Pinagsasama ng Rip It ang social interaction, kompetisyon, at dynamic personalization para gumawa ng kakaiba, viral, at adrenaline-pumping na karanasan.',
     'about_footer': 'Nandito kami para gawing mahalaga ang iyong profile, status, at survival story—manalo, mag-reset, o mag-evolve.',
     'about_close': 'Isara',
@@ -4897,11 +4881,11 @@ const translations: Record<string, Record<string, string>> = {
     'model_pley_item2': 'Down votes lang ang mahalaga',
     'model_pley_item3': 'Mga timed round (ang user ang nagtatakda ng oras)',
     'model_pley_item4': 'Ang mga huling natitirang user ay nakakakuha ng pagkilala',
-    'model_kight_title': 'Kight',
-    'model_kight_item1': 'Extreme survival mode',
-    'model_kight_item2': 'Down votes lang',
-    'model_kight_item3': 'Full reset kapag na-vote down',
-    'model_kight_item4': 'Boluntaryo para sa mga naghahanap ng high-risk thrill',
+    'model_Pley_title': 'Pley',
+    'model_Pley_item1': 'Extreme survival mode',
+    'model_Pley_item2': 'Down votes lang',
+    'model_Pley_item3': 'Full reset kapag na-vote down',
+    'model_Pley_item4': 'Boluntaryo para sa mga naghahanap ng high-risk thrill',
     'model_pers_title': '3️⃣ Personalization (Non-IP Specific)',
     'model_pers_item1': 'Custom display name at tema ng profile',
     'model_pers_item2': 'Mode-based visual na karanasan',
@@ -4948,7 +4932,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. Ano ang Rip It',
     'terms_s1_desc': 'Ang Rip It ay isang high-stakes social survival app kung saan ang mga user ay lumalahok sa mga timed challenge, pampublikong pagboto, at mga competitive mode.',
     'terms_s1_list_title': 'Nagbibigay kami ng mga tool para sa:',
-    'terms_s1_i1': 'Mode-based survival experiences (Pley, Kight)',
+    'terms_s1_i1': 'Mode-based survival experiences (Pley, Pley)',
     'terms_s1_i2': 'Pampublikong pagboto at pagkilala',
     'terms_s1_i3': 'Profile personalization at pagsubaybay sa status',
     'terms_s1_disclaimer': 'Hindi ginagarantiya ng Rip It ang mga resulta, survival, o ranking.',
@@ -4958,7 +4942,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Magbigay ng tumpak na impormasyon',
     'terms_s2_i4': 'Maging responsable para sa iyong account at aktibidad',
     'terms_s3_title': '3. Mga Mode at Panuntunan sa Pagboto',
-    'terms_s3_i1': 'Ang Pley, Vause, at Kight ay may mga natatanging mekanismo na nakakaapekto sa profile status at pag-unlad.',
+    'terms_s3_i1': 'Ang Pley, Pley, at Pley ay may mga natatanging mekanismo na nakakaapekto sa profile status at pag-unlad.',
     'terms_s3_i2': 'Ang mga boto ay maaaring makaapekto sa pag-unlad ng user, profile reset, o pansamantalang paghihigpit.',
     'terms_s3_i3': 'Ang mga timer, round, at resulta ay idinedetermina ng app at ng mga kalahok na user.',
     'terms_s3_i4': 'Ang mga user ay lumalahok sa sarili nilang pagpapasya.',
@@ -5023,29 +5007,19 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
   });
   const [clickCounts, setClickCounts] = useState<Record<string, number>>({
-    pley: 0,
-    
-    kight: 0
+    pley: 0
   });
   const [eliminationCounts, setEliminationCounts] = useState<Record<string, number>>({
-    pley: 0,
-    
-    kight: 0
+    pley: 0
   });
   const [madeItCounts, setMadeItCounts] = useState<Record<string, number>>({
-    pley: 0,
-    
-    kight: 0
+    pley: 0
   });
   const [variantDurations, setVariantDurations] = useState<Record<string, number>>({
-    pley: 0,
-    
-    kight: 0
+    pley: 0
   });
   const [variantFirstClickTime, setVariantFirstClickTime] = useState<Record<string, number>>({
-    pley: 0,
-    
-    kight: 0
+    pley: 0
   });
   const [userSelection, setUserSelection] = useState<string | null>(null);
   const [isChallengeEnded, setIsChallengeEnded] = useState(false);
@@ -5081,11 +5055,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     return initialComments;
   });
   const [showPills, setShowPills] = useState(true);
-  const [activeTab, setActiveTab] = useState<string | null>('kight');
-  const [kightRankingVotes, setKightRankingVotes] = useState<Record<string, number>>({});
-  const [kightFirstRankingVoteTime, setKightFirstRankingVoteTime] = useState<Record<string, number>>({});
-  const [userKightRanking, setUserKightRanking] = useState<number>(1);
-  const [hasVotedKightRanking, setHasVotedKightRanking] = useState(false);
+  const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
   const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>(() => {
     const saved = localStorage.getItem('survivorHistory');
@@ -5182,31 +5152,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const majorityVariant = getMajorityVariant();
 
-  const getMajorityRankingRule = () => {
-    const counts = Object.entries(kightRankingVotes);
-    if (counts.length === 0) return null;
-    
-    const maxCount = Math.max(...counts.map(([, count]) => count));
-    if (maxCount === 0) return null;
-
-    const leaders = counts.filter(([, count]) => count === maxCount);
-    if (leaders.length === 1) return leaders[0][0];
-
-    return leaders.reduce((prev, curr) => {
-      const prevTime = kightFirstRankingVoteTime[prev[0]] || Infinity;
-      const currTime = kightFirstRankingVoteTime[curr[0]] || Infinity;
-      return currTime < prevTime ? curr : prev;
-    })[0];
-  };
-
-  const majorityRankingRule = getMajorityRankingRule();
-
   const getVariantDisplayName = (key: string | null) => {
     if (!key) return '';
     const names: Record<string, string> = {
       pley: 'Pley',
-      vause: 'Vause',
-      kight: 'Kight'
+      Pley: 'Pley',
+      Pley: 'Pley'
     };
     return names[key] || key;
   };
@@ -5265,7 +5216,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const isLegend = (username: string) => {
     const userHistory = survivorHistory.filter(s => s.username === username);
     const variants = new Set(userHistory.map(s => s.variant));
-    return variants.has('pley') && variants.has('vause') && variants.has('kight');
+    return variants.has('pley');
   };
 
   const [isDurationInitialized, setIsDurationInitialized] = useState(false);
@@ -5277,16 +5228,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     setIsDurationInitialized(false);
     setUserSelection(null);
     setShowPills(true);
-    setActiveTab('kight');
-    setClickCounts({ pley: 0, kight: 0 });
-    setEliminationCounts({ pley: 0, kight: 0 });
-    setMadeItCounts({ pley: 0, kight: 0 });
-    setVariantDurations({ pley: 0, kight: 0 });
-    setVariantFirstClickTime({ pley: 0, kight: 0 });
-    setKightRankingVotes({});
-    setKightFirstRankingVoteTime({});
-    setUserKightRanking(1);
-    setHasVotedKightRanking(false);
+    setActiveTab('pley');
+    setClickCounts({ pley: 0 });
+    setEliminationCounts({ pley: 0 });
+    setMadeItCounts({ pley: 0 });
+    setVariantDurations({ pley: 0 });
+    setVariantFirstClickTime({ pley: 0 });
     setSurvivors([]);
     setVisiblePosts(allPosts);
   };
@@ -5324,12 +5271,10 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         survivors: survivors.map(s => ({ 
           ...s, 
           variant: activeVariant, 
-          userVote: null,
-          rankingRule: activeVariant === 'kight' ? majorityRankingRule : undefined
+          userVote: null
         })),
         durationLabel,
-        variant: activeVariant,
-        rankingRule: activeVariant === 'kight' ? majorityRankingRule : undefined
+        variant: activeVariant
       };
 
       setRoundHistory(prev => [roundRecord, ...prev]);
@@ -5343,8 +5288,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           roundDurationLabel: durationLabel,
           roundDurationValue: durationSeconds,
           variant: activeVariant,
-          userVote: null,
-          rankingRule: activeVariant === 'kight' ? majorityRankingRule : undefined
+          userVote: null
         }));
         
         setSurvivorHistory(prev => {
@@ -5440,7 +5384,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     let interval: NodeJS.Timeout;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        const variants = ['pley', 'vause', 'kight'];
+        const variants = ['pley'];
         const randomVariant = variants[Math.floor(Math.random() * variants.length)];
         const weights = [5, 10, 20, 50, 100];
         const randomClicks = weights[Math.floor(Math.random() * weights.length)];
@@ -5468,24 +5412,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         });
 
         // 4. Removed random elimination simulation - now depends on user actions
-
-        // 5. Update Kight ranking votes if applicable
-        if (majorityVariant === 'kight') {
-          const rules = [1, 5, 10, 20];
-          const randomRankingValue = rules[Math.floor(Math.random() * rules.length)];
-          const ruleKey = `Top ${randomRankingValue}`;
-          const randomRankingClicks = Math.floor(Math.random() * 20) + 1;
-
-          setKightRankingVotes(prev => ({
-            ...prev,
-            [ruleKey]: (prev[ruleKey] || 0) + randomRankingClicks
-          }));
-
-          setKightFirstRankingVoteTime(prev => {
-            if (!prev[ruleKey]) return { ...prev, [ruleKey]: Date.now() };
-            return prev;
-          });
-        }
       }, 4000);
     }
     return () => clearInterval(interval);
@@ -5498,12 +5424,10 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       showPills, setShowPills, activeTab, setActiveTab,
       enemies, postComments, wallPosts, followedUsers, toggleFollow, isLegend, allPosts, setAllPosts,
       visiblePosts, setVisiblePosts,
-      kightRankingVotes, kightFirstRankingVoteTime, userKightRanking,
-      hasVotedKightRanking, majorityVariant, majorityRankingRule, survivors, survivorHistory, roundHistory,
+      majorityVariant, survivors, survivorHistory, roundHistory,
       setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
-      setUserSelection, setIsChallengeEnded, setKightRankingVotes,
-      setKightFirstRankingVoteTime, setUserKightRanking, setHasVotedKightRanking,
+      setUserSelection, setIsChallengeEnded,
       setSurvivors, setSurvivorHistory, setRoundHistory, updateHistoryVote, startNewChallenge, clearAllHistory, getVariantDisplayName,
       addEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, login, logout, language, setLanguage, theme, setTheme, t
     }}>

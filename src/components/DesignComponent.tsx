@@ -37,9 +37,8 @@ const DesignComponent: React.FC = () => {
   };
 
   const handleVote = (vote: 1 | -1) => {
-    if (gameMode === 'vause' || gameMode === 'pley' || gameMode === 'kight') {
+    if (gameMode === 'pley') {
       if (vote === 1) {
-        if (gameMode === 'kight' || gameMode === 'pley') return;
         return;
       }
       if (vote === -1) {
@@ -121,7 +120,7 @@ const DesignComponent: React.FC = () => {
               "flex items-center space-x-1 rounded-full px-1 transition-all duration-300",
               userVote === 1 ? "bg-green-600" : userVote === -1 ? "bg-[#DC143C]" : "bg-zinc-50"
             )}>
-              {(!gameMode || gameMode === 'vause') && (
+              {(!gameMode || gameMode === 'pley') && (
                 <button 
                   onClick={() => handleVote(1)}
                   className="p-1 transition-all duration-300 hover:scale-110"

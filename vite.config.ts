@@ -8,4 +8,10 @@ export default defineConfig({
     react(),
     tsconfigPaths()
   ],
+  build: {
+    sourcemap: false
+  },
+  esbuild: {
+    sourcemap: false
+  }
 })

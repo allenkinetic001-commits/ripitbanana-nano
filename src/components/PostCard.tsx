@@ -51,9 +51,9 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
       return;
     }
 
-    if (gameMode === 'pley' || gameMode === 'kight') {
+    if (gameMode === 'pley') {
       if (vote === 1) {
-        return; // Downvotes only in Kight and Pley
+        return; // Downvotes only in Pley
       }
       if (vote === -1) {
         if (onDelete) onDelete();
