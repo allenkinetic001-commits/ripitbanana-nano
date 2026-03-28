@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle } from 'lucide-react';
@@ -60,7 +60,7 @@ const Home = () => {
       avatar: userProfile.avatar,
       image: selectedFile,
       type: fileType,
-      caption: captionText || (fileType === 'video' ? 'Just uploaded a video! 🎥' : 'Just uploaded a photo! 📸'),
+      caption: captionText || (fileType === 'video' ? 'Just uploaded a video! ðŸŽ¥' : 'Just uploaded a photo! ðŸ“¸'),
       likes: 0,
       time: 'Just now',
       comments: []
@@ -340,7 +340,7 @@ const Home = () => {
                 onClick={() => setShowPillsInfo(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 text-zinc-400 hover:text-zinc-900 transition-all"
               >
-                ✕
+                âœ•
               </button>
             </div>
             
@@ -351,11 +351,11 @@ const Home = () => {
                   <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full">Pley</span>
                   <div className="flex items-center gap-1.5">
                     <Flame size={12} className="text-orange-600 fill-orange-600" />
-                    <span className="text-xs font-black text-zinc-900 uppercase tracking-tighter">— Fate Worse Than Death</span>
+                    <span className="text-xs font-black text-zinc-900 uppercase tracking-tighter">â€” Fate Worse Than Death</span>
                   </div>
                 </div>
                 <p className="text-sm text-zinc-400 leading-relaxed font-medium">
-                  A feature game mode where users can only vote down, and a single down permanently destroys a player’s account for that round.
+                  A feature game mode where users can only vote down, and a single down permanently destroys a playerâ€™s account for that round.
                 </p>
               </div>
 
@@ -365,7 +365,7 @@ const Home = () => {
                   <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full"></span>
                 </div>
                 <p className="text-sm text-zinc-400 leading-relaxed font-medium">
-                  A high-stakes game mode where users can only receive downvotes. Before the round begins, players select the ranking rule they want—Top 1, Top 5, Top 10, or Top 20. The final rule is determined by majority vote, with the first player’s choice acting as a temporary default until the majority is established. At the end of the round, any player who fails to make it into the selected top ranking has their profile, followers, and posts reset to zero, while their account remains intact.
+                  A high-stakes game mode where users can only receive downvotes. Before the round begins, players select the ranking rule they wantâ€”Top 1, Top 5, Top 10, or Top 20. The final rule is determined by majority vote, with the first playerâ€™s choice acting as a temporary default until the majority is established. At the end of the round, any player who fails to make it into the selected top ranking has their profile, followers, and posts reset to zero, while their account remains intact.
                 </p>
               </div>
             </div>
@@ -400,7 +400,9 @@ const Home = () => {
             {!isChallengeEnded && showMustache && (
               <button 
                 onClick={() => {
-                  if (showPills) {
+                  if (!showPills) {
+                    setActiveTab('pley');
+                  } else {
                     setActiveTab(null);
                   }
                   setShowPills(!showPills);
@@ -543,78 +545,21 @@ const Home = () => {
           </div>
         )}
 
-        {/* Sub-header Navigation */}
+        {/* Sub-header Navigation - Simplified for Pley-only */}
         <div className="px-6 pt-0 pb-1 flex items-end justify-between gap-6 relative">
-          {showPills && !isChallengeEnded ? (
-            <>
-              {/* Pley Pill Container */}
-               <div className="flex flex-col items-center gap-2 flex-1 max-w-[120px] relative group">
-                 <div className="h-[48px] flex flex-col items-center justify-end w-full">
-                   {/* Variant Label or Majority Badge */}
-                   {majorityVariant === 'pley' && timeLeft > 0 ? (
-                     <div className="flex flex-col items-center gap-1 w-full">
-                       {eliminationCounts.pley > 0 && (
-                         <div className="flex items-center gap-1.5 bg-rose-50/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-rose-100 shadow-[0_2px_10px_-3px_rgba(225,29,72,0.2)] animate-slide-in w-fit">
-                           <Skull size={10} className="text-rose-500 fill-rose-500" />
-                           <span className="text-[8px] font-black text-rose-600 uppercase tracking-tighter leading-none whitespace-nowrap">
-                             <span className="mr-1">{eliminationCounts.pley}</span>
-                             {t('home_eliminated')}
-                           </span>
-                         </div>
-                       )}
-                       {madeItCounts.pley > 0 && (
-                        <div className="flex items-center gap-1.5 bg-green-50/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-green-100 shadow-[0_2px_10px_-3px_rgba(22,163,74,0.2)] animate-slide-in w-fit">
-                          <Sparkles size={10} className="text-green-500 fill-green-500" />
-                          <span className="text-[8px] font-black text-green-600 uppercase tracking-tighter leading-none whitespace-nowrap">
-                            <span className="mr-1">{madeItCounts.pley}</span>
-                            {t('home_survivors')}
-                          </span>
-                        </div>
-                      )}
-                       <div className="flex items-center gap-1 bg-amber-50/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-200 shadow-sm animate-pulse w-fit">
-                         <Sparkles size={10} className="text-amber-500 fill-amber-500" />
-                         <span className="text-[9px] font-black font-serif text-amber-700 uppercase tracking-tight leading-none">{t('home_majority')}</span>
-                       </div>
-                     </div>
-                   ) : (
-                     <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-purple-200 shadow-[0_4px_15px_-3px_rgba(147,51,234,0.1)] animate-float">
-                       <Sparkles size={12} className="text-purple-500 fill-purple-500" />
-                       <span className="text-[10px] font-black font-serif bg-gradient-to-r from-purple-600 via-purple-400 to-zinc-900 bg-clip-text text-transparent tracking-tight leading-none whitespace-nowrap">
-                         {t('home_choose_variant')}
-                       </span>
-                     </div>
-                   )}
-                 </div>
-                 
-                 <button 
-                   onClick={() => handleTabClick('pley')}
-                   className={`w-full py-3 border-2 rounded-2xl text-center text-[11px] uppercase tracking-[0.2em] font-black transition-all duration-500 relative overflow-hidden group/pill ${
-                     activeTab === 'pley' 
-                       ? 'bg-orange-600 border-orange-500 text-white shadow-[0_10px_25px_-5px_rgba(234,88,12,0.4)] scale-105 translate-y-[-4px]' 
-                       : userSelection === 'pley'
-                         ? 'bg-orange-50 border-orange-200 text-orange-600'
-                         : 'bg-zinc-50/50 border-zinc-200 text-zinc-400 hover:border-orange-300 hover:bg-orange-50/30 hover:text-orange-500 hover:translate-y-[-2px]'
-                   } ${userSelection && timeLeft > 0 ? 'cursor-not-allowed opacity-80' : ''}`}
-                 >
-                   <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/pill:translate-x-[100%] transition-transform duration-1000" />
-                   <span className="relative z-10 flex items-center justify-center gap-2">
-                     {activeTab === 'pley' && <Flame size={12} className="animate-pulse" />}
-                     Pley
-                   </span>
-                   {timeLeft > 0 && (
-                     <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                       <span className="bg-black/10 px-1.5 py-0.5 rounded text-[8px] font-bold backdrop-blur-sm">
-                         {clickCounts.pley}
-                       </span>
-                     </div>
-                   )}
-                 </button>
-               </div>
-
-            </>
-          ) : (
-            <div className="flex-1" /> // Spacer when pills are hidden
+          {showPills && !isChallengeEnded && (
+            <div className="flex flex-col items-center gap-2 flex-1 relative group">
+              <div className="h-[48px] flex flex-col items-center justify-end w-full">
+                <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-orange-200 shadow-[0_4px_15px_-3px_rgba(234,88,12,0.1)] animate-float">
+                  <Flame size={12} className="text-orange-500 fill-orange-500" />
+                  <span className="text-[10px] font-black font-serif bg-gradient-to-r from-orange-600 via-orange-400 to-zinc-900 bg-clip-text text-transparent tracking-tight leading-none whitespace-nowrap">
+                    PLEY: FATE WORSE THAN DEATH
+                  </span>
+                </div>
+              </div>
+            </div>
           )}
+          {!showPills && <div className="flex-1" />}
         </div>
 
         {/* Timer and Submit Section */}
