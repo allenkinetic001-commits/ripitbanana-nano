@@ -392,7 +392,7 @@ const Home = () => {
               title="Toggle Menu"
             >
               <img src="/header-logo-hydrant.png" alt="Logo" className="h-[60px] w-auto object-contain" />
-              <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain -ml-2" />
+              <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain ml-4" />
             </button>
           </div>
           <div className="flex items-center gap-4">
