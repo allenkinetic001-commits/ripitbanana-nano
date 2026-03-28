@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle } from 'lucide-react';
@@ -388,12 +388,11 @@ const Home = () => {
           <div className="flex items-center gap-0">
             <button 
               onClick={() => setShowMustache(!showMustache)}
-              className="transition-all active:scale-95 hover:opacity-80"
-              title="Toggle Mustache"
+              className="transition-all active:scale-95 hover:opacity-80 flex items-center"
+              title="Toggle Menu"
             >
-              <img src="/header-logo-banana.png" alt="Logo" className="h-[60px] w-auto object-contain" />
+              <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain" />
             </button>
-            <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-4">
             <ChallengeTimer />
