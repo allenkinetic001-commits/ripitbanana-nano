@@ -660,7 +660,7 @@ const Home = () => {
                 <img 
                   src="/btn-submit.png" 
                   alt={userSelection && timeLeft > 0 ? "Submitted" : "Submit"} 
-                  className="h-[38px] w-auto object-contain" 
+                  className="h-[38px] w-auto object-contain mix-blend-multiply" 
                 />
               </button>
             </div>
