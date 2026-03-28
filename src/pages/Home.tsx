@@ -651,16 +651,16 @@ const Home = () => {
                     setHours(0);
                     setMinutes(0);
                   }}
-                className={`transition-all transform flex items-center justify-center ${
+                className={`transition-all transform flex items-center justify-center mix-blend-multiply ${
                   (!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)
                     ? 'opacity-50 grayscale cursor-not-allowed scale-100'
-                    : 'hover:scale-105 active:scale-95 hover:opacity-90 shadow-lg shadow-purple-200/50 rounded-full'
+                    : 'hover:scale-105 active:scale-95 hover:opacity-90'
                 }`}
               >
                 <img 
                   src="/btn-submit.png" 
                   alt={userSelection && timeLeft > 0 ? "Submitted" : "Submit"} 
-                  className="h-[38px] w-auto object-contain mix-blend-multiply" 
+                  className="h-[38px] w-auto object-contain" 
                 />
               </button>
             </div>
