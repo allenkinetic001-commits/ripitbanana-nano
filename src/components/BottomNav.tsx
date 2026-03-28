@@ -70,7 +70,7 @@ const BottomNav = () => {
                 </div>
               )}
             </div>
-            <div className="h-4 flex items-center justify-center">
+            <div className="h-7 flex items-center justify-center -mt-1">
               {item.path === '/' ? (
                 <img 
                   src="/nav-home-text.png" 
