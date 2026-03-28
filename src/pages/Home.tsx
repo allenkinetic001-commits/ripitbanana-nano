@@ -660,7 +660,7 @@ const Home = () => {
                 <img 
                   src="/btn-submit.png" 
                   alt={userSelection && timeLeft > 0 ? "Submitted" : "Submit"} 
-                  className="h-[64px] w-auto object-contain" 
+                  className="h-[72px] w-auto object-contain" 
                 />
               </button>
             </div>
