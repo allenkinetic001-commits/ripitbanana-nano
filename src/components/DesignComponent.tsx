@@ -72,18 +72,19 @@ const DesignComponent: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {(!isEnemy || showAddedFeedback) && (
             <button 
               onClick={handleAddEnemy}
-              className={`transition-all duration-300 group px-3 py-1.5 rounded-md ${
-                showAddedFeedback ? "text-rose-600" : "text-[#DC143C] hover:bg-red-50"
-              }`}
+              className={cn(
+                "transition-all duration-300 transform",
+                isEnemy ? "opacity-40 grayscale cursor-not-allowed" : "hover:opacity-80 active:scale-95 drop-shadow-sm"
+              )}
             >
-              <span className="text-sm font-bold">
-                 {showAddedFeedback ? 'Added Enemy' : 'Add Enemy'}
-               </span>
+              <img 
+                src="/add-enemy.png" 
+                alt={isEnemy ? 'Added Enemy' : 'Add Enemy'} 
+                className="h-[34px] w-auto object-contain rounded-xl"
+              />
             </button>
-          )}
         </div>
       </div>
 
