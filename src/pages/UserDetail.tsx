@@ -104,11 +104,15 @@ const UserDetail = () => {
               }
             }}
             className={cn(
-              "flex-1 py-1.5 rounded-lg text-sm font-semibold transition-colors",
-              isEnemy ? "bg-rose-100 text-rose-600" : "bg-zinc-100 text-zinc-900"
+              "flex-1 flex items-center justify-center transition-all active:scale-95",
+              isEnemy ? "opacity-30 grayscale" : "hover:opacity-80 drop-shadow-sm transition-opacity"
             )}
           >
-            {isEnemy ? 'Enemy Marked' : 'Mark Enemy'}
+            <img 
+              src="/add-enemy.png" 
+              alt={isEnemy ? 'Enemy Marked' : 'Mark Enemy'} 
+              className="h-[38px] w-auto object-contain" 
+            />
           </button>
         </div>
       </div>
