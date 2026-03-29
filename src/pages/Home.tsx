@@ -613,6 +613,10 @@ const Home = () => {
               </div>
             </div>
             
+            <div className="flex justify-center w-full pb-2">
+              <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[28px] w-auto object-contain opacity-80" />
+            </div>
+
             <div className="flex justify-end items-center gap-3">
               {(userSelection && timeLeft > 0) ? (
                 <span className="text-[10px] font-bold text-zinc-400 italic">{t('home_selection_locked')}</span>
