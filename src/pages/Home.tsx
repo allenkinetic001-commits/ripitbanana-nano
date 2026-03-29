@@ -551,7 +551,7 @@ const Home = () => {
             <div className="flex flex-col items-center gap-2 flex-1 relative group">
               <div className="h-[48px] flex flex-col items-center justify-end w-full">
                 <div className="flex items-center gap-1">
-                  <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[48px] w-auto object-contain shrink-0 ml-20" />
+                  <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[48px] w-auto object-contain shrink-0 ml-36" />
                   <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[52px] w-auto object-contain shrink-0" />
                   <img src="/pley-challenge-garage.png" alt="Challenge Garage" className="h-[44px] w-auto object-contain shrink-0 ml-16 relative z-10" />
                 </div>
