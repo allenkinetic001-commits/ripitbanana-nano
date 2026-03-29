@@ -550,9 +550,7 @@ const Home = () => {
           {showPills && !isChallengeEnded && (
             <div className="flex flex-col items-center gap-2 flex-1 relative group">
               <div className="h-[48px] flex flex-col items-center justify-end w-full">
-                <div className="flex items-center bg-white/90 backdrop-blur-sm px-4 py-2 rounded-2xl border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-                  <img src="/pley-challenge-logo.png" alt="Pley Challenge" className="h-[40px] w-auto object-contain" />
-                </div>
+                <img src="/pley-challenge-logo.png" alt="Pley Challenge" className="h-[40px] w-auto object-contain" />
               </div>
             </div>
           )}
