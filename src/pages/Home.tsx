@@ -420,7 +420,7 @@ const Home = () => {
               onClick={() => navigate('/chat')}
               className="text-zinc-700 hover:text-purple-600 transition-colors"
             >
-              <img src="/nav-news-v3.png" alt="News" className="h-[38px] w-[38px] object-contain" />
+              <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" />
             </button>
             <button 
               onClick={() => fileInputRef.current?.click()}
@@ -439,7 +439,7 @@ const Home = () => {
               className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
               onClick={() => setShowPillsInfo(true)}
             >
-              <img src="/nav-info-v3.png" alt="Info" className="h-[38px] w-[38px] object-contain" />
+              <img src="/nav-news-v3.png" alt="News" className="h-[38px] w-[38px] object-contain" />
             </button>
             <button 
               className="text-zinc-700 transition-all active:scale-90 hover:opacity-70"
