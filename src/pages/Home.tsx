@@ -553,7 +553,7 @@ const Home = () => {
                 <div className="flex items-center gap-1">
                   <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[40px] w-auto object-contain" />
                   <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[28px] w-auto object-contain" />
-                  <div className="w-4" /> {/* Extra spacing for 'further right' */}
+                  <div className="w-10" /> {/* Even more spacing for 'further right' */}
                   <img src="/pley-challenge-garage.png" alt="Challenge Garage" className="h-[36px] w-auto object-contain" />
                 </div>
               </div>
