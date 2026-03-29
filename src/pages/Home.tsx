@@ -565,7 +565,7 @@ const Home = () => {
           <div className="px-6 pb-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="flex items-center justify-between bg-zinc-50 rounded-2xl p-3 border border-zinc-100">
               <div className="flex items-center gap-3">
-                <Clock size={18} className="text-purple-600" />
+                <img src="/duration-clock.png" alt="Duration" className="h-[44px] w-auto object-contain" />
                 <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{t('home_set_duration')}</span>
               </div>
               
