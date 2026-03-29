@@ -549,6 +549,7 @@ const Home = () => {
         <div className="px-6 pt-0 pb-1 flex items-end justify-between gap-6 relative">
           {showPills && !isChallengeEnded && (
             <div className="flex flex-col items-center gap-2 flex-1 relative group">
+                <div className="w-full h-px bg-zinc-100 mb-6" />
                 <div className="flex items-center justify-center relative w-full h-[48px]">
                   <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[48px] w-auto object-contain absolute left-0" />
                   <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[52px] w-auto object-contain relative z-10" />
