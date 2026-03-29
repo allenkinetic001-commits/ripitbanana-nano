@@ -420,7 +420,7 @@ const Home = () => {
               onClick={() => navigate('/chat')}
               className="text-zinc-700 hover:text-purple-600 transition-colors"
             >
-              <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" />
+              <img src="/nav-news-v3.png" alt="News" className="h-[38px] w-[38px] object-contain" />
             </button>
             <button 
               onClick={() => fileInputRef.current?.click()}
@@ -614,7 +614,7 @@ const Home = () => {
             </div>
             
             <div className="flex justify-center w-full pb-2">
-              <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[80px] w-auto object-contain" />
+              <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[72px] w-auto object-contain" />
             </div>
 
             <div className="flex justify-end items-center gap-3">
