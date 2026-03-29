@@ -617,10 +617,11 @@ const Home = () => {
               <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[72px] w-auto object-contain" />
             </div>
 
-            <div className="flex justify-end items-center gap-3">
+            <div className="flex justify-end items-center gap-4">
               {(userSelection && timeLeft > 0) ? (
                 <span className="text-[10px] font-bold text-zinc-400 italic">{t('home_selection_locked')}</span>
               ) : null}
+              <img src="/alligator-logo.png" alt="Alligator" className="h-[60px] w-auto object-contain" />
               <button 
                 disabled={(!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)}
                 onClick={() => {
