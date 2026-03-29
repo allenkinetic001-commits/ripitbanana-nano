@@ -550,7 +550,10 @@ const Home = () => {
           {showPills && !isChallengeEnded && (
             <div className="flex flex-col items-center gap-2 flex-1 relative group">
               <div className="h-[48px] flex flex-col items-center justify-end w-full">
-                <img src="/pley-challenge-logo.png" alt="Pley Challenge" className="h-[40px] w-auto object-contain" />
+                <div className="flex items-center gap-6">
+                  <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[40px] w-auto object-contain" />
+                  <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[28px] w-auto object-contain" />
+                </div>
               </div>
             </div>
           )}
