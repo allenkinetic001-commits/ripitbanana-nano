@@ -614,7 +614,7 @@ const Home = () => {
             </div>
             
             <div className="flex justify-center w-full pb-2">
-              <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[64px] w-auto object-contain" />
+              <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[80px] w-auto object-contain" />
             </div>
 
             <div className="flex justify-end items-center gap-3">
