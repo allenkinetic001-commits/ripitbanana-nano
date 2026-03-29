@@ -548,8 +548,8 @@ const Home = () => {
         {/* Sub-header Navigation - Simplified for Pley-only */}
         <div className="px-6 pt-0 pb-1 flex items-end justify-between gap-6 relative">
           {showPills && !isChallengeEnded && (
-            <div className="flex flex-col items-start pl-6 gap-2 flex-1 relative group">
-              <div className="h-[48px] flex flex-col items-start justify-end w-full">
+            <div className="flex flex-col items-center gap-2 flex-1 relative group">
+              <div className="h-[48px] flex flex-col items-center justify-end w-full">
                 <div className="flex items-center gap-1">
                   <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[40px] w-auto object-contain" />
                   <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[28px] w-auto object-contain" />
