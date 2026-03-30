@@ -516,9 +516,15 @@ const Search = () => {
               <div className="relative mb-8">
                 <img src="/empty-dog.png" alt="Empty" className="w-64 h-auto object-contain animate-in fade-in zoom-in duration-1000" />
               </div>
-              <h2 className="text-2xl font-black text-zinc-900 tracking-tighter uppercase mb-2">
-                {isActive ? t('search_waiting') : t('search_no_active')}
-              </h2>
+              <div className="mb-4">
+                {isActive ? (
+                  <h2 className="text-2xl font-black text-zinc-900 tracking-tighter uppercase mb-2">
+                    {t('search_waiting')}
+                  </h2>
+                ) : (
+                  <img src="/nobody-yet.png" alt="NoBody yet" className="w-48 h-auto object-contain mx-auto" />
+                )}
+              </div>
               <p className="text-zinc-400 text-[10px] font-bold tracking-[0.3em] uppercase max-w-[200px] leading-relaxed">
                 {isActive 
                   ? t('search_waiting_desc')
