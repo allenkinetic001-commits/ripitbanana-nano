@@ -34,8 +34,10 @@ const Search = () => {
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
   const [selectedRoundId, setSelectedRoundId] = useState<string | null>(null);
 
-    // The Home component will handle the default 'pley' state on mount
+  const handleJoinNextTask = () => {
     navigate('/');
+  };
+
 
   const currentVariant = useMemo(() => {
     // Try to get variant from current survivors or context
@@ -509,13 +511,10 @@ const Search = () => {
             )}
           </div>
         ) : (
-          !isChallengeEnded && (
+          (true) && (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-700">
-              <div className="relative mb-8">
-                <div className="absolute -inset-4 bg-purple-100 rounded-full animate-ping opacity-20" />
-                <div className="relative w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center border-2 border-purple-100">
-                  <Sparkles size={32} className="text-purple-500 animate-pulse" />
-                </div>
+              <div className="relative mb-6">
+                <img src="/empty-dog.png" alt="Empty" className="w-32 h-auto object-contain animate-in fade-in zoom-in duration-1000" />
               </div>
               <h2 className="text-2xl font-black text-zinc-900 tracking-tighter uppercase mb-2">
                 {isActive ? t('search_waiting') : t('search_no_active')}
