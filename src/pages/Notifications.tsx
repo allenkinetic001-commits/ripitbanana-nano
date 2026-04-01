@@ -1,8 +1,9 @@
 import React from 'react';
 import { useChallenge } from '../contexts/ChallengeContext';
+import ChallengeTimer from '../components/ChallengeTimer';
 
 const Notifications = () => {
-  const { t } = useChallenge();
+  const { t, isActive } = useChallenge();
 
   const notifications = [
     {
@@ -45,8 +46,16 @@ const Notifications = () => {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20">
-      <header className="px-4 h-14 flex items-center border-b border-zinc-100 sticky top-0 bg-white z-10">
-        <h1 className="text-lg font-bold">{t('notif_activity')}</h1>
+      <header className="px-4 py-2 flex flex-col items-start border-b border-zinc-100 sticky top-0 bg-white z-10">
+        <h1 className="flex items-center gap-2">
+          <img src="/activity-icon.png" alt="" className="h-8 w-8 object-contain mix-blend-multiply" />
+          <img src="/activity-header.png" alt={t('notif_activity')} className="h-8 w-auto object-contain mix-blend-multiply" />
+        </h1>
+        {isActive && (
+          <div className="mt-2 w-full min-w-[200px]">
+            <ChallengeTimer />
+          </div>
+        )}
       </header>
 
       <div className="flex flex-col divide-y divide-zinc-50">

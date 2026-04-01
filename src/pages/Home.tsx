@@ -140,13 +140,15 @@ const Home = () => {
         setIsActive(false);
         setIsChallengeEnded(true);
         setTimeLeft(0);
+        navigate('/search');
       } else if (timeLeft === 0 && isActive) {
         // Timer ran out logic is now handled in ChallengeContext
         setIsActive(false);
         setIsChallengeEnded(true);
+        navigate('/search');
       }
     }
-  }, [visiblePosts.length, isActive, isChallengeEnded, timeLeft, setSurvivors, setIsActive, setIsChallengeEnded, setTimeLeft, userSelection, majorityVariant, setMadeItCounts]);
+  }, [visiblePosts.length, isActive, isChallengeEnded, timeLeft, setSurvivors, setIsActive, setIsChallengeEnded, setTimeLeft, userSelection, majorityVariant, setMadeItCounts, navigate]);
 
   const handleTabClick = (tab: string) => {
     if (timeLeft > 0) {
@@ -396,7 +398,6 @@ const Home = () => {
             </button>
           </div>
           <div className="flex items-center gap-4">
-            <ChallengeTimer />
             {!isChallengeEnded && showMustache && (
               <button 
                 onClick={() => {
@@ -449,6 +450,17 @@ const Home = () => {
             </button>
           </div>
         </div>
+        {/* Timer row — shown below all icons when a round is active */}
+        {isActive && (
+          <div className="px-4 pb-2 flex items-center gap-3 border-t border-zinc-50">
+            <ChallengeTimer />
+            {Object.values(eliminationCounts).reduce((a, b) => a + b, 0) > 0 && (
+              <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">
+                💀 {Object.values(eliminationCounts).reduce((a, b) => a + b, 0)} eliminated
+              </span>
+            )}
+          </div>
+        )}
         
         {/* Search Modal */}
         {showSearchModal && (
@@ -545,127 +557,128 @@ const Home = () => {
           </div>
         )}
 
-        {/* Sub-header Navigation - Simplified for Pley-only */}
-        <div className="px-6 pt-0 pb-1 flex items-end justify-between gap-6 relative">
-          {showPills && !isChallengeEnded && (
-            <div className="flex flex-col items-center gap-2 flex-1 relative group">
-                <div className="w-full h-px bg-zinc-100 mb-6" />
-                <div className="flex items-center justify-center relative w-full h-[48px]">
-                  <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[48px] w-auto object-contain absolute left-0" />
-                  <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[52px] w-auto object-contain relative z-10" />
-                  <img src="/pley-challenge-garage.png" alt="Challenge Garage" className="h-[50px] w-auto object-contain absolute right-4" />
-                </div>
-            </div>
-          )}
-          {!showPills && <div className="flex-1" />}
-        </div>
-
-        {/* Timer and Submit Section */}
-        {showPills && activeTab && (
-          <div className="px-6 pb-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center justify-between bg-zinc-50 rounded-2xl p-3 border border-zinc-100">
-              <div className="flex items-center gap-3">
-                <img src="/duration-clock.png" alt="Duration" className="h-[44px] w-auto object-contain" />
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{t('home_set_duration')}</span>
+        {/* Enhanced Setup Container - Simplified for Pley-only */}
+        {showPills && !isChallengeEnded && (
+          <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="bg-zinc-50/50 rounded-[2rem] border border-zinc-100 p-4 space-y-5 shadow-sm">
+              {/* Asset Section */}
+              <div className="flex items-center justify-center relative w-full h-[52px]">
+                <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[48px] w-auto object-contain absolute left-0 opacity-80" />
+                <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[52px] w-auto object-contain relative z-10" />
+                <img src="/pley-challenge-garage.png" alt="Challenge Garage" className="h-[50px] w-auto object-contain absolute right-0 opacity-80" />
               </div>
-              
-              <div className="flex items-center gap-4">
-                {/* Hours Setter */}
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => adjustTime('h', -1)}
-                    className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all"
-                  >
-                    -
-                  </button>
-                  <div className="flex flex-col items-center min-w-[2.5rem]">
-                    <span className="text-sm font-black text-zinc-900 leading-none">{hours}</span>
-                    <span className="text-[8px] font-bold text-zinc-400 uppercase">hrs</span>
-                  </div>
-                  <button 
-                    onClick={() => adjustTime('h', 1)}
-                    className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all"
-                  >
-                    +
-                  </button>
-                </div>
 
-                <div className="w-[1px] h-6 bg-zinc-200" />
+              <div className="h-px w-full bg-zinc-100/80" />
 
-                {/* Minutes Setter */}
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => adjustTime('m', -1)}
-                    className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all"
-                  >
-                    -
-                  </button>
-                  <div className="flex flex-col items-center min-w-[2.5rem]">
-                    <span className="text-sm font-black text-zinc-900 leading-none">{minutes}</span>
-                    <span className="text-[8px] font-bold text-zinc-400 uppercase">mins</span>
-                  </div>
-                  <button 
-                    onClick={() => adjustTime('m', 1)}
-                    className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-center w-full pb-2">
-              <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[72px] w-auto object-contain" />
-            </div>
 
-            <div className="flex justify-end items-center gap-4">
-              {(userSelection && timeLeft > 0) ? (
-                <span className="text-[10px] font-bold text-zinc-400 italic">{t('home_selection_locked')}</span>
-              ) : null}
-              <img src="/alligator-logo.png" alt="Alligator" className="h-[60px] w-auto object-contain" />
-              <button 
-                disabled={(!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)}
-                onClick={() => {
-                  const totalSeconds = (hours * 3600) + (minutes * 60);
-                  if (totalSeconds > 0) {
-                    setTimeLeft(totalSeconds);
-                    setIsActive(true);
+              {/* Timer and Submit Logic */}
+              {activeTab && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-zinc-100 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <img src="/duration-alarm.png" alt="Duration" className="h-[48px] w-auto object-contain mix-blend-multiply" />
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest">{t('home_set_duration')}</span>
+                        <span className="text-[9px] font-bold text-zinc-400 uppercase">Min. Round Length</span>
+                      </div>
+                    </div>
                     
-                    // Increment click count for the active tab
-                    if (activeTab) {
-                      setClickCounts(prev => ({
-                        ...prev,
-                        [activeTab]: prev[activeTab] + 1
-                      }));
+                    <div className="flex items-center gap-4">
+                      {/* Hours Setter */}
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => adjustTime('h', -1)}
+                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
+                        >
+                          -
+                        </button>
+                        <div className="flex flex-col items-center min-w-[2.5rem]">
+                          <span className="text-sm font-black text-zinc-900 leading-none">{hours}</span>
+                          <span className="text-[8px] font-bold text-zinc-400 uppercase">hrs</span>
+                        </div>
+                        <button 
+                          onClick={() => adjustTime('h', 1)}
+                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
+                        >
+                          +
+                        </button>
+                      </div>
 
-                      setVariantFirstClickTime(prev => {
-                        if (!prev[activeTab]) return { ...prev, [activeTab]: Date.now() };
-                        return prev;
-                      });
-                      setVariantDurations(prev => {
-                        if (!prev[activeTab]) return { ...prev, [activeTab]: totalSeconds };
-                        return prev;
-                      });
-                      setUserSelection(activeTab);
-                    }
-                  }
-                    setShowPills(false);
-                    setActiveTab(null);
-                    setHours(0);
-                    setMinutes(0);
-                  }}
-                className={`transition-all transform flex items-center justify-center mix-blend-multiply ${
-                  (!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)
-                    ? 'opacity-50 grayscale cursor-not-allowed scale-100'
-                    : 'hover:scale-105 active:scale-95 hover:opacity-90'
-                }`}
-              >
-                <img 
-                  src="/btn-submit.png" 
-                  alt={userSelection && timeLeft > 0 ? "Submitted" : "Submit"} 
-                  className="h-[72px] w-auto object-contain" 
-                />
-              </button>
+                      <div className="w-[1px] h-6 bg-zinc-100" />
+
+                      {/* Minutes Setter */}
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => adjustTime('m', -1)}
+                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
+                        >
+                          -
+                        </button>
+                        <div className="flex flex-col items-center min-w-[2.5rem]">
+                          <span className="text-sm font-black text-zinc-900 leading-none">{minutes}</span>
+                          <span className="text-[8px] font-bold text-zinc-400 uppercase">mins</span>
+                        </div>
+                        <button 
+                          onClick={() => adjustTime('m', 1)}
+                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col items-center gap-4">
+                    <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[72px] w-auto object-contain" />
+                    
+                    <div className="h-px w-full bg-zinc-100/80" />
+
+                    <div className="flex items-center justify-end w-full gap-4">
+                      {userSelection && timeLeft > 0 && (
+                        <span className="text-[10px] font-bold text-zinc-400 italic">{t('home_selection_locked')}</span>
+                      )}
+                      <img src="/alligator-logo.png" alt="Alligator" className="h-[60px] w-auto object-contain" />
+                      <button 
+                        disabled={(!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)}
+                        onClick={() => {
+                          const totalSeconds = (hours * 3600) + (minutes * 60);
+                          if (totalSeconds > 0) {
+                            setTimeLeft(totalSeconds);
+                            setIsActive(true);
+                            if (activeTab) {
+                              setClickCounts(prev => ({ ...prev, [activeTab]: prev[activeTab] + 1 }));
+                              setVariantFirstClickTime(prev => {
+                                if (!prev[activeTab]) return { ...prev, [activeTab]: Date.now() };
+                                return prev;
+                              });
+                              setVariantDurations(prev => {
+                                if (!prev[activeTab]) return { ...prev, [activeTab]: totalSeconds };
+                                return prev;
+                              });
+                              setUserSelection(activeTab);
+                            }
+                          }
+                          setShowPills(false);
+                          setActiveTab(null);
+                          setHours(0);
+                          setMinutes(0);
+                        }}
+                        className={`transition-all transform flex items-center justify-center mix-blend-multiply ${
+                          (!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)
+                            ? 'opacity-50 grayscale cursor-not-allowed scale-100'
+                            : 'hover:scale-105 active:scale-95 hover:opacity-90'
+                        }`}
+                      >
+                        <img 
+                          src="/btn-submit.png" 
+                          alt={userSelection && timeLeft > 0 ? "Submitted" : "Submit"} 
+                          className="h-[72px] w-auto object-contain" 
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -686,9 +699,7 @@ const Home = () => {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20">
             <div className="space-y-4 mb-8">
-              <h2 className="text-7xl font-black font-serif text-zinc-900 tracking-tighter uppercase italic">
-                {t('home_the_end')}
-              </h2>
+              <img src="/the-end.png" alt={t('home_the_end')} className="h-16 w-auto object-contain mix-blend-multiply mx-auto" />
               <div className="flex flex-col items-center gap-3">
                 <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
                 <p className="text-zinc-400 font-black uppercase tracking-[0.4em] text-[10px]">
@@ -702,7 +713,7 @@ const Home = () => {
             {survivors.length > 0 && (
               <div className="w-full max-w-sm mb-8 animate-in slide-in-from-bottom-4 duration-700 delay-300">
                 <div className="flex items-center gap-2 mb-3 px-2">
-                  <Sparkles size={14} className="text-green-500" />
+                  <img src="/guacamole-trophy.png" alt="Survival" className="h-5 w-auto object-contain" />
                   <span className="text-xs font-black uppercase tracking-widest text-zinc-500">{t('home_survivors')}</span>
                   <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold">{survivors.length}</span>
                 </div>
@@ -730,17 +741,6 @@ const Home = () => {
             )}
 
             <button
-              onClick={() => navigate('/search')}
-              className="group relative w-full max-w-xs py-6 bg-zinc-900 text-white rounded-2xl font-black uppercase tracking-[0.3em] text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <span className="relative z-10 flex items-center justify-center gap-3">
-                {t('home_view_history')}
-                <Search size={18} className="text-purple-400" />
-              </span>
-            </button>
-
-            <button
               onClick={() => {
                 startNewChallenge();
                 setVisiblePosts(allPosts);
@@ -749,9 +749,24 @@ const Home = () => {
                 setActiveTab('pley');
                 setShowPills(true);
               }}
-              className="mt-8 text-zinc-400 font-bold uppercase tracking-widest text-[10px] hover:text-zinc-900 transition-colors"
+              className="mt-8 transition-all hover:scale-105 active:scale-95 flex items-center justify-center p-2"
             >
-              {t('home_start_new')}
+              <img 
+                src="/btn-get-started-mask.png" 
+                alt={t('home_start_new')} 
+                className="h-24 w-auto object-contain drop-shadow-xl" 
+              />
+            </button>
+
+            <button
+              onClick={() => navigate('/search')}
+              className="mt-6 group relative w-full max-w-[220px] hover:scale-[1.02] active:scale-[0.98] transition-transform animate-in slide-in-from-bottom-6 duration-700"
+            >
+              <img 
+                src="/btn-view-round-history.png" 
+                alt={t('home_view_history')} 
+                className="w-full h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] mix-blend-multiply" 
+              />
             </button>
           </div>
         )}

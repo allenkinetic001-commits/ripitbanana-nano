@@ -20,7 +20,7 @@ const ChallengeTimer = () => {
       <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border shadow-[0_0_15px_-5px_rgba(147,51,234,0.4)] ${isChallengeEnded ? 'bg-zinc-100 border-zinc-200' : 'bg-purple-50 border-purple-200 animate-pulse'}`}>
         <div className="flex flex-col items-end">
           <div className="flex items-center gap-1.5">
-            <Clock size={14} className={isChallengeEnded ? 'text-zinc-400' : 'text-purple-600'} />
+            <img src="/duration-alarm.png" alt="" className="h-6 w-auto object-contain mix-blend-multiply" />
             <span className={`text-xs font-mono font-black ${isChallengeEnded ? 'text-zinc-500' : 'text-purple-700'}`}>{formatTime(timeLeft)}</span>
           </div>
         </div>

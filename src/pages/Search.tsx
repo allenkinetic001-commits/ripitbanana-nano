@@ -99,8 +99,14 @@ const Search = () => {
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">
       {/* Header */}
-      <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-30 flex items-center justify-between border-b border-zinc-100">
-        <div className="flex items-center gap-3">
+      <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-30 flex items-center border-b border-zinc-100">
+        {!isChallengeEnded && !selectedRoundId && allAvailableSurvivors.length > 0 && (
+          <div className="flex items-center mr-4">
+            <img src="/termination-skull.jpg" alt="" className="h-14 w-auto object-contain mix-blend-multiply" />
+          </div>
+        )}
+        <div className="flex-1 flex items-center justify-between">
+          <div className="flex items-center gap-3">
           {selectedRoundId && (
             <button 
               onClick={() => setSelectedRoundId(null)}
@@ -110,46 +116,67 @@ const Search = () => {
             </button>
           )}
           <div className="flex flex-col">
-            <h2 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em]">
-              {selectedRoundId ? t('search_header_details') : isChallengeEnded ? t('search_header_results') : viewMode === 'hall_of_fame' ? t('search_header_hall') : t('search_header_history')}
+            <h2 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-2">
+              {selectedRoundId ? t('search_header_details') : isChallengeEnded ? (
+                <>
+                  <img src="/round-results-thumbsup.png" alt="" className="h-8 w-auto object-contain mix-blend-multiply" />
+                  <img src="/header-round-results.png" alt={t('search_header_results')} className="h-[20px] w-auto object-contain mix-blend-multiply" />
+                </>
+              ) : viewMode === 'hall_of_fame' ? (
+                <>
+                  <img src="/guacamole-trophy.png" alt="" className="h-16 w-auto object-contain" />
+                  <span className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em]">{t('search_header_hall')}</span>
+                </>
+              ) : null}
             </h2>
-            {!isChallengeEnded && !selectedRoundId && (
-              <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
-                {viewMode === 'hall_of_fame' ? t('search_top_survivors') : t('search_recent_outcomes')}
-              </span>
+            {isActive && (
+              <div className="mt-2 w-full min-w-[200px]">
+                <ChallengeTimer />
+              </div>
             )}
             {selectedRoundId && selectedRound && (
-              <span className="text-[9px] font-bold text-purple-600 uppercase tracking-widest">
+              <span className="text-[9px] font-bold text-purple-600 uppercase tracking-widest mt-1">
                 {selectedRound.durationLabel} Round • {selectedRound.date}
               </span>
             )}
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {!isChallengeEnded && !selectedRoundId && (
+            <div className="flex items-center gap-2 mr-3">
+              <span className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] whitespace-nowrap">
+                {t('search_recent_outcomes')}
+              </span>
+            </div>
+          )}
           {!isActive && (
-            <button
-              onClick={() => {
-                if (window.confirm('Clear all round history and Hall of Fame? This cannot be undone.')) {
-                  clearAllHistory();
-                }
-              }}
-              className="p-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition-all rounded-full"
-              title={t('search_clear_history')}
-            >
-              <Trash2 size={18} />
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  if (window.confirm('Clear all round history and Hall of Fame? This cannot be undone.')) {
+                    clearAllHistory();
+                  }
+                }}
+                className="p-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition-all rounded-full"
+                title={t('search_clear_history')}
+              >
+                <Trash2 size={18} />
+              </button>
+              {!totalElimination && (
+                <button 
+                  onClick={handleJoinNextTask}
+                  className="transition-all hover:scale-105 active:scale-95 flex items-center justify-center mix-blend-multiply"
+                >
+                  <img 
+                    src="/btn-get-started.png" 
+                    alt={t('search_start_round')} 
+                    className="h-[36px] w-auto object-contain" 
+                  />
+                </button>
+              )}
+            </>
           )}
-          {isActive ? <ChallengeTimer /> : (
-            <button 
-              onClick={handleJoinNextTask}
-              className="group relative px-4 py-1.5 overflow-hidden rounded-lg bg-zinc-900 transition-all hover:scale-105 active:scale-95"
-            >
-              <div className="relative flex items-center gap-2">
-                <Zap size={12} className="text-amber-400 fill-amber-400" />
-                <span className="text-[9px] font-black text-white uppercase tracking-widest">{t('search_start_round')}</span>
-              </div>
-            </button>
-          )}
+          </div>
         </div>
       </div>
 
@@ -184,7 +211,7 @@ const Search = () => {
                     : "bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-200"
                 )}
               >
-                <Clock size={10} />
+                <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply relative -top-[0.5px]" />
                 {duration} Round
               </button>
             ))}
@@ -194,8 +221,8 @@ const Search = () => {
         {isChallengeEnded && totalElimination && (
           <div className="flex flex-col items-center justify-center p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="space-y-6 py-12">
-              <div className="w-24 h-24 bg-rose-100 rounded-full flex items-center justify-center mx-auto shadow-[0_0_40px_-5px_rgba(225,29,72,0.5)] animate-pulse">
-                <Skull size={48} className="text-rose-600 fill-rose-600" />
+              <div className="flex items-center justify-center mx-auto text-rose-600">
+                <img src="/elimination-protocol.png" alt="Total P-Termination" className="w-96 h-96 object-contain" />
               </div>
               <div className="space-y-2">
                   <h2 className="text-5xl font-black text-rose-600 tracking-tighter uppercase leading-none">
@@ -207,9 +234,9 @@ const Search = () => {
                 </div>
               <button 
                 onClick={handleJoinNextTask}
-                className="mt-8 px-8 py-3 bg-zinc-900 text-white text-xs font-black uppercase tracking-[0.3em] rounded-xl hover:scale-105 transition-transform"
+                className="mt-8 hover:scale-105 active:scale-95 transition-transform mix-blend-multiply flex items-center justify-center mx-auto"
               >
-                {t('search_try_again')}
+                <img src="/btn-try-again.png" alt={t('search_try_again')} className="h-14 w-auto object-contain" />
               </button>
             </div>
           </div>
@@ -222,14 +249,19 @@ const Search = () => {
               isHistoryView && availableDurations.length > 0 && !selectedRoundId ? "top-[105px]" : "top-[57px]"
             )}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center shadow-sm">
-                  <Trophy size={20} className="text-amber-600" />
+                <div className="flex items-center justify-center">
+                  <img src="/round-trophy.png" alt="" className="w-24 h-24 object-contain mix-blend-multiply" />
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none">
+                  <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none flex items-center gap-2">
                     {selectedRoundId 
                       ? (selectedRound?.variant === 'pley' ? 'people that pleyed' : 'people that survived') 
-                      : isChallengeEnded ? 'people that survived' : viewMode === 'hall_of_fame' ? 'Hall of Fame' : 'Round History'}
+                      : isChallengeEnded ? 'people that survived' : viewMode === 'hall_of_fame' ? 'Hall of Fame' : (
+                        <>
+                          <img src="/round-history-icon.png" alt="" className="w-12 h-12 object-contain mix-blend-multiply" />
+                          Round History
+                        </>
+                      )}
                   </h2>
                   <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1 flex items-center">
                     {selectedRoundId && selectedRound ? (
@@ -250,18 +282,7 @@ const Search = () => {
                   </p>
                 </div>
               </div>
-              {isChallengeEnded && (
-                <button 
-                  onClick={handleJoinNextTask}
-                  className="group relative px-6 py-2.5 overflow-hidden rounded-xl bg-zinc-900 transition-all hover:scale-105 active:scale-95 shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
-                >
-                  <div className="absolute inset-0 w-3 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-                  <div className="relative flex items-center gap-2">
-                    <Zap size={14} className="text-amber-400 fill-amber-400" />
-                    <span className="text-[11px] font-black text-white uppercase tracking-[0.2em]">{t('search_join_next')}</span>
-                  </div>
-                </button>
-              )}
+              {/* Join next task button moved to bottom of list */}
             </div>
 
             {viewMode === 'hall_of_fame' || isChallengeEnded || selectedRoundId ? (
@@ -274,10 +295,14 @@ const Search = () => {
                         <div className="relative">
                           <img src={survivor.avatar} alt={survivor.username} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
                           <div className={cn(
-                            "absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center",
-                            isLegend(survivor.username) ? "bg-amber-500" : "bg-green-500"
+                            "absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center overflow-hidden",
+                            isLegend(survivor.username) ? "bg-amber-500" : "bg-white"
                           )}>
-                            {isLegend(survivor.username) ? <Trophy size={8} className="text-white fill-white" /> : <Sparkles size={8} className="text-white fill-white" />}
+                            {isLegend(survivor.username) ? (
+                              <Trophy size={10} className="text-white fill-white" />
+                            ) : (
+                              <img src="/guacamole-trophy.png" alt="" className="w-full h-full object-contain" />
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-col">
@@ -296,7 +321,7 @@ const Search = () => {
                               <>
                                 <span className="w-1 h-1 rounded-full bg-zinc-200" />
                                 <span className="text-[10px] text-purple-600 font-black uppercase tracking-tighter flex items-center gap-1">
-                                  <Clock size={10} />
+                                  <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply mr-0.5 relative -top-[0.5px]" />
                                   {survivor.roundDurationLabel}
                                 </span>
                               </>
@@ -323,7 +348,7 @@ const Search = () => {
                     <div className="aspect-square bg-zinc-50 overflow-hidden relative group">
                       <img src={survivor.image} alt="Post content" className="w-full h-full object-cover" />
                       <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 border border-white/50">
-                        {(isHistoryView || isChallengeEnded) && <Clock size={10} className="text-amber-600" />}
+                        {(isHistoryView || isChallengeEnded) && <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply mr-0.5 relative -top-[0.5px]" />}
                         <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
                           {isHistoryView 
                             ? (survivor.variant === 'pley' ? 'PLEYED' : 'SURVIVED') 
@@ -445,6 +470,17 @@ const Search = () => {
                     </div>
                   </div>
                 ))}
+                
+                {isChallengeEnded && !selectedRoundId && (
+                  <div className="flex justify-center -mt-4 pt-0 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
+                    <button 
+                      onClick={handleJoinNextTask}
+                      className="hover:scale-105 active:scale-95 transition-transform"
+                    >
+                      <img src="/btn-join-next-task.png" alt={t('search_join_next')} className="h-12 w-auto object-contain drop-shadow-md" />
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex-1 p-6 space-y-4">
@@ -458,9 +494,9 @@ const Search = () => {
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "w-10 h-10 rounded-full flex items-center justify-center",
-                          log.outcome === 'SURVIVAL' ? "bg-green-100" : "bg-rose-100"
+                          log.outcome === 'SURVIVAL' ? "bg-green-100" : ""
                         )}>
-                          {log.outcome === 'SURVIVAL' ? <Trophy size={18} className="text-green-600" /> : <Skull size={18} className="text-rose-600" />}
+                          {log.outcome === 'SURVIVAL' ? <img src="/guacamole-trophy.png" alt="Survival" className="h-[24px] w-auto object-contain" /> : <img src="/elimination-protocol.png" className="h-[36px] w-auto object-contain" alt="" />}
                         </div>
                         <div className="flex flex-col">
                           <span className="text-[11px] font-black text-zinc-900 uppercase tracking-tight mb-0.5">
@@ -477,7 +513,7 @@ const Search = () => {
                         </div>
                       </div>
                       <div className="bg-zinc-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-                        <Clock size={10} className="text-zinc-500" />
+                        <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply mr-0.5 relative -top-[0.5px]" />
                         <span className="text-[9px] font-black text-zinc-900 uppercase">{log.durationLabel} Round</span>
                       </div>
                     </div>
@@ -522,7 +558,7 @@ const Search = () => {
                     {t('search_waiting')}
                   </h2>
                 ) : (
-                  <img src="/nobody-yet.png" alt="NoBody yet" className="w-48 h-auto object-contain mx-auto" />
+                  <img src="/nobody-yet.png" alt="NoBody yet" className="w-72 h-auto object-contain mx-auto" />
                 )}
               </div>
               <p className="text-zinc-400 text-[10px] font-bold tracking-[0.3em] uppercase max-w-[200px] leading-relaxed">
