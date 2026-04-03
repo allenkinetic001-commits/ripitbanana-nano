@@ -67,7 +67,17 @@ const Profile = () => {
         className="hidden" 
       />
       <header className="px-4 h-14 flex items-center justify-between border-b border-zinc-100 sticky top-0 bg-white z-10">
-        <h1 className="text-lg font-bold">{userProfile.username}</h1>
+        <div className="flex items-center gap-1">
+          <h1 className="text-lg font-bold">{userProfile.username}</h1>
+          {isLegend(userProfile.username) && (
+            <img 
+              src="/badge-legend.png" 
+              alt="Legend" 
+              className="h-5 w-auto object-contain" 
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
+          )}
+        </div>
         <div className="flex items-center gap-3">
           <ChallengeTimer />
           <button 
@@ -172,21 +182,31 @@ const Profile = () => {
       {/* Profile Info */}
       <div className="p-4 space-y-4">
         <div className="flex items-center space-x-8">
-          <div 
-            onClick={() => fileInputRef.current?.click()}
-            className="relative w-20 h-20 rounded-full border border-zinc-200 overflow-hidden cursor-pointer group"
-          >
-            <img
+          <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden relative group shadow-lg">
+            <img 
               src={userProfile.avatar}
               alt="Profile"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            {isLegend(userProfile.username) && (
+              <div className="absolute -bottom-3 -right-3 flex items-center justify-center">
+                <img 
+                  src="/pley-badge.png" 
+                  alt="Survivor" 
+                  className="w-12 h-12 object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               <Camera size={20} className="text-white" />
             </div>
-            <div className="absolute bottom-0 right-0 bg-white p-1 rounded-full border border-zinc-200 shadow-sm">
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 bg-white p-1 rounded-full border border-zinc-200 shadow-sm hover:bg-zinc-50 transition-colors"
+            >
               <Camera size={12} className="text-zinc-600" />
-            </div>
+            </button>
           </div>
           <div className="flex-1 flex justify-around">
             <div className="flex flex-col items-center">
@@ -316,8 +336,8 @@ const Profile = () => {
                   <div className="relative">
                     <img src={user.avatar} alt={user.username} className="w-12 h-12 rounded-full object-cover border-2 border-zinc-100 shadow-sm" />
                     {user.isLegend && (
-                      <div className="absolute -bottom-1 -right-1 bg-amber-500 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center">
-                        <Trophy size={10} className="text-white fill-white" />
+                      <div className="absolute -bottom-2 -right-2 flex items-center justify-center">
+                        <img src="/pley-badge.png" alt="Legend" className="w-11 h-11 object-contain" />
                       </div>
                     )}
                   </div>
@@ -325,7 +345,12 @@ const Profile = () => {
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-black text-zinc-900">@{user.username}</span>
                       {user.isLegend && (
-                        <span className="px-1.5 py-0.5 bg-amber-100 text-amber-600 text-[8px] font-black uppercase rounded">{t('profile_legend')}</span>
+                        <img 
+                          src="/badge-legend.png" 
+                          alt="Legend" 
+                          className="h-5 w-auto object-contain" 
+                          style={{ imageRendering: '-webkit-optimize-contrast' }}
+                        />
                       )}
                     </div>
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('profile_following')}</span>

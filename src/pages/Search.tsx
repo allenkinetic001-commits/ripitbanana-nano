@@ -28,13 +28,16 @@ const Search = () => {
   const { 
     isChallengeEnded, survivors, survivorHistory, roundHistory, isActive, 
     startNewChallenge, clearAllHistory, updateHistoryVote, getVariantDisplayName,
-    toggleFollow, followedUsers, isLegend, t
+    toggleFollow, followedUsers, isLegend, setShowPills, setActiveTab, t
   } = useChallenge();
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
   const [selectedRoundId, setSelectedRoundId] = useState<string | null>(null);
 
   const handleJoinNextTask = () => {
+    startNewChallenge();
+    setActiveTab('pley');
+    setShowPills(false);
     navigate('/');
   };
 
@@ -102,7 +105,7 @@ const Search = () => {
       <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-30 flex items-center border-b border-zinc-100">
         {!isChallengeEnded && !selectedRoundId && allAvailableSurvivors.length > 0 && (
           <div className="flex items-center mr-4">
-            <img src="/termination-skull.jpg" alt="" className="h-14 w-auto object-contain mix-blend-multiply" />
+            <img src="/termination-skull.jpg" alt="" className="h-14 w-auto object-contain" />
           </div>
         )}
         <div className="flex-1 flex items-center justify-between">
@@ -117,12 +120,7 @@ const Search = () => {
           )}
           <div className="flex flex-col">
             <h2 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-2">
-              {selectedRoundId ? t('search_header_details') : isChallengeEnded ? (
-                <>
-                  <img src="/round-results-thumbsup.png" alt="" className="h-8 w-auto object-contain mix-blend-multiply" />
-                  <img src="/header-round-results.png" alt={t('search_header_results')} className="h-[20px] w-auto object-contain mix-blend-multiply" />
-                </>
-              ) : viewMode === 'hall_of_fame' ? (
+              {selectedRoundId ? t('search_header_details') : isChallengeEnded ? null : viewMode === 'hall_of_fame' ? (
                 <>
                   <img src="/guacamole-trophy.png" alt="" className="h-16 w-auto object-contain" />
                   <span className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em]">{t('search_header_hall')}</span>
@@ -165,7 +163,7 @@ const Search = () => {
               {!totalElimination && (
                 <button 
                   onClick={handleJoinNextTask}
-                  className="transition-all hover:scale-105 active:scale-95 flex items-center justify-center mix-blend-multiply"
+                  className="transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
                 >
                   <img 
                     src="/btn-get-started.png" 
@@ -211,7 +209,7 @@ const Search = () => {
                     : "bg-white text-zinc-400 hover:text-zinc-600 border border-zinc-200"
                 )}
               >
-                <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply relative -top-[0.5px]" />
+                <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain relative -top-[0.5px]" />
                 {duration} Round
               </button>
             ))}
@@ -232,13 +230,7 @@ const Search = () => {
                     No profiles pleyed this round
                   </p>
                 </div>
-              <button 
-                onClick={handleJoinNextTask}
-                className="mt-8 hover:scale-105 active:scale-95 transition-transform mix-blend-multiply flex items-center justify-center mx-auto"
-              >
-                <img src="/btn-try-again.png" alt={t('search_try_again')} className="h-14 w-auto object-contain" />
-              </button>
-            </div>
+              </div>
           </div>
         )}
 
@@ -250,7 +242,7 @@ const Search = () => {
             )}>
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center">
-                  <img src="/round-trophy.png" alt="" className="w-24 h-24 object-contain mix-blend-multiply" />
+                  <img src="/round-trophy.png" alt="" className="w-24 h-24 object-contain" />
                 </div>
                 <div className="flex flex-col">
                   <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none flex items-center gap-2">
@@ -258,7 +250,7 @@ const Search = () => {
                       ? (selectedRound?.variant === 'pley' ? 'people that pleyed' : 'people that survived') 
                       : isChallengeEnded ? 'people that survived' : viewMode === 'hall_of_fame' ? 'Hall of Fame' : (
                         <>
-                          <img src="/round-history-icon.png" alt="" className="w-12 h-12 object-contain mix-blend-multiply" />
+                          <img src="/round-history-icon.png" alt="" className="w-12 h-12 object-contain" />
                           Round History
                         </>
                       )}
@@ -294,26 +286,28 @@ const Search = () => {
                       <div className="flex items-center space-x-3">
                         <div className="relative">
                           <img src={survivor.avatar} alt={survivor.username} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
-                          <div className={cn(
-                            "absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center overflow-hidden",
-                            isLegend(survivor.username) ? "bg-amber-500" : "bg-white"
-                          )}>
-                            {isLegend(survivor.username) ? (
-                              <Trophy size={10} className="text-white fill-white" />
-                            ) : (
-                              <img src="/guacamole-trophy.png" alt="" className="w-full h-full object-contain" />
-                            )}
+                          <div className="absolute -bottom-3 -right-3 flex items-center justify-center">
+                            <img 
+                              src="/pley-badge.png" 
+                              alt="Survivor" 
+                              className="w-12 h-12 object-contain" 
+                              style={{ imageRendering: '-webkit-optimize-contrast' }}
+                            />
                           </div>
                         </div>
                         <div className="flex flex-col">
                           <div className="flex items-center gap-1">
-                            <span className="text-sm font-black text-zinc-900 italic">@{survivor.username}</span>
-                            {isLegend(survivor.username) && (
-                              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-600 text-[8px] font-black uppercase rounded flex items-center gap-0.5">
-                                <Trophy size={8} className="fill-amber-600" />
-                                Legend
-                              </span>
-                            )}
+                            <div className="flex items-center gap-1">
+                              <span className="text-sm font-black text-zinc-900 italic">@{survivor.username}</span>
+                              {isLegend(survivor.username) && (
+                                <img 
+                                  src="/badge-legend.png" 
+                                  alt="Legend" 
+                                  className="h-5 w-auto object-contain" 
+                                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                                />
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter">{survivor.time}</span>
@@ -321,7 +315,7 @@ const Search = () => {
                               <>
                                 <span className="w-1 h-1 rounded-full bg-zinc-200" />
                                 <span className="text-[10px] text-purple-600 font-black uppercase tracking-tighter flex items-center gap-1">
-                                  <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply mr-0.5 relative -top-[0.5px]" />
+                                  <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" />
                                   {survivor.roundDurationLabel}
                                 </span>
                               </>
@@ -332,14 +326,13 @@ const Search = () => {
                       <div className="flex items-center space-x-3">
                         <button 
                           onClick={() => toggleFollow(survivor.username)}
-                          className={cn(
-                            "px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-full transition-all active:scale-95 shadow-sm",
-                            followedUsers.includes(survivor.username)
-                              ? "bg-zinc-100 text-zinc-400 border border-zinc-200"
-                              : "bg-zinc-900 text-white hover:bg-zinc-800"
-                          )}
+                          className="transition-all active:scale-95 hover:scale-105"
                         >
-                          {followedUsers.includes(survivor.username) ? 'Following' : 'Follow'}
+                          {followedUsers.includes(survivor.username) ? (
+                            <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
+                          ) : (
+                            <img src="/btn-follow.png" alt="Follow" className="h-7 w-auto object-contain" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -348,7 +341,7 @@ const Search = () => {
                     <div className="aspect-square bg-zinc-50 overflow-hidden relative group">
                       <img src={survivor.image} alt="Post content" className="w-full h-full object-cover" />
                       <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 border border-white/50">
-                        {(isHistoryView || isChallengeEnded) && <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply mr-0.5 relative -top-[0.5px]" />}
+                        {(isHistoryView || isChallengeEnded) && <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" />}
                         <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
                           {isHistoryView 
                             ? (survivor.variant === 'pley' ? 'PLEYED' : 'SURVIVED') 
@@ -432,8 +425,18 @@ const Search = () => {
                       {/* Caption & Comments */}
                       <div className="space-y-2">
                         <p className="text-sm">
-                          <span className="font-black mr-2 text-zinc-900">@{survivor.username}</span>
-                          <span className="text-zinc-700">{survivor.caption}</span>
+                          <div className="flex items-center gap-1 mb-1">
+                            <span className="font-black italic text-zinc-900">@{survivor.username}</span>
+                            {isLegend(survivor.username) && (
+                              <img 
+                                src="/badge-legend.png" 
+                                alt="Legend" 
+                                className="h-6 w-auto object-contain" 
+                                style={{ imageRendering: '-webkit-optimize-contrast' }}
+                              />
+                            )}
+                          </div>
+                          <span className="text-zinc-700 block">{survivor.caption}</span>
                         </p>
                         
                         {survivor.comments.length > 0 && (
@@ -446,7 +449,12 @@ const Search = () => {
                               <div key={comment.id} className="flex items-start space-x-2">
                                 <div className="w-5 h-5 bg-zinc-200 rounded-full flex-shrink-0 mt-0.5" />
                                 <div className="flex flex-col">
-                                  <span className="text-[11px] font-black text-zinc-900">@{comment.username}</span>
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[11px] font-black text-zinc-900">@{comment.username}</span>
+                                    {isLegend(comment.username) && (
+                                      <img src="/badge-legend.png" alt="Legend" className="h-3.5 w-auto object-contain" />
+                                    )}
+                                  </div>
                                   <p className="text-[11px] text-zinc-500 leading-tight">{comment.text}</p>
                                 </div>
                               </div>
@@ -513,7 +521,7 @@ const Search = () => {
                         </div>
                       </div>
                       <div className="bg-zinc-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-                        <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mix-blend-multiply mr-0.5 relative -top-[0.5px]" />
+                        <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" />
                         <span className="text-[9px] font-black text-zinc-900 uppercase">{log.durationLabel} Round</span>
                       </div>
                     </div>

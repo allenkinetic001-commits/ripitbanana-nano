@@ -24,7 +24,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const [quickComment, setQuickComment] = useState('');
   const navigate = useNavigate();
-  const { addEnemy, enemies, addComment, userProfile, postComments, t } = useChallenge();
+  const { addEnemy, enemies, addComment, userProfile, postComments, isLegend, t } = useChallenge();
 
   const isEnemy = enemies.some(e => e.id === id);
   const isMe = username === userProfile.username;
@@ -76,8 +76,30 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           onClick={() => navigate(`/user/${username}`)}
           className="flex items-center space-x-3 cursor-pointer group"
         >
-          <img src={avatar} alt={username} className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-purple-100 transition-all" />
-          <span className="text-sm font-semibold group-hover:text-purple-600 transition-colors">{username}</span>
+          <div className="relative">
+            <img src={avatar} alt={username} className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-purple-100 transition-all shadow-sm" />
+            {isLegend(username) && (
+              <div className="absolute -bottom-2 -right-2 flex items-center justify-center">
+                <img 
+                  src="/pley-badge.png" 
+                  alt="Survivor" 
+                  className="w-11 h-11 object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-black italic group-hover:text-purple-600 transition-colors">@{username}</span>
+            {isLegend(username) && (
+              <img 
+                src="/badge-legend.png" 
+                alt="Legend" 
+                className="h-5 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
+            )}
+          </div>
         </div>
         <div className="flex items-center space-x-2">
           {!isMe && (
@@ -175,9 +197,9 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           <p className="text-sm">
             <span 
               onClick={() => navigate(`/user/${username}`)}
-              className="font-bold mr-2 cursor-pointer hover:text-purple-600 transition-colors"
+              className="font-black italic mr-1 cursor-pointer hover:text-purple-600 transition-colors"
             >
-              {username}
+              @{username}
             </span>
             {caption}
           </p>
@@ -192,9 +214,17 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           )}
 
           {localComments.slice(-2).map((comment, idx) => (
-            <p key={idx} className="text-xs">
-              <span className="font-bold mr-2">{comment.username}</span>
-              <span className="text-zinc-700">{comment.text}</span>
+            <p key={idx} className="text-xs flex items-center gap-1">
+              <span className="font-bold">@{comment.username}</span>
+              {isLegend(comment.username) && (
+                <img 
+                  src="/badge-legend.png" 
+                  alt="Legend" 
+                  className="h-5 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              )}
+              <span className="text-zinc-700 ml-1">{comment.text}</span>
             </p>
           ))}
 

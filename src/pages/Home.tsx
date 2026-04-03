@@ -364,7 +364,7 @@ const Home = () => {
               {/*  */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full"></span>
+                  <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full">Pills</span>
                 </div>
                 <p className="text-sm text-zinc-400 leading-relaxed font-medium">
                   A high-stakes game mode where users can only receive downvotes. Before the round begins, players select the ranking rule they wantâ€”Top 1, Top 5, Top 10, or Top 20. The final rule is determined by majority vote, with the first playerâ€™s choice acting as a temporary default until the majority is established. At the end of the round, any player who fails to make it into the selected top ranking has their profile, followers, and posts reset to zero, while their account remains intact.
@@ -385,7 +385,8 @@ const Home = () => {
       )}
 
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
+      {!isChallengeEnded && (
+        <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
         <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between">
           <div className="flex items-center gap-0">
             <button 
@@ -576,7 +577,7 @@ const Home = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-zinc-100 shadow-sm">
                     <div className="flex items-center gap-3">
-                      <img src="/duration-alarm.png" alt="Duration" className="h-[48px] w-auto object-contain mix-blend-multiply" />
+                      <img src="/duration-alarm.png" alt="Duration" className="h-[48px] w-auto object-contain" />
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest">{t('home_set_duration')}</span>
                         <span className="text-[9px] font-bold text-zinc-400 uppercase">Min. Round Length</span>
@@ -663,7 +664,7 @@ const Home = () => {
                           setHours(0);
                           setMinutes(0);
                         }}
-                        className={`transition-all transform flex items-center justify-center mix-blend-multiply ${
+                        className={`transition-all transform flex items-center justify-center ${
                           (!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)
                             ? 'opacity-50 grayscale cursor-not-allowed scale-100'
                             : 'hover:scale-105 active:scale-95 hover:opacity-90'
@@ -682,7 +683,8 @@ const Home = () => {
             </div>
           </div>
         )}
-      </header>
+        </header>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto pb-20">
@@ -698,8 +700,8 @@ const Home = () => {
           ))
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20">
-            <div className="space-y-4 mb-8">
-              <img src="/the-end.png" alt={t('home_the_end')} className="h-16 w-auto object-contain mix-blend-multiply mx-auto" />
+            <div className="space-y-4 mb-8 mt-20">
+              <img src="/the-end.png" alt={t('home_the_end')} className="h-16 w-auto object-contain mx-auto" />
               <div className="flex flex-col items-center gap-3">
                 <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
                 <p className="text-zinc-400 font-black uppercase tracking-[0.4em] text-[10px]">
@@ -740,6 +742,13 @@ const Home = () => {
               </div>
             )}
 
+            <div className="mt-8 flex items-center justify-center p-2">
+              <img 
+                src="/btn-get-started-mask.png" 
+                alt={t('home_start_new')} 
+                className="h-36 w-auto object-contain drop-shadow-xl" 
+              />
+            </div>
             <button
               onClick={() => {
                 startNewChallenge();
@@ -747,25 +756,15 @@ const Home = () => {
                 setHours(0);
                 setMinutes(0);
                 setActiveTab('pley');
-                setShowPills(true);
+                setShowPills(false);
               }}
-              className="mt-8 transition-all hover:scale-105 active:scale-95 flex items-center justify-center p-2"
+              className="mt-8 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center mx-auto"
             >
               <img 
-                src="/btn-get-started-mask.png" 
-                alt={t('home_start_new')} 
-                className="h-24 w-auto object-contain drop-shadow-xl" 
-              />
-            </button>
-
-            <button
-              onClick={() => navigate('/search')}
-              className="mt-6 group relative w-full max-w-[220px] hover:scale-[1.02] active:scale-[0.98] transition-transform animate-in slide-in-from-bottom-6 duration-700"
-            >
-              <img 
-                src="/btn-view-round-history.png" 
-                alt={t('home_view_history')} 
-                className="w-full h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] mix-blend-multiply" 
+                src="/artisan-lobster.png" 
+                alt={t('search_try_again')} 
+                className="h-32 w-auto object-contain drop-shadow-sm" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </button>
           </div>

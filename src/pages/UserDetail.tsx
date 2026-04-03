@@ -41,12 +41,22 @@ const UserDetail = () => {
       {/* Profile Info */}
       <div className="p-4 space-y-4">
         <div className="flex items-center space-x-8">
-          <div className="w-20 h-20 rounded-full border border-zinc-200 overflow-hidden">
+          <div className="w-20 h-20 rounded-full border border-zinc-200 overflow-hidden relative">
             <img
               src={userPosts[0]?.avatar || `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${username}&image_size=square`}
               alt="Profile"
               className="w-full h-full object-cover"
             />
+            {userIsLegend && (
+              <div className="absolute -bottom-3 -right-3 flex items-center justify-center">
+                <img 
+                  src="/pley-badge.png" 
+                  alt="Survivor" 
+                  className="w-12 h-12 object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              </div>
+            )}
           </div>
           <div className="flex-1 flex justify-around">
             <div className="flex flex-col items-center">
@@ -65,12 +75,10 @@ const UserDetail = () => {
         </div>
 
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <h2 className="text-sm font-bold">{username}</h2>
             {userIsLegend && (
-              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-600 text-[8px] font-black uppercase rounded flex items-center gap-0.5">
-                Legend
-              </span>
+              <img src="/badge-legend.png" alt="Legend" className="h-6 w-auto object-contain" />
             )}
           </div>
           <p className="text-sm text-zinc-600">Digital Creator | Explorer 🌍</p>

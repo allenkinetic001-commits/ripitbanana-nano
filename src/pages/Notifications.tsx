@@ -48,8 +48,8 @@ const Notifications = () => {
     <div className="flex flex-col h-full overflow-y-auto pb-20">
       <header className="px-4 py-2 flex flex-col items-start border-b border-zinc-100 sticky top-0 bg-white z-10">
         <h1 className="flex items-center gap-2">
-          <img src="/activity-icon.png" alt="" className="h-8 w-8 object-contain mix-blend-multiply" />
-          <img src="/activity-header.png" alt={t('notif_activity')} className="h-8 w-auto object-contain mix-blend-multiply" />
+          <img src="/activity-icon.png" alt="" className="h-8 w-8 object-contain" />
+          <img src="/activity-header.png" alt={t('notif_activity')} className="h-8 w-auto object-contain" />
         </h1>
         {isActive && (
           <div className="mt-2 w-full min-w-[200px]">
