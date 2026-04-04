@@ -59,7 +59,7 @@ const SettingsPage = () => {
         <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-zinc-100 text-zinc-900 transition-colors">
           <ChevronLeft size={24} />
         </button>
-        <h2 className="font-bold text-lg">{t('settings')}</h2>
+        <img src="/settings-header.png" alt="Settings" className="h-7 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
         <div className="w-10" /> {/* Spacer */}
       </header>
       
