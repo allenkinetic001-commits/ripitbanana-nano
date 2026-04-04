@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Settings, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles } from 'lucide-react';
+import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles } from 'lucide-react';
 import ChallengeTimer from '../components/ChallengeTimer';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
@@ -95,7 +95,7 @@ const Profile = () => {
               onClick={() => navigate('/settings')}
               className="text-zinc-700 hover:bg-zinc-100 p-2 rounded-full transition-colors"
             >
-              <Settings size={24} />
+              <Menu size={24} />
             </button>
           </div>
         </div>
