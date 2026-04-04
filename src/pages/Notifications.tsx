@@ -1,9 +1,10 @@
 import React from 'react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import ChallengeTimer from '../components/ChallengeTimer';
+import { cn } from '../utils';
 
 const Notifications = () => {
-  const { t, isActive } = useChallenge();
+  const { t, isActive, toggleFollow, followedUsers, isSurvivor } = useChallenge();
 
   const notifications = [
     {
@@ -70,9 +71,23 @@ const Notifications = () => {
             {notif.postImage ? (
               <img src={notif.postImage} alt="Post" className="w-10 h-10 rounded object-cover" />
             ) : (
-              <button className="bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg">
-                {t('notif_follow')}
-              </button>
+              isSurvivor(notif.user) && (
+                <button 
+                  onClick={() => toggleFollow(notif.user)}
+                  className="transition-all active:scale-95 hover:scale-105"
+                >
+                  {followedUsers.includes(notif.user) ? (
+                    <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
+                  ) : (
+                    <img 
+                      src="/btn-follow.png" 
+                      alt="Follow" 
+                      className="h-7 w-auto object-contain" 
+                      style={{ imageRendering: '-webkit-optimize-contrast' }}
+                    />
+                  )}
+                </button>
+              )
             )}
           </div>
         ))}

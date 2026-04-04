@@ -73,8 +73,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                  <Globe size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/language-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('language')}</span>
               </div>
@@ -89,8 +89,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
-                  <Sun size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/theme-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('theme')}</span>
               </div>
@@ -105,8 +105,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center text-pink-500">
-                  <Palette size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/personalization-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('personalization')}</span>
               </div>
@@ -124,8 +124,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500">
-                  <Layers size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/model-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('model')}</span>
               </div>
@@ -137,8 +137,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
-                  <FileText size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/terms-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('terms')}</span>
               </div>
@@ -150,8 +150,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-500">
-                  <Lock size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/privacy-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('privacy')}</span>
               </div>
@@ -163,8 +163,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                  <Info size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/about-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('about')}</span>
               </div>
@@ -181,8 +181,8 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500">
-                  <MessageCircle size={18} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/contact-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-zinc-900">{t('contact')}</span>
               </div>
@@ -195,8 +195,8 @@ const SettingsPage = () => {
               onClick={handleLogout}
               className="w-full flex items-center gap-3 p-4 hover:bg-red-50 transition-colors text-left group"
             >
-              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-100 transition-colors">
-                <LogOut size={18} />
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img src="/logout-icon.png" alt="" className="w-full h-full object-contain" />
               </div>
               <span className="font-bold text-red-600">{t('logout')}</span>
             </button>

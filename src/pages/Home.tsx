@@ -17,7 +17,7 @@ const Home = () => {
     setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
     setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
     setUserSelection, setIsChallengeEnded,
-    setSurvivors, startNewChallenge, getVariantDisplayName, userProfile,
+    setSurvivors, addEliminated, startNewChallenge, getVariantDisplayName, userProfile,
     allPosts, setAllPosts, wallPosts, addWallPost,
     visiblePosts, setVisiblePosts,
     t
@@ -206,13 +206,27 @@ const Home = () => {
   const handleDeletePost = (postId: number) => {
     const activeMode = userSelection || majorityVariant;
     
+    const eliminatedPost = visiblePosts.find(post => post.id === postId);
+    if (eliminatedPost) {
+      addEliminated({
+        id: eliminatedPost.id,
+        username: eliminatedPost.username,
+        avatar: eliminatedPost.avatar,
+        image: eliminatedPost.image,
+        caption: eliminatedPost.caption,
+        time: eliminatedPost.time,
+        comments: eliminatedPost.comments,
+        madeIt: false
+      });
+    }
+
     setVisiblePosts(prev => prev.filter(post => post.id !== postId));
     
     // Track eliminations for the current active mode
     if (activeMode && Object.prototype.hasOwnProperty.call(eliminationCounts, activeMode)) {
       setEliminationCounts(prev => ({
         ...prev,
-        [activeMode]: prev[activeMode] + 1
+        [activeMode]: (prev[activeMode] || 0) + 1
       }));
     }
   };
@@ -235,7 +249,8 @@ const Home = () => {
           image: passedPost.image,
           caption: passedPost.caption,
           time: passedPost.time,
-          comments: passedPost.comments
+          comments: passedPost.comments,
+          madeIt: true
         }];
       });
     }
@@ -333,8 +348,8 @@ const Home = () => {
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Info size={18} className="text-purple-600" />
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <img src="/nav-news-v3.png" alt="" className="w-full h-full object-contain" />
                 </div>
                 <h2 className="text-lg font-black font-serif text-zinc-900">Rip It Rules</h2>
               </div>
@@ -342,32 +357,13 @@ const Home = () => {
                 onClick={() => setShowPillsInfo(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 text-zinc-400 hover:text-zinc-900 transition-all"
               >
-                âœ•
+                ✕
               </button>
             </div>
-            
             <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto">
-              {/* Pley */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full">Pley</span>
-                  <div className="flex items-center gap-1.5">
-                    <Flame size={12} className="text-orange-600 fill-orange-600" />
-                    <span className="text-xs font-black text-zinc-900 uppercase tracking-tighter">â€” Fate Worse Than Death</span>
-                  </div>
-                </div>
-                <p className="text-sm text-zinc-400 leading-relaxed font-medium">
-                  A feature game mode where users can only vote down, and a single down permanently destroys a playerâ€™s account for that round.
-                </p>
-              </div>
-
-              {/*  */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 bg-zinc-100 text-zinc-500 border border-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full">Pills</span>
-                </div>
-                <p className="text-sm text-zinc-400 leading-relaxed font-medium">
-                  A high-stakes game mode where users can only receive downvotes. Before the round begins, players select the ranking rule they wantâ€”Top 1, Top 5, Top 10, or Top 20. The final rule is determined by majority vote, with the first playerâ€™s choice acting as a temporary default until the majority is established. At the end of the round, any player who fails to make it into the selected top ranking has their profile, followers, and posts reset to zero, while their account remains intact.
+              <div className="flex flex-col gap-4">
+                <p className="text-base text-zinc-800 leading-relaxed font-bold italic border-l-4 border-zinc-900 pl-4 py-4 bg-zinc-50 rounded-r-2xl">
+                  RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.
                 </p>
               </div>
             </div>
@@ -391,12 +387,18 @@ const Home = () => {
           <div className="flex items-center gap-0">
             <button 
               onClick={() => setShowMustache(!showMustache)}
-              className="transition-all active:scale-95 hover:opacity-80 flex items-center gap-0"
+              className="transition-all active:scale-95 flex items-center gap-0"
               title="Toggle Menu"
             >
               <img src="/header-logo-hydrant.png" alt="Logo" className="h-[60px] w-auto object-contain" />
-              <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain ml-4" />
             </button>
+            <Link 
+              to="/" 
+              className="transition-all active:scale-95"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain ml-4" />
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             {!isChallengeEnded && showMustache && (
@@ -405,16 +407,27 @@ const Home = () => {
                   if (!showPills) {
                     setActiveTab('pley');
                   } else {
-                    setActiveTab(null);
+                    setActiveTab('pley'); // KEEP activeTab string active so the UI stays stable underneath!
                   }
                   setShowPills(!showPills);
                 }}
-                className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
+                className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
               >
                 <img 
-                  src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"} 
+                  src="/nav-mustache.png" 
                   alt="Create" 
-                  className="h-[44px] w-[44px] object-contain transition-all duration-300 transform" 
+                  className={cn(
+                    "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain",
+                    showPills ? "opacity-0" : "opacity-100"
+                  )} 
+                />
+                <img 
+                  src="/nav-mustache-active.png" 
+                  alt="Create Active" 
+                  className={cn(
+                    "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain translate-x-[0.5px]",
+                    showPills ? "opacity-100" : "opacity-0"
+                  )} 
                 />
               </button>
             )}
@@ -715,7 +728,12 @@ const Home = () => {
             {survivors.length > 0 && (
               <div className="w-full max-w-sm mb-8 animate-in slide-in-from-bottom-4 duration-700 delay-300">
                 <div className="flex items-center gap-2 mb-3 px-2">
-                  <img src="/guacamole-trophy.png" alt="Survival" className="h-5 w-auto object-contain" />
+                  <img 
+                    src="/guacamole-trophy.png" 
+                    alt="Survival" 
+                    className="h-5 w-auto object-contain" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
                   <span className="text-xs font-black uppercase tracking-widest text-zinc-500">{t('home_survivors')}</span>
                   <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold">{survivors.length}</span>
                 </div>

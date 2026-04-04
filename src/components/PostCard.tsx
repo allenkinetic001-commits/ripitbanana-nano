@@ -24,7 +24,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const [quickComment, setQuickComment] = useState('');
   const navigate = useNavigate();
-  const { addEnemy, enemies, addComment, userProfile, postComments, isLegend, t } = useChallenge();
+  const { addEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t } = useChallenge();
 
   const isEnemy = enemies.some(e => e.id === id);
   const isMe = username === userProfile.username;
@@ -101,7 +101,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
             )}
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+         <div className="flex items-center space-x-2">
           {!isMe && (
              <div className="flex items-center">
               <button 
@@ -116,15 +116,35 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
               </button>
             </div>
           )}
+          {!isMe && isSurvivor(username) && (
+            <button 
+              onClick={() => toggleFollow(username)}
+              className="transition-all active:scale-95 hover:scale-105"
+            >
+              {followedUsers.includes(username) ? (
+                <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
+              ) : (
+                <img 
+                  src="/btn-follow.png" 
+                  alt="Follow" 
+                  className="h-7 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              )}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Media Content */}
-      <div className="aspect-square bg-zinc-100 overflow-hidden relative flex items-center justify-center">
+      <div 
+        onClick={() => navigate(`/post/${id}`)}
+        className="aspect-square bg-zinc-100 overflow-hidden relative flex items-center justify-center cursor-pointer group"
+      >
         {type === 'video' ? (
           <video 
             src={image} 
-            className="w-full h-full object-contain bg-black" 
+            className="w-full h-full object-contain bg-black group-hover:scale-105 transition-transform duration-500" 
             controls 
             loop 
             muted 
@@ -135,7 +155,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           <img 
             src={image} 
             alt="Post content" 
-            className="w-full h-full object-cover" 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
           />
         )}
       </div>

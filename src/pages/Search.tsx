@@ -28,7 +28,7 @@ const Search = () => {
   const { 
     isChallengeEnded, survivors, survivorHistory, roundHistory, isActive, 
     startNewChallenge, clearAllHistory, updateHistoryVote, getVariantDisplayName,
-    toggleFollow, followedUsers, isLegend, setShowPills, setActiveTab, t
+    toggleFollow, followedUsers, isLegend, setShowPills, setActiveTab, isSurvivor, t
   } = useChallenge();
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
@@ -88,8 +88,11 @@ const Search = () => {
   }, [isChallengeEnded, survivors, survivorHistory]);
 
   const displaySurvivors = useMemo(() => {
-    if (selectedDuration === 'all') return allAvailableSurvivors;
-    return allAvailableSurvivors.filter(s => s.roundDurationLabel === selectedDuration);
+    const base = selectedDuration === 'all' 
+      ? allAvailableSurvivors 
+      : allAvailableSurvivors.filter(s => s.roundDurationLabel === selectedDuration);
+    // Only show winners/survivors, remove terminated players
+    return base.filter(s => s.madeIt !== false);
   }, [allAvailableSurvivors, selectedDuration]);
 
   const displayLogs = useMemo(() => {
@@ -102,12 +105,7 @@ const Search = () => {
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">
       {/* Header */}
-      <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-30 flex items-center border-b border-zinc-100">
-        {!isChallengeEnded && !selectedRoundId && allAvailableSurvivors.length > 0 && (
-          <div className="flex items-center mr-4">
-            <img src="/termination-skull.jpg" alt="" className="h-14 w-auto object-contain" />
-          </div>
-        )}
+      <div className="p-4 bg-white z-30 flex items-center border-b border-zinc-100">
         <div className="flex-1 flex items-center justify-between">
           <div className="flex items-center gap-3">
           {selectedRoundId && (
@@ -122,7 +120,12 @@ const Search = () => {
             <h2 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-2">
               {selectedRoundId ? t('search_header_details') : isChallengeEnded ? null : viewMode === 'hall_of_fame' ? (
                 <>
-                  <img src="/guacamole-trophy.png" alt="" className="h-16 w-auto object-contain" />
+                  <img 
+                    src="/guacamole-trophy.png" 
+                    alt="" 
+                    className="h-16 w-auto object-contain" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
                   <span className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em]">{t('search_header_hall')}</span>
                 </>
               ) : null}
@@ -182,7 +185,7 @@ const Search = () => {
       <div className="flex-1 flex flex-col">
         {/* Filter Bar */}
         {availableDurations.length > 0 && !isChallengeEnded && !selectedRoundId && (
-          <div className="px-4 py-3 bg-zinc-50 border-b border-zinc-100 flex items-center gap-3 overflow-x-auto no-scrollbar sticky top-[57px] z-20">
+          <div className="px-4 py-3 bg-zinc-50 border-b border-zinc-100 flex items-center gap-3 overflow-x-auto no-scrollbar z-20">
             <div className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-black text-zinc-400 uppercase tracking-widest whitespace-nowrap">
               <Filter size={12} />
               {t('search_filter_type')}
@@ -237,8 +240,7 @@ const Search = () => {
         {(displaySurvivors.length > 0 || displayLogs.length > 0) ? (
           <div className="flex flex-col">
             <div className={cn(
-              "p-6 border-b border-zinc-50 bg-zinc-50/30 flex items-center justify-between sticky z-10 backdrop-blur-sm",
-              isHistoryView && availableDurations.length > 0 && !selectedRoundId ? "top-[105px]" : "top-[57px]"
+              "p-6 border-b border-zinc-50 bg-zinc-50/30 flex items-center justify-between z-10",
             )}>
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center">
@@ -247,7 +249,7 @@ const Search = () => {
                 <div className="flex flex-col">
                   <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none flex items-center gap-2">
                     {selectedRoundId 
-                      ? (selectedRound?.variant === 'pley' ? 'people that pleyed' : 'people that survived') 
+                      ? (selectedRound?.variant === 'pley' ? 'people that made it' : 'people that survived')
                       : isChallengeEnded ? 'people that survived' : viewMode === 'hall_of_fame' ? 'Hall of Fame' : (
                         <>
                           <img src="/round-history-icon.png" alt="" className="w-12 h-12 object-contain" />
@@ -279,7 +281,7 @@ const Search = () => {
 
             {viewMode === 'hall_of_fame' || isChallengeEnded || selectedRoundId ? (
               <div className="flex-1 space-y-8 py-6">
-                {(selectedRoundId ? selectedRound?.survivors : displaySurvivors)?.map((survivor, idx) => (
+                {(selectedRoundId ? selectedRound?.survivors?.filter(s => s.madeIt !== false) : displaySurvivors)?.map((survivor, idx) => (
                   <div key={`${survivor.id}-${idx}`} className="bg-white border-y border-zinc-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500">
                     {/* Header */}
                     <div className="flex items-center justify-between p-3">
@@ -324,16 +326,23 @@ const Search = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <button 
-                          onClick={() => toggleFollow(survivor.username)}
-                          className="transition-all active:scale-95 hover:scale-105"
-                        >
-                          {followedUsers.includes(survivor.username) ? (
-                            <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
-                          ) : (
-                            <img src="/btn-follow.png" alt="Follow" className="h-7 w-auto object-contain" />
-                          )}
-                        </button>
+                        {isSurvivor(survivor.username) && (
+                          <button 
+                            onClick={() => toggleFollow(survivor.username)}
+                            className="transition-all active:scale-95 hover:scale-105"
+                          >
+                            {followedUsers.includes(survivor.username) ? (
+                              <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
+                            ) : (
+                              <img 
+                                src="/btn-follow.png" 
+                                alt="Follow" 
+                                className="h-7 w-auto object-contain" 
+                                style={{ imageRendering: '-webkit-optimize-contrast' }}
+                              />
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -342,9 +351,18 @@ const Search = () => {
                       <img src={survivor.image} alt="Post content" className="w-full h-full object-cover" />
                       <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 border border-white/50">
                         {(isHistoryView || isChallengeEnded) && <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" />}
-                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
+                        <span className={cn(
+                          "ml-2 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md",
+                          isHistoryView 
+                            ? (survivor.madeIt === false 
+                                ? "bg-rose-100 text-rose-600 border border-rose-200" 
+                                : (survivor.variant === 'pley' ? "bg-blue-100 text-blue-600 border border-blue-200" : "bg-green-100 text-green-600 border border-green-200"))
+                            : "bg-purple-100 text-purple-600 border border-purple-200"
+                        )}>
                           {isHistoryView 
-                            ? (survivor.variant === 'pley' ? 'PLEYED' : 'SURVIVED') 
+                            ? (survivor.madeIt === false 
+                                ? 'TERMINATED' 
+                                : (survivor.variant === 'pley' ? 'PLEYED' : 'SURVIVED')) 
                             : 'SURVIVOR'}
                         </span>
                       </div>
@@ -354,43 +372,66 @@ const Search = () => {
                     <div className="p-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-1 bg-zinc-100 rounded-xl px-2 py-1">
+                          <div className="flex items-center space-x-1 bg-zinc-100 rounded-full px-2 py-1">
                             {survivor.variant !== 'pley' && (
                               <button 
                                 onClick={() => handleVote(survivor.id, selectedRoundId, 'up')}
                                 className={cn(
-                                  "p-1 transition-colors",
-                                  survivor.userVote === 'up' ? "text-green-600" : "text-zinc-500 hover:text-green-600"
+                                  "p-1 transition-all duration-300",
+                                  survivor.userVote === 'up' && "hover:scale-110"
                                 )}
                               >
-                                <ArrowBigUp size={24} strokeWidth={survivor.userVote === 'up' ? 3 : 2} fill={survivor.userVote === 'up' ? "currentColor" : "none"} />
+                                <ArrowBigUp 
+                                  size={24} 
+                                  fill="white" 
+                                  stroke={survivor.userVote === 'up' ? "none" : "black"}
+                                  strokeWidth={survivor.userVote === 'up' ? 0 : 2}
+                                />
                               </button>
                             )}
                             <button 
                               onClick={() => handleVote(survivor.id, selectedRoundId, 'down')}
                               className={cn(
-                                "p-1 transition-colors",
-                                survivor.userVote === 'down' ? "text-red-600" : "text-zinc-500 hover:text-red-600"
+                                "p-1 transition-all duration-300",
+                                survivor.userVote === 'down' && "hover:scale-110"
                               )}
                             >
-                              <ArrowBigDown size={24} strokeWidth={survivor.userVote === 'down' ? 3 : 2} fill={survivor.userVote === 'down' ? "currentColor" : "none"} />
+                              <ArrowBigDown 
+                                size={24} 
+                                fill="white" 
+                                stroke={survivor.userVote === 'down' ? "none" : "black"}
+                                strokeWidth={survivor.userVote === 'down' ? 0 : 2}
+                              />
                             </button>
                           </div>
                           
                           <div className="flex items-center gap-2">
                             <button 
                               onClick={() => navigate(`/post/${survivor.id}`)}
-                              className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-9 w-9 rounded-full transition-colors"
+                              className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-8 w-8 rounded-full transition-colors group"
                             >
-                              <MessageCircle size={20} className="text-zinc-700" />
+                              <MessageCircle size={20} stroke="black" />
                             </button>
                             <button 
                               onClick={() => navigate(`/chat/${survivor.username}`)}
-                              className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-9 w-9 rounded-full transition-colors"
-                              title="Message survivor"
+                              className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-8 w-8 rounded-full transition-colors"
+                              title="Message"
                             >
-                              <Send size={16} className="text-zinc-700 -rotate-45" />
+                              <img src="/nav-chat-v3.png" alt="Message" className="h-7 w-7 object-contain" />
                             </button>
+                            {isSurvivor(survivor.username) && (
+                              <button 
+                                onClick={() => toggleFollow(survivor.username)}
+                                className={cn(
+                                  "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm",
+                                  followedUsers.includes(survivor.username)
+                                    ? "bg-zinc-100 text-zinc-400 border border-zinc-200"
+                                    : "bg-purple-600 text-white hover:bg-purple-700"
+                                )}
+                              >
+                                {followedUsers.includes(survivor.username) ? 'Following' : 'Follow'}
+                              </button>
+                            )}
                             {(survivor.survivalTime || !isHistoryView) && (
                               <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-zinc-400 uppercase tracking-tighter leading-none">
@@ -452,7 +493,7 @@ const Search = () => {
                                   <div className="flex items-center gap-1">
                                     <span className="text-[11px] font-black text-zinc-900">@{comment.username}</span>
                                     {isLegend(comment.username) && (
-                                      <img src="/badge-legend.png" alt="Legend" className="h-3.5 w-auto object-contain" />
+                                      <img src="/badge-legend.png" alt="Legend" className="h-3.5 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                                     )}
                                   </div>
                                   <p className="text-[11px] text-zinc-500 leading-tight">{comment.text}</p>
@@ -502,9 +543,18 @@ const Search = () => {
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "w-10 h-10 rounded-full flex items-center justify-center",
-                          log.outcome === 'SURVIVAL' ? "bg-green-100" : ""
+                          log.outcome === 'SURVIVAL' ? "bg-green-100" : "bg-zinc-100"
                         )}>
-                          {log.outcome === 'SURVIVAL' ? <img src="/guacamole-trophy.png" alt="Survival" className="h-[24px] w-auto object-contain" /> : <img src="/elimination-protocol.png" className="h-[36px] w-auto object-contain" alt="" />}
+                          {log.outcome === 'SURVIVAL' ? (
+                            <img 
+                              src="/guacamole-trophy.png" 
+                              alt="Survival" 
+                              className="h-[24px] w-auto object-contain" 
+                              style={{ imageRendering: '-webkit-optimize-contrast' }}
+                            />
+                          ) : (
+                            <img src="/elimination-protocol.png" className="h-[36px] w-auto object-contain" alt="" />
+                          )}
                         </div>
                         <div className="flex flex-col">
                           <span className="text-[11px] font-black text-zinc-900 uppercase tracking-tight mb-0.5">

@@ -358,9 +358,18 @@ const Profile = () => {
                 </div>
                 <button 
                   onClick={() => toggleFollow(user.username)}
-                  className="px-4 py-1.5 bg-zinc-100 text-zinc-400 text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-zinc-200 transition-all active:scale-95"
+                  className="transition-all active:scale-95 hover:scale-105"
                 >
-                  {t('profile_unfollow')}
+                  {followedUsers.includes(user.username) ? (
+                    <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
+                  ) : (
+                    <img 
+                      src="/btn-follow.png" 
+                      alt="Follow" 
+                      className="h-7 w-auto object-contain" 
+                      style={{ imageRendering: '-webkit-optimize-contrast' }}
+                    />
+                  )}
                 </button>
               </div>
             ))

@@ -48,6 +48,15 @@ const PostDetail = () => {
         <h1 className="text-lg font-bold">Comments</h1>
       </header>
 
+      {/* Main Post Media */}
+      <div className="aspect-square bg-zinc-100 overflow-hidden relative flex items-center justify-center border-b border-zinc-100">
+        <img 
+          src={post.image} 
+          alt="Post content" 
+          className="w-full h-full object-cover" 
+        />
+      </div>
+
       {/* Post Content Summary */}
       <div className="p-4 border-b border-zinc-50 flex gap-3">
         <img src={post.avatar} alt={post.username} className="w-8 h-8 rounded-full object-cover shrink-0" />
@@ -64,10 +73,12 @@ const PostDetail = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {localComments.length > 0 ? (
           localComments.map((comment) => (
-            <div key={comment.id} className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-zinc-100 shrink-0 flex items-center justify-center text-[10px] font-bold">
-                {comment.username[0].toUpperCase()}
-              </div>
+            <div key={comment.id} className="flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <img 
+                src={comment.avatar || `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${comment.username}&image_size=square`} 
+                alt={comment.username} 
+                className="w-10 h-10 rounded-full object-cover shrink-0 border border-zinc-100 shadow-sm"
+              />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold">{comment.username}</span>

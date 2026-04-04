@@ -8,8 +8,20 @@ export const posts = [
     likes: 1240,
     time: '2 hours ago',
     comments: [
-      { id: 1, username: 'nature_lover', text: 'This looks incredible! 😍', time: '1h ago' },
-      { id: 2, username: 'globetrotter', text: 'Wish I was there right now.', time: '45m ago' }
+      { 
+        id: 1, 
+        username: 'nature_lover', 
+        avatar: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+nature_lover&image_size=square',
+        text: 'This looks incredible! 😍', 
+        time: '1h ago' 
+      },
+      { 
+        id: 2, 
+        username: 'globetrotter', 
+        avatar: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+globetrotter&image_size=square',
+        text: 'Wish I was there right now.', 
+        time: '45m ago' 
+      }
     ]
   },
   {
@@ -21,7 +33,13 @@ export const posts = [
     likes: 850,
     time: '5 hours ago',
     comments: [
-      { id: 3, username: 'burger_king', text: 'Where is this?? I need it!', time: '2h ago' }
+      { 
+        id: 3, 
+        username: 'burger_king', 
+        avatar: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+burger_king&image_size=square',
+        text: 'Where is this?? I need it!', 
+        time: '2h ago' 
+      }
     ]
   },
   {
@@ -33,8 +51,20 @@ export const posts = [
     likes: 2100,
     time: '10 hours ago',
     comments: [
-      { id: 4, username: 'dev_guy', text: 'Specs? Love the monitor arm.', time: '5h ago' },
-      { id: 5, username: 'minimalist', text: 'Clean setup, man.', time: '3h ago' }
+      { 
+        id: 4, 
+        username: 'dev_guy', 
+        avatar: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+dev_guy&image_size=square',
+        text: 'Specs? Love the monitor arm.', 
+        time: '5h ago' 
+      },
+      { 
+        id: 5, 
+        username: 'minimalist', 
+        avatar: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+minimalist&image_size=square',
+        text: 'Clean setup, man.', 
+        time: '3h ago' 
+      }
     ]
   }
 ];

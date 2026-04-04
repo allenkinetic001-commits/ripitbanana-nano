@@ -17,6 +17,7 @@ interface Survivor {
   variant?: string | null;
   userVote?: 'up' | 'down' | null;
   rankingRule?: string | null;
+  madeIt?: boolean;
 }
 
 interface RoundRecord {
@@ -34,6 +35,7 @@ interface RoundRecord {
 interface Comment {
   id: number;
   username: string;
+  avatar: string;
   text: string;
   time: string;
 }
@@ -73,12 +75,15 @@ interface ChallengeContextType {
   followedUsers: string[];
   toggleFollow: (username: string) => void;
   isLegend: (username: string) => boolean;
+  isSurvivor: (username: string) => boolean;
   allPosts: any[];
   setAllPosts: React.Dispatch<React.SetStateAction<any[]>>;
   visiblePosts: any[];
   setVisiblePosts: React.Dispatch<React.SetStateAction<any[]>>;
   majorityVariant: string | null;
   survivors: Survivor[];
+  eliminated: Survivor[];
+  addEliminated: (user: Survivor) => void;
   survivorHistory: Survivor[];
   roundHistory: RoundRecord[];
   showPills: boolean;
@@ -254,7 +259,7 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'About Rip It',
     'about_tagline': 'Tagline: Survive. Reset. Evolve.',
-    'about_desc1': 'Rip It is a high-stakes social survival platform designed for bold players. Compete in Pley mode to test your strategy, resilience, and social skills.',
+    'about_desc1': 'RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Survival mode with high-risk elimination.',
     'about_desc2': 'Rip It combines social interaction, competition, and dynamic personalization to create a unique, viral, and adrenaline-pumping experience.',
@@ -272,7 +277,7 @@ const translations: Record<string, Record<string, string>> = {
     // Model Modal
     'model_title': '🔥 Rip It – App Model',
     'model_concept_title': '1️⃣ Core Concept',
-    'model_concept_desc': 'Rip It is a high-stakes social survival app where user participation, voting, and strategy determine progression, status, and legacy. Each action has consequences, creating tension and engagement.',
+    'model_concept_desc': 'RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.',
     'model_modes_title': '2️⃣ Modes',
     'model_pley_title': 'Pley',
     'model_pley_item1': 'Survival-focused',
@@ -325,7 +330,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s1_title': '1. What Rip It Is',
     'terms_s1_desc': 'Rip It is a high-stakes social survival app where users participate in timed challenges, public voting, and competitive modes.',
     'terms_s1_list_title': 'We provide tools for:',
-    'terms_s1_i1': 'Mode-based survival experiences (Pley, Pley)',
+    'terms_s1_i1': 'Mode-based survival experiences (Pley, Pills)',
     'terms_s1_i2': 'Public voting and recognition',
     'terms_s1_i3': 'Profile personalization and status tracking',
     'terms_s1_disclaimer': 'Rip It does not guarantee outcomes, survival, or ranking.',
@@ -335,7 +340,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s2_i3': 'Provide accurate information',
     'terms_s2_i4': 'Be responsible for your account and activity',
     'terms_s3_title': '3. Modes & Voting Rules',
-    'terms_s3_i1': 'Pley and Pley have unique mechanics affecting profile status and progression.',
+    'terms_s3_i1': 'Pley and Pills have unique mechanics affecting profile status and progression.',
     'terms_s3_i2': 'Votes may affect user progress, profile reset, or temporary restrictions.',
     'terms_s3_i3': 'Timers, rounds, and outcomes are determined by the app and participating users.',
     'terms_s3_i4': 'Users participate at their own discretion.',
@@ -5045,7 +5050,27 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   });
   const [postComments, setPostComments] = useState<Record<number, Comment[]>>(() => {
     const saved = localStorage.getItem('postComments');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      let needsUpdate = false;
+      Object.keys(parsed).forEach(postIdStr => {
+        const postId = Number(postIdStr);
+        parsed[postId] = parsed[postId].map((c: any) => {
+          if (!c.avatar) {
+            needsUpdate = true;
+            const post = posts.find((p: any) => p.id === postId);
+            const defaultComment = post?.comments.find((dc: any) => dc.id === c.id);
+            return {
+              ...c,
+              avatar: defaultComment?.avatar || `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${c.username}&image_size=square`
+            };
+          }
+          return c;
+        });
+      });
+      if (needsUpdate) localStorage.setItem('postComments', JSON.stringify(parsed));
+      return parsed;
+    }
     
     // Initialize with default comments from data
     const initialComments: Record<number, Comment[]> = {};
@@ -5054,7 +5079,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     });
     return initialComments;
   });
-  const [showPills, setShowPills] = useState(true);
+  const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
   const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>(() => {
@@ -5155,9 +5180,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const getVariantDisplayName = (key: string | null) => {
     if (!key) return '';
     const names: Record<string, string> = {
-      pley: 'Pley',
-      Pley: 'Pley',
-      Pley: 'Pley'
+      pley: 'Pley'
     };
     return names[key] || key;
   };
@@ -5181,7 +5204,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       const existing = prev[postId] || [];
       const newComment: Comment = {
         id: existing.length + 1,
-        username: 'you',
+        username: userProfile.username,
+        avatar: userProfile.avatar,
         text,
         time: 'Just now'
       };
@@ -5206,8 +5230,14 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const toggleFollow = (username: string) => {
     setFollowedUsers(prev => {
-      if (prev.includes(username)) {
+      const isFollowing = prev.includes(username);
+      if (isFollowing) {
         return prev.filter(u => u !== username);
+      }
+      // Survivor-only follow logic enforcement
+      if (!isSurvivor(username)) {
+        console.warn(`Follow action blocked: ${username} is not a survivor.`);
+        return prev;
       }
       return [...prev, username];
     });
@@ -5217,6 +5247,20 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const userHistory = survivorHistory.filter(s => s.username === username);
     const variants = new Set(userHistory.map(s => s.variant));
     return variants.has('pley');
+  };
+
+  const isSurvivor = (username: string) => {
+    return survivorHistory.some(s => s.username === username);
+  };
+
+  const [eliminated, setEliminated] = useState<Survivor[]>([]);
+
+  const addEliminated = (user: Survivor) => {
+    setEliminated(prev => {
+      const existingIds = new Set(prev.map(p => p.id));
+      if (existingIds.has(user.id)) return prev;
+      return [...prev, { ...user, madeIt: false }];
+    });
   };
 
   const [isDurationInitialized, setIsDurationInitialized] = useState(false);
@@ -5235,6 +5279,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     setVariantDurations({ pley: 0 });
     setVariantFirstClickTime({ pley: 0 });
     setSurvivors([]);
+    setEliminated([]);
     setVisiblePosts(allPosts);
   };
 
@@ -5261,18 +5306,19 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
       const durationLabel = formatDuration(durationSeconds);
 
-      // Create round record
+      // Create round record with participants (survivors + eliminated)
+      const allParticipants = [
+        ...survivors.map(s => ({ ...s, madeIt: true, variant: activeVariant, userVote: null })),
+        ...eliminated.map(e => ({ ...e, madeIt: false, variant: activeVariant, userVote: null }))
+      ];
+
       const roundRecord: RoundRecord = {
         id: Math.random().toString(36).substr(2, 9),
         date: today,
         time: survivalTime,
         outcome: survivors.length > 0 ? 'SURVIVAL' : 'TERMINATION',
         survivorCount: survivors.length,
-        survivors: survivors.map(s => ({ 
-          ...s, 
-          variant: activeVariant, 
-          userVote: null
-        })),
+        survivors: allParticipants,
         durationLabel,
         variant: activeVariant
       };
@@ -5283,6 +5329,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (survivors.length > 0) {
         const updatedSurvivors = survivors.map(s => ({
           ...s,
+          madeIt: true,
           survivalDate: today,
           survivalTime: survivalTime,
           roundDurationLabel: durationLabel,
@@ -5299,7 +5346,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         });
       }
     }
-  }, [isChallengeEnded, survivors, majorityVariant, userSelection, variantDurations]);
+  }, [isChallengeEnded, survivors, eliminated, majorityVariant, userSelection, variantDurations]);
 
   const clearAllHistory = () => {
     setSurvivorHistory([]);
@@ -5422,9 +5469,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       timeLeft, isActive, userProfile, setUserProfile, clickCounts, eliminationCounts, madeItCounts,
       variantDurations, variantFirstClickTime, userSelection, isChallengeEnded,
       showPills, setShowPills, activeTab, setActiveTab,
-      enemies, postComments, wallPosts, followedUsers, toggleFollow, isLegend, allPosts, setAllPosts,
+      enemies, postComments, wallPosts, followedUsers, toggleFollow, isLegend, isSurvivor, allPosts, setAllPosts,
       visiblePosts, setVisiblePosts,
-      majorityVariant, survivors, survivorHistory, roundHistory,
+      majorityVariant, survivors, eliminated, addEliminated, survivorHistory, roundHistory,
       setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
       setUserSelection, setIsChallengeEnded,

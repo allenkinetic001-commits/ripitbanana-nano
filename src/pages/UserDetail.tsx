@@ -10,7 +10,7 @@ const UserDetail = () => {
   const navigate = useNavigate();
   const { 
     addEnemy, enemies, removeEnemy, wallPosts, addWallPost, userProfile,
-    toggleFollow, followedUsers, isLegend
+    toggleFollow, followedUsers, isLegend, isSurvivor
   } = useChallenge();
   const [viewMode, setViewMode] = useState<'posts' | 'wall'>('posts');
   const [wallInput, setWallInput] = useState('');
@@ -74,51 +74,68 @@ const UserDetail = () => {
           </div>
         </div>
 
-        <div className="space-y-1">
-          <div className="flex items-center gap-1">
-            <h2 className="text-sm font-bold">{username}</h2>
-            {userIsLegend && (
-              <img src="/badge-legend.png" alt="Legend" className="h-6 w-auto object-contain" />
-            )}
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1">
+              <h2 className="text-sm font-bold">{username}</h2>
+              {userIsLegend && (
+                <img 
+                  src="/badge-legend.png" 
+                  alt="Legend" 
+                  className="h-6 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              )}
+            </div>
+            <p className="text-sm text-zinc-600">Digital Creator | Explorer 🌍</p>
           </div>
-          <p className="text-sm text-zinc-600">Digital Creator | Explorer 🌍</p>
+          <div className="flex items-center gap-3">
+            {username && isSurvivor(username) && (
+              <button 
+                onClick={() => toggleFollow(username)}
+                className="transition-all active:scale-95 hover:scale-105"
+              >
+                {isFollowing ? (
+                  <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
+                ) : (
+                  <img 
+                    src="/btn-follow.png" 
+                    alt="Follow" 
+                    className="h-8 w-auto object-contain" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                )}
+              </button>
+            )}
+            <button 
+              onClick={() => {
+                if (isEnemy) {
+                  const enemy = enemies.find(e => e.username === username);
+                  if (enemy) removeEnemy(enemy.id);
+                } else {
+                  if (userPosts[0]) addEnemy(userPosts[0]);
+                }
+              }}
+              className="flex items-center justify-center transition-all active:scale-95 hover:opacity-80 drop-shadow-sm"
+            >
+              <img 
+                src="/add-enemy.png" 
+                alt={isEnemy ? 'Enemy Marked' : 'Mark Enemy'} 
+                className="h-[48px] w-auto object-contain pr-2 translate-y-[1px]" 
+              />
+            </button>
+          </div>
         </div>
 
-        <div className="flex space-x-2">
-          <button 
-            onClick={() => username && toggleFollow(username)}
-            className={cn(
-              "flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all",
-              isFollowing 
-                ? "bg-zinc-100 text-zinc-400 border border-zinc-200" 
-                : "bg-purple-600 text-white shadow-sm hover:bg-purple-700"
-            )}
-          >
-            {isFollowing ? 'Following' : 'Follow'}
-          </button>
-          <button 
-            onClick={() => navigate(`/chat/${username}`)}
-            className="flex-1 bg-zinc-100 py-1.5 rounded-lg text-sm font-semibold hover:bg-zinc-200 transition-colors"
-          >
-            Message
-          </button>
-          <button 
-            onClick={() => {
-              if (isEnemy) {
-                const enemy = enemies.find(e => e.username === username);
-                if (enemy) removeEnemy(enemy.id);
-              } else {
-                if (userPosts[0]) addEnemy(userPosts[0]);
-              }
-            }}
-            className="flex-1 flex items-center justify-center transition-all active:scale-95 hover:opacity-80 drop-shadow-sm transition-opacity"
-          >
-            <img 
-              src="/add-enemy.png" 
-              alt={isEnemy ? 'Enemy Marked' : 'Mark Enemy'} 
-              className="h-[48px] w-auto object-contain" 
-            />
-          </button>
+        <div className="flex flex-col gap-3 mt-2">
+          {username && isSurvivor(username) && (
+            <button 
+              onClick={() => navigate(`/chat/${username}`)}
+              className="w-full bg-zinc-100 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-zinc-200 transition-colors"
+            >
+              Message
+            </button>
+          )}
         </div>
       </div>
 
