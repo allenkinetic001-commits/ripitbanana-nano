@@ -397,7 +397,12 @@ const Home = () => {
               className="transition-all active:scale-95"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
-              <img src="/header-logo-text.png" alt="RipIt" className="h-6 w-auto object-contain ml-4" />
+              <img 
+                src="/header-logo-text.png" 
+                alt="RipIt" 
+                className="h-6 w-auto object-contain ml-4" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
             </Link>
           </div>
           <div className="flex items-center gap-4">
@@ -420,6 +425,7 @@ const Home = () => {
                     "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain",
                     showPills ? "opacity-0" : "opacity-100"
                   )} 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
                 <img 
                   src="/nav-mustache-active.png" 
@@ -428,6 +434,7 @@ const Home = () => {
                     "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain translate-x-[0.5px]",
                     showPills ? "opacity-100" : "opacity-0"
                   )} 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               </button>
             )}
@@ -435,13 +442,13 @@ const Home = () => {
               onClick={() => navigate('/chat')}
               className="text-zinc-700 hover:text-purple-600 transition-colors"
             >
-              <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" />
+              <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             <button 
               onClick={() => fileInputRef.current?.click()}
               className="text-zinc-700 hover:text-purple-600 transition-colors"
             >
-              <img src="/nav-camera-v3.png" alt="Camera" className="h-[38px] w-[38px] object-contain" />
+              <img src="/nav-camera-v3.png" alt="Camera" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             <input 
               type="file" 
@@ -454,13 +461,13 @@ const Home = () => {
               className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
               onClick={() => setShowPillsInfo(true)}
             >
-              <img src="/nav-news-v3.png" alt="News" className="h-[38px] w-[38px] object-contain" />
+              <img src="/nav-news-v3.png" alt="News" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             <button 
               className="text-zinc-700 transition-all active:scale-90 hover:opacity-70"
               onClick={() => setShowSearchModal(true)}
             >
-              <img src="/header-search-v3.png" alt="Search" className="h-[26px] w-[26px] object-contain" />
+              <img src="/header-search-v3.png" alt="Search" className="h-[26px] w-[26px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
           </div>
         </div>

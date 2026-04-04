@@ -244,7 +244,7 @@ const Search = () => {
             )}>
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center">
-                  <img src="/round-trophy.png" alt="" className="w-24 h-24 object-contain" />
+                  <img src="/round-trophy.png" alt="" className="w-24 h-24 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                 </div>
                 <div className="flex flex-col">
                   <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none flex items-center gap-2">
@@ -252,7 +252,7 @@ const Search = () => {
                       ? (selectedRound?.variant === 'pley' ? 'people that made it' : 'people that survived')
                       : isChallengeEnded ? 'people that survived' : viewMode === 'hall_of_fame' ? 'Hall of Fame' : (
                         <>
-                          <img src="/round-history-icon.png" alt="" className="w-12 h-12 object-contain" />
+                          <img src="/round-history-icon.png" alt="" className="w-12 h-12 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                           Round History
                         </>
                       )}
@@ -287,8 +287,7 @@ const Search = () => {
                     <div className="flex items-center justify-between p-3">
                       <div className="flex items-center space-x-3">
                         <div className="relative">
-                          <img src={survivor.avatar} alt={survivor.username} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
-                          <div className="absolute -bottom-3 -right-3 flex items-center justify-center">
+                          <img src={survivor.avatar} alt={survivor.username} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />                           <div className="absolute -bottom-3 -right-3 flex items-center justify-center">
                             <img 
                               src="/pley-badge.png" 
                               alt="Survivor" 
@@ -317,7 +316,7 @@ const Search = () => {
                               <>
                                 <span className="w-1 h-1 rounded-full bg-zinc-200" />
                                 <span className="text-[10px] text-purple-600 font-black uppercase tracking-tighter flex items-center gap-1">
-                                  <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" />
+                                  <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                                   {survivor.roundDurationLabel}
                                 </span>
                               </>
@@ -350,7 +349,7 @@ const Search = () => {
                     <div className="aspect-square bg-zinc-50 overflow-hidden relative group">
                       <img src={survivor.image} alt="Post content" className="w-full h-full object-cover" />
                       <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 border border-white/50">
-                        {(isHistoryView || isChallengeEnded) && <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" />}
+                        {(isHistoryView || isChallengeEnded) && <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" style={{ imageRendering: '-webkit-optimize-contrast' }} />}
                         <span className={cn(
                           "ml-2 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md",
                           isHistoryView 
@@ -553,7 +552,12 @@ const Search = () => {
                               style={{ imageRendering: '-webkit-optimize-contrast' }}
                             />
                           ) : (
-                            <img src="/elimination-protocol.png" className="h-[36px] w-auto object-contain" alt="" />
+                            <img 
+                              src="/elimination-protocol.png" 
+                              className="h-[36px] w-auto object-contain" 
+                              alt="Elimination" 
+                              style={{ imageRendering: '-webkit-optimize-contrast' }}
+                            />
                           )}
                         </div>
                         <div className="flex flex-col">
@@ -571,7 +575,7 @@ const Search = () => {
                         </div>
                       </div>
                       <div className="bg-zinc-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-                        <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" />
+                        <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                         <span className="text-[9px] font-black text-zinc-900 uppercase">{log.durationLabel} Round</span>
                       </div>
                     </div>

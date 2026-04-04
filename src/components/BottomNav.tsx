@@ -79,6 +79,7 @@ const BottomNav = () => {
                     "h-full w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100 font-extrabold"
                   )} 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : item.path === '/search' ? (
                 <img 
@@ -88,6 +89,7 @@ const BottomNav = () => {
                     "h-full w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100"
                   )} 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : item.path === '/notifications' ? (
                 <img 
@@ -97,6 +99,7 @@ const BottomNav = () => {
                     "h-full w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100"
                   )} 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : item.path === '/profile' ? (
                 <img 
@@ -106,6 +109,7 @@ const BottomNav = () => {
                     "h-full w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100"
                   )} 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : (
                 <span className={cn(
