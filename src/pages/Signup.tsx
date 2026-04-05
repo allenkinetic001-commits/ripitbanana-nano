@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useChallenge } from '../contexts/ChallengeContext';
-import { Sparkles, User, Key, Mail, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Signup() {
   const [username, setUsername] = useState('');
@@ -43,14 +43,22 @@ export default function Signup() {
 
       <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-500">
         <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 bg-zinc-900 rounded-2xl flex items-center justify-center shadow-xl rotate-3 hover:rotate-6 transition-transform duration-300">
-              <Sparkles className="text-white w-6 h-6" />
-            </div>
+          <div className="flex items-center justify-center mb-6">
+            <img 
+              src="/signup-welcome-hydrant.png" 
+              alt="Welcome" 
+              className="w-32 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
           </div>
-          <h1 className="text-4xl font-black font-serif tracking-tighter text-zinc-900 mb-2">
-            Create Account
-          </h1>
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/signup-title-text.png?v=2" 
+              alt="Create Account" 
+              className="h-40 w-auto object-contain animate-in fade-in zoom-in duration-500"
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
+          </div>
           <p className="text-zinc-500 font-medium">
             Join the RipIt community today
           </p>
@@ -66,9 +74,14 @@ export default function Signup() {
           <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Username</label>
             <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-600 transition-colors">
-                <User size={20} />
-              </div>
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6">
+                  <img 
+                    src="/signup-user-icon.png?v=1" 
+                    alt="" 
+                    className="w-6 h-6 object-contain opacity-40 group-focus-within:opacity-100 transition-opacity"
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                </div>
               <input
                 type="text"
                 value={username}
@@ -84,7 +97,7 @@ export default function Signup() {
             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Email</label>
             <div className="relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-600 transition-colors">
-                <Mail size={20} />
+                <img src="/login-email-icon.png" alt="" className="w-6 h-6 object-contain" />
               </div>
               <input
                 type="email"
@@ -106,7 +119,7 @@ export default function Signup() {
             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Password</label>
             <div className="relative group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-600 transition-colors">
-                <Key size={20} />
+                <img src="/login-password-key.png" alt="" className="w-6 h-6 object-contain" />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
@@ -128,17 +141,21 @@ export default function Signup() {
 
           <button
             type="submit"
-            className="w-full bg-zinc-900 text-white font-bold py-4 rounded-2xl shadow-xl hover:bg-zinc-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 mt-6"
+            className="w-full hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex justify-center mt-6"
           >
-            <span>Sign Up</span>
-            <Sparkles size={18} />
+            <img 
+              src="/signup-button.png?v=1" 
+              alt="Sign Up" 
+              className="h-32 w-auto object-contain drop-shadow-xl"
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
           </button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-zinc-500 font-medium">
             Already have an account?{' '}
-            <Link to="/login" className="text-purple-600 font-bold hover:text-purple-700 transition-colors">
+            <Link to="/login" className="text-red-600 font-bold hover:text-red-700 transition-colors">
               Sign In
             </Link>
           </p>

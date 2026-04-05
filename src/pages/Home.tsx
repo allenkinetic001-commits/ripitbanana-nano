@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
@@ -31,6 +31,7 @@ const Home = () => {
   const [fileType, setFileType] = useState<'image' | 'video'>('image');
   const [captionText, setCaptionText] = useState('');
   const [showMustache, setShowMustache] = useState(true);
+  const { setShowBottomNav, showBottomNav } = useOutletContext<{ setShowBottomNav: React.Dispatch<React.SetStateAction<boolean>>; showBottomNav: boolean }>();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -395,7 +396,10 @@ const Home = () => {
             <Link 
               to="/" 
               className="transition-all active:scale-95"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => {
+                setShowBottomNav(prev => !prev);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             >
               <img 
                 src="/header-logo-text.png" 
@@ -412,7 +416,7 @@ const Home = () => {
                   if (!showPills) {
                     setActiveTab('pley');
                   } else {
-                    setActiveTab('pley'); // KEEP activeTab string active so the UI stays stable underneath!
+                    setActiveTab('pley');
                   }
                   setShowPills(!showPills);
                 }}
@@ -425,16 +429,16 @@ const Home = () => {
                     "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain",
                     showPills ? "opacity-0" : "opacity-100"
                   )} 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
                 />
                 <img 
                   src="/nav-mustache-active.png" 
                   alt="Create Active" 
                   className={cn(
-                    "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain translate-x-[0.5px]",
+                    "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain",
                     showPills ? "opacity-100" : "opacity-0"
                   )} 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
                 />
               </button>
             )}
@@ -694,6 +698,7 @@ const Home = () => {
                           src="/btn-submit.png" 
                           alt={userSelection && timeLeft > 0 ? "Submitted" : "Submit"} 
                           className="h-[72px] w-auto object-contain" 
+                          style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
                         />
                       </button>
                     </div>
@@ -707,7 +712,7 @@ const Home = () => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
         {visiblePosts.length > 0 && !isChallengeEnded ? (
           visiblePosts.map((post) => (
             <PostCard 
