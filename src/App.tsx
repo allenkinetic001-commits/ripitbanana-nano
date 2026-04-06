@@ -11,6 +11,7 @@ import Pley from "./pages/Pley";
 import PostDetail from "./pages/PostDetail";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/SettingsPage";
 import Chat from "./pages/Chat";
 import { useChallenge } from "./contexts/ChallengeContext";
@@ -27,6 +28,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />

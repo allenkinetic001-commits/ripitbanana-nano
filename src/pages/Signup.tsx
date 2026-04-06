@@ -29,7 +29,7 @@ export default function Signup() {
     if (username && email && password) {
       // In a real app, you would validate credentials here
       login(username);
-      navigate('/');
+      navigate('/onboarding');
     }
   };
 
@@ -47,7 +47,7 @@ export default function Signup() {
             <img 
               src="/signup-welcome-hydrant.png" 
               alt="Welcome" 
-              className="w-32 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
+              className="w-56 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </div>

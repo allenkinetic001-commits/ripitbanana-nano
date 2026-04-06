@@ -47,7 +47,7 @@ export default function Login() {
             <img 
               src="/welcome-back-hydrant.png" 
               alt="Welcome Back" 
-              className="w-32 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
+              className="w-56 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </div>
