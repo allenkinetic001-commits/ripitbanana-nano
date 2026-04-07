@@ -30,14 +30,14 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
 
   const navItems: NavItem[] = [
     { icon: '/nav-home-v3.png', label: t('nav_home'), path: '/', isImage: true },
-    { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true, size: 'h-[53px] w-[53px]' },
+    { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true, size: 'h-[50px] w-[50px]' },
     { icon: '/nav-phone-v3.png', label: t('nav_notifications'), path: '/notifications', isImage: true },
     { icon: '/nav-profile-v3.png', label: t('nav_profile'), path: '/profile', isImage: true },
   ];
 
   return (
     <div className={cn(
-      "absolute bottom-0 w-full bg-white border-t border-zinc-100 px-6 py-2 flex justify-between items-center z-50",
+      "absolute bottom-0 w-full bg-white border-t border-zinc-100 px-2 py-2 flex justify-around items-center z-50",
       "transition-all duration-300 ease-in-out",
       visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-full pointer-events-none"
     )}>
@@ -121,8 +121,8 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                 />
               ) : (
                 <span className={cn(
-                  "text-[10px] font-medium transition-all translate-y-1", 
-                  isActive ? "font-bold text-zinc-900" : "font-black text-zinc-500"
+                  "text-[10px] font-bold tracking-tighter uppercase transition-all", 
+                  isActive ? "text-zinc-900 scale-110" : "text-zinc-400 scale-100"
                 )}>
                   {item.label}
                 </span>

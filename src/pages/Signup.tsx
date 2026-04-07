@@ -53,7 +53,7 @@ export default function Signup() {
           </div>
           <div className="flex justify-center mb-4">
             <img 
-              src="/signup-title-text.png?v=2" 
+              src="/signup-title-text.png" 
               alt="Create Account" 
               className="h-40 w-auto object-contain animate-in fade-in zoom-in duration-500"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
@@ -76,7 +76,7 @@ export default function Signup() {
             <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6">
                   <img 
-                    src="/signup-user-icon.png?v=1" 
+                    src="/signup-user-icon.png" 
                     alt="" 
                     className="w-6 h-6 object-contain opacity-40 group-focus-within:opacity-100 transition-opacity"
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
@@ -144,7 +144,7 @@ export default function Signup() {
             className="w-full hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex justify-center mt-6"
           >
             <img 
-              src="/signup-button.png?v=1" 
+              src="/signup-button.png" 
               alt="Sign Up" 
               className="h-32 w-auto object-contain drop-shadow-xl"
               style={{ imageRendering: '-webkit-optimize-contrast' }}

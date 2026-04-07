@@ -20,42 +20,55 @@ export default function Onboarding() {
     {
       title: 'Welcome to RipIt',
       titleImage: '/onboarding-title-1.png',
+      textImage: '/onboarding-text.png',
       description: 'The premier platform for artisan challenges. Get ready to prove yourself.',
       icon: '🔥',
       image: '/onboarding-step1.png'
     },
     {
       title: 'Built for Survivors',
+      titleImage: '/onboarding-title-2.png',
+      textImage: '/onboarding-text-2.png',
       description: 'Only the best make it through. Track your survival history over time.',
       icon: '💀',
       image: '/onboarding-step2.png?v=4'
     },
     {
       title: 'Set Your Profile',
+      titleImage: '/onboarding-title-3.png',
+      textImage: '/onboarding-text-3.png',
       description: 'Customize your artisan presence. Show them who you truly are.',
       icon: '🎭',
       image: '/onboarding-step3.png?v=3'
     },
     {
       title: 'Find Your Tribe',
+      titleImage: '/onboarding-title-4.png',
+      textImage: '/onboarding-text-4.png',
       description: 'Follow other survivors and build your network. Note: only survivors can be followed.',
       icon: '🤝',
       image: '/onboarding-step4.png'
     },
     {
       title: 'Earn Your Status',
+      titleImage: '/onboarding-title-5.png',
+      textImage: '/onboarding-text-5.png',
       description: 'Unlock exclusive achievements as you overcome impossible odds.',
       icon: '🏆',
       image: '/onboarding-step5.png'
     },
     {
       title: 'Dominate the Leaderboard',
+      titleImage: '/onboarding-title-6.png',
+      textImage: '/onboarding-text-6.png',
       description: 'Rise to the top and let the community witness your legendary runs.',
       icon: '👑',
       image: '/onboarding-step6.png'
     },
     {
       title: 'Are You Ready?',
+      titleImage: '/onboarding-title-7.png',
+      textImage: '/onboarding-text-7.png',
       description: 'The challenges wait for no one. Step up and rip it.',
       icon: '🚀',
       image: '/onboarding-step7.png'
@@ -84,7 +97,6 @@ export default function Onboarding() {
               src={stepsContent[step - 1].titleImage} 
               alt={stepsContent[step - 1].title} 
               className="h-40 w-auto object-contain mx-auto"
-              style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           ) : (
             <h1 className="text-3xl font-black text-zinc-900 tracking-tight">
@@ -97,7 +109,6 @@ export default function Onboarding() {
                 src={stepsContent[step - 1].image} 
                 alt=""
                 className="h-[32rem] w-auto object-contain drop-shadow-2xl animate-in zoom-in slide-in-from-bottom duration-700 mt-2 scale-110"
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
           ) : (
@@ -107,10 +118,21 @@ export default function Onboarding() {
           )}
         </div>
 
+        {/* Text Image */}
+        {stepsContent[step - 1].textImage && (
+          <div className="flex justify-center w-full px-2 mt-8">
+            <img 
+              src={stepsContent[step - 1].textImage} 
+              alt="Description" 
+              className={`${step === 2 ? 'h-12' : step === 4 ? 'h-36' : step === 5 ? 'h-28' : step === 6 ? 'h-28' : step === 7 ? 'h-24' : step === 1 ? 'h-20' : 'h-[68px]'} w-auto object-contain mx-auto drop-shadow-md animate-in fade-in zoom-in duration-500`}
+            />
+          </div>
+        )}
+
         {/* Progress Section */}
-        <div className="w-full mt-12 flex flex-col items-center space-y-8">
+        <div className="w-full mt-8 flex flex-row items-center justify-between px-2">
           {/* Progress Dots */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 ml-12">
             {[...Array(totalSteps)].map((_, i) => (
               <div 
                 key={i} 
@@ -128,18 +150,22 @@ export default function Onboarding() {
           {/* Action Button */}
           <button
             onClick={handleNext}
-            className="w-full bg-zinc-900 text-white font-bold py-4 rounded-2xl shadow-xl hover:bg-zinc-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+            className="hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center"
           >
             {step < totalSteps ? (
-              <>
-                <span>Continue</span>
-                <ChevronRight size={20} />
-              </>
+              <img 
+                src="/onboarding-continue.png" 
+                alt="Continue" 
+                className="h-32 w-auto object-contain"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
             ) : (
-              <>
-                <span>Get Started</span>
-                <Check size={20} />
-              </>
+              <img 
+                src="/get-started-btn.png" 
+                alt="Get Started" 
+                className="h-32 w-auto object-contain"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
             )}
           </button>
         </div>
