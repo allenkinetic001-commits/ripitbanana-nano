@@ -352,7 +352,7 @@ const Home = () => {
                 <div className="w-8 h-8 flex items-center justify-center">
                   <img src="/nav-news-v3.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <h2 className="text-lg font-black font-serif text-zinc-900">Rip It Rules</h2>
+                <img src="/ripit-rules-header.png" alt="Rip It Rules" className="h-10 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <button 
                 onClick={() => setShowPillsInfo(false)}
@@ -363,18 +363,18 @@ const Home = () => {
             </div>
             <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto">
               <div className="flex flex-col gap-4">
-                <p className="text-base text-zinc-800 leading-relaxed font-bold italic border-l-4 border-zinc-900 pl-4 py-4 bg-zinc-50 rounded-r-2xl">
+                <p className="text-base text-zinc-800 leading-relaxed font-bold italic border-l-4 border-red-600 pl-4 py-4 bg-zinc-50 rounded-r-2xl">
                   RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.
                 </p>
               </div>
             </div>
 
-            <div className="p-6 bg-zinc-50 border-t border-zinc-100">
+            <div className="p-4 bg-zinc-50 border-t border-zinc-100 flex justify-center">
               <button 
                 onClick={() => setShowPillsInfo(false)}
-                className="w-full py-3 bg-zinc-900 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg hover:bg-zinc-800 transition-all active:scale-[0.98]"
+                className="transition-all hover:scale-105 active:scale-95"
               >
-                Understood
+                <img src="/understood-button.png" alt="Understood" className="h-[48px] w-auto object-contain drop-shadow-sm" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </button>
             </div>
           </div>

@@ -59,7 +59,7 @@ const SettingsPage = () => {
         <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-zinc-100 text-zinc-900 transition-colors">
           <ChevronLeft size={24} />
         </button>
-        <img src="/settings-header.png" alt="Settings" className="h-7 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+        <img src="/settings-header.png" alt="Settings" className="h-10 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
         <div className="w-10" /> {/* Spacer */}
       </header>
       
@@ -208,14 +208,16 @@ const SettingsPage = () => {
       {showAboutModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-            <div className="flex items-center justify-between shrink-0">
-              <h3 className="text-xl font-bold text-zinc-900 sticky top-0 bg-white pb-2 border-b border-zinc-100">{t('about_title')}</h3>
-              <button 
-                onClick={() => setShowAboutModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-500 hover:bg-zinc-200 transition-colors"
-              >
-                <span className="text-lg font-bold">×</span>
-              </button>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/about-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/about-header.png" 
+                alt="About" 
+                className="h-24 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </div>
             
             <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -243,9 +245,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowAboutModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-colors mt-2 sticky bottom-0 shadow-lg shrink-0"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              {t('about_close')}
+              <img 
+                src="/btn-close.png" 
+                alt="Close" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>
@@ -255,7 +262,17 @@ const SettingsPage = () => {
       {showContactModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-zinc-900">{t('contact_title')}</h3>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/contact-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/contact-header.png" 
+                alt="Contact Us" 
+                className="h-24 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
+            </div>
             
             <div className="space-y-4 text-sm text-zinc-600">
               <p className="font-medium text-zinc-800">{t('contact_desc')}</p>
@@ -277,9 +294,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowContactModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-colors mt-4"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-4"
             >
-              {t('contact_close')}
+              <img 
+                src="/btn-close.png" 
+                alt="Close" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>
@@ -289,14 +311,16 @@ const SettingsPage = () => {
       {showLanguageModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-            <div className="flex items-center justify-between shrink-0">
-              <h3 className="text-xl font-bold text-zinc-900">{t('language')}</h3>
-              <button 
-                onClick={() => setShowLanguageModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-500 hover:bg-zinc-200 transition-colors"
-              >
-                <span className="text-lg font-bold">×</span>
-              </button>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/language-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/language-header.png" 
+                alt="Language" 
+                className="h-24 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </div>
             
             <div className="space-y-2 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -341,9 +365,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowLanguageModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-100 text-zinc-600 font-bold hover:bg-zinc-200 transition-colors shrink-0"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 shrink-0"
             >
-              {t('cancel')}
+              <img 
+                src="/btn-cancel.png" 
+                alt="Cancel" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>
@@ -353,7 +382,17 @@ const SettingsPage = () => {
       {showThemeModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-zinc-900">{t('theme')}</h3>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/theme-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/theme-header.png" 
+                alt="Theme" 
+                className="h-24 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
+            </div>
             
             <div className="space-y-2">
               {[
@@ -381,9 +420,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowThemeModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-50 text-blue-600 font-bold hover:bg-zinc-100 transition-colors"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105"
             >
-              {t('cancel')}
+              <img 
+                src="/btn-cancel-red.png" 
+                alt="Cancel" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>
@@ -393,7 +437,17 @@ const SettingsPage = () => {
       {showPersonalizationModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-zinc-900">{t('pers_title')}</h3>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/personalization-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/personalization-header.png" 
+                alt="Personalization" 
+                className="h-32 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
+            </div>
             
             <div className="space-y-4 text-sm text-zinc-600">
               <p className="font-medium text-zinc-800">{t('pers_subtitle')}</p>
@@ -412,9 +466,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowPersonalizationModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-colors mt-4"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-4"
             >
-              {t('pers_button')}
+              <img 
+                src="/btn-got-it.png" 
+                alt="Got it" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>
@@ -424,14 +483,16 @@ const SettingsPage = () => {
       {showPrivacyModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-            <div className="flex items-center justify-between shrink-0">
-              <h3 className="text-xl font-bold text-zinc-900 sticky top-0 bg-white pb-2 border-b border-zinc-100">{t('privacy')}</h3>
-              <button 
-                onClick={() => setShowPrivacyModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-500 hover:bg-zinc-200 transition-colors"
-              >
-                <span className="text-lg font-bold">×</span>
-              </button>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/privacy-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/privacy-header.png" 
+                alt="Privacy Policy" 
+                className="h-24 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </div>
             
             <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -506,9 +567,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowPrivacyModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-colors mt-2 sticky bottom-0 shadow-lg shrink-0"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              {t('cancel')}
+              <img 
+                src="/btn-close.png" 
+                alt="Close" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>
@@ -518,14 +584,16 @@ const SettingsPage = () => {
       {showTermsModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-            <div className="flex items-center justify-between shrink-0">
-              <h3 className="text-xl font-bold text-zinc-900 sticky top-0 bg-white pb-2 border-b border-zinc-100">{t('terms')}</h3>
-              <button 
-                onClick={() => setShowTermsModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-500 hover:bg-zinc-200 transition-colors"
-              >
-                <span className="text-lg font-bold">×</span>
-              </button>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/terms-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/terms-header.png" 
+                alt="Terms of Service" 
+                className="h-24 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </div>
             
             <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -633,9 +701,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowTermsModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-colors mt-2 sticky bottom-0 shadow-lg shrink-0"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              {t('cancel')}
+              <img 
+                src="/btn-cancel-red-solid.png" 
+                alt="Cancel" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>
@@ -645,14 +718,16 @@ const SettingsPage = () => {
       {showModelModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-            <div className="flex items-center justify-between shrink-0">
-              <h3 className="text-xl font-bold text-zinc-900 sticky top-0 bg-white pb-2 border-b border-zinc-100">{t('model_title')}</h3>
-              <button 
-                onClick={() => setShowModelModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-500 hover:bg-zinc-200 transition-colors"
-              >
-                <span className="text-lg font-bold">×</span>
-              </button>
+            <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/model-icon.png" alt="" className="w-full h-full object-contain" />
+              </div>
+              <img 
+                src="/model-header.png" 
+                alt="Model" 
+                className="h-24 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </div>
             
             <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -697,9 +772,14 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowModelModal(false)}
-              className="w-full py-3 rounded-xl bg-zinc-900 text-white font-bold hover:bg-zinc-800 transition-colors mt-2 sticky bottom-0 shadow-lg shrink-0"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              {t('model_close')}
+              <img 
+                src="/btn-close.png" 
+                alt="Close" 
+                className="h-12 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
             </button>
           </div>
         </div>

@@ -124,7 +124,7 @@ export default function Onboarding() {
             <img 
               src={stepsContent[step - 1].textImage} 
               alt="Description" 
-              className={`${step === 2 ? 'h-12' : step === 4 ? 'h-36' : step === 5 ? 'h-28' : step === 6 ? 'h-28' : step === 7 ? 'h-24' : step === 1 ? 'h-20' : 'h-[68px]'} w-auto object-contain mx-auto drop-shadow-md animate-in fade-in zoom-in duration-500`}
+              className={`${step === 2 ? 'h-12' : step === 4 ? 'h-36' : step === 5 ? 'h-28' : step === 6 ? 'h-28' : step === 7 ? 'h-24' : step === 1 ? 'h-48' : 'h-[68px]'} w-auto object-contain mx-auto drop-shadow-md animate-in fade-in zoom-in duration-500`}
             />
           </div>
         )}
@@ -157,14 +157,12 @@ export default function Onboarding() {
                 src="/onboarding-continue.png" 
                 alt="Continue" 
                 className="h-32 w-auto object-contain"
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             ) : (
               <img 
-                src="/get-started-btn.png" 
+                src="/get-started-v3.png" 
                 alt="Get Started" 
-                className="h-32 w-auto object-contain"
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
+                className="h-24 w-auto object-contain"
               />
             )}
           </button>

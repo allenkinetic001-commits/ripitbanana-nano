@@ -51,9 +51,9 @@ const Notifications = () => {
         <h1 className="flex items-center gap-2">
           <img src="/activity-icon.png" alt="" className="h-8 w-8 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
           <img 
-            src="/activity-header.png" 
+            src="/activity-header-v3.png" 
             alt={t('notif_activity')} 
-            className="h-8 w-auto object-contain" 
+            className="h-6 w-auto object-contain" 
             style={{ imageRendering: '-webkit-optimize-contrast' }} 
           />
         </h1>

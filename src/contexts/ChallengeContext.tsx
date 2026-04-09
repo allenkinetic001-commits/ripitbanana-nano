@@ -245,7 +245,7 @@ const translations: Record<string, Record<string, string>> = {
     'theme_system': 'System',
 
     // Personalization Modal
-    'pers_title': '🔥 Rip It – Personalization (Gen Z Style)',
+    'pers_title': 'Rip It – Personalization (Gen Z Style)',
     'pers_subtitle': 'Rip It isn’t one-size-fits-all.',
     'pers_desc': 'Your profile evolves with how you survive.',
     'pers_item1': 'Custom vibes & themes',
@@ -275,7 +275,7 @@ const translations: Record<string, Record<string, string>> = {
     'contact_close': 'Close',
 
     // Model Modal
-    'model_title': '🔥 Rip It – App Model',
+    'model_title': 'Rip It – App Model',
     'model_concept_title': '1️⃣ Core Concept',
     'model_concept_desc': 'RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.',
     'model_modes_title': '2️⃣ Modes',
@@ -500,7 +500,7 @@ const translations: Record<string, Record<string, string>> = {
     'theme_system': '시스템',
 
     // Personalization Modal
-    'pers_title': '🔥 Rip It – 개인화 (Z세대 스타일)',
+    'pers_title': 'Rip It – 개인화 (Z세대 스타일)',
     'pers_subtitle': 'Rip It은 모두에게 똑같은 경험을 제공하지 않습니다.',
     'pers_desc': '당신의 프로필은 생존 방식에 따라 진화합니다.',
     'pers_item1': '커스텀 분위기 및 테마',
@@ -532,7 +532,7 @@ const translations: Record<string, Record<string, string>> = {
     'contact_close': '닫기',
 
     // Model Modal
-    'model_title': '🔥 Rip It – 앱 모델',
+    'model_title': 'Rip It – 앱 모델',
     'model_concept_title': '1️⃣ 핵심 컨셉',
     'model_concept_desc': 'Rip It은 사용자 참여, 투표, 전략이 진행 상황, 상태 및 유산을 결정하는 고위험 사회적 생존 앱입니다. 모든 행동에는 결과가 따르며 긴장감과 몰입감을 조성합니다.',
     'model_modes_title': '2️⃣ 모드',
@@ -761,7 +761,7 @@ const translations: Record<string, Record<string, string>> = {
     'theme_system': 'システム',
 
     // Personalization Modal
-    'pers_title': '🔥 Rip It – 個人設定 (Z世代スタイル)',
+    'pers_title': 'Rip It – 個人設定 (Z世代スタイル)',
     'pers_subtitle': 'Rip Itは一律の体験ではありません。',
     'pers_desc': 'プロフィールはあなたの生き残り方とともに進化します。',
     'pers_item1': 'カスタムバイブス＆テーマ',
@@ -793,7 +793,7 @@ const translations: Record<string, Record<string, string>> = {
     'contact_close': '閉じる',
 
     // Model Modal
-    'model_title': '🔥 Rip It – アプリモデル',
+    'model_title': 'Rip It – アプリモデル',
     'model_concept_title': '1️⃣ コアコンセプト',
     'model_concept_desc': 'Rip Itは、ユーザーの参加、投票、戦略が進行状況、ステータス、遺産を決定するハイリスクなソーシャルサバイバルアプリです。すべての行動には結果が伴い、緊張感とエンゲージメントを生み出します。',
     'model_modes_title': '2️⃣ モード',

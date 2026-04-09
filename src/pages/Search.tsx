@@ -145,6 +145,7 @@ const Search = () => {
         <div className="flex items-center gap-3">
           {!isChallengeEnded && !selectedRoundId && (
             <div className="flex items-center gap-2 mr-3">
+              <img src="/round-outro-icon.png" alt="" className="h-16 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               <span className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] whitespace-nowrap">
                 {t('search_recent_outcomes')}
               </span>
@@ -169,9 +170,9 @@ const Search = () => {
                   className="transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
                 >
                   <img 
-                    src="/btn-get-started.png" 
+                    src="/btn-get-started-v2.png" 
                     alt={t('search_start_round')} 
-                    className="h-[36px] w-auto object-contain" 
+                    className="h-[48px] w-auto object-contain" 
                   />
                 </button>
               )}
