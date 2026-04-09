@@ -91,10 +91,10 @@ const Home = () => {
 
   // Sync pills visibility with global state and selection
   useEffect(() => {
-    if (userSelection || isActive) {
+    if (userSelection) {
       setShowPills(false);
     }
-  }, [userSelection, isActive, setShowPills]);
+  }, [userSelection, setShowPills]);
 
   // Helper to generate a random 4-digit number
   // const getRandomNumber = () => Math.floor(1000 + Math.random() * 9000);
