@@ -705,8 +705,6 @@ const Home = () => {
               onClick={() => {
                 startNewChallenge();
                 setVisiblePosts(allPosts);
-                setHours(0);
-                setMinutes(0);
                 setActiveTab('pley');
                 setShowPills(false);
               }}
