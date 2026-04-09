@@ -354,8 +354,7 @@ const Home = () => {
       )}
 
       {/* Header */}
-      (true) && (
-        <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
+      <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
         <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between">
           <div className="flex items-center gap-0">
             <button 
@@ -615,9 +614,7 @@ const Home = () => {
               )}
             </div>
           </div>
-        )}
         </header>
-      )}
 
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
