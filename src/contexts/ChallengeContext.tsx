@@ -171,6 +171,8 @@ const translations: Record<string, Record<string, string>> = {
     'home_majority': 'Majority',
     'home_choose_variant': 'Choose Variant',
     'home_set_duration': 'Set Time',
+    'home_calendar': 'Today',
+    'home_next_reshuffle': 'Next Reshuffle',
     'home_select_ranking': 'Select Top Ranking',
     'home_select_rule': 'Select Rule',
     'home_current_choice': 'Current Choice',
@@ -4999,8 +5001,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const saved = localStorage.getItem('theme') || 'system';
     return saved === 'dark' ? 'system' : saved;
   });
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [isActive, setIsActive] = useState(false);
+  const getSecondsUntilMidnight = () => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    return Math.floor((midnight.getTime() - now.getTime()) / 1000);
+  };
+
+  const [timeLeft, setTimeLeft] = useState(getSecondsUntilMidnight());
+  const [isActive, setIsActive] = useState(true);
+  const [currentDate, setCurrentDate] = useState(new Date().toDateString());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('userProfile');
     return saved ? JSON.parse(saved) : {
@@ -5266,8 +5276,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isDurationInitialized, setIsDurationInitialized] = useState(false);
 
   const startNewChallenge = () => {
-    setIsActive(false);
-    setTimeLeft(0);
+    setIsActive(true);
+    setTimeLeft(getSecondsUntilMidnight());
     setIsChallengeEnded(false);
     setIsDurationInitialized(false);
     setUserSelection(null);
@@ -5276,7 +5286,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     setClickCounts({ pley: 0 });
     setEliminationCounts({ pley: 0 });
     setMadeItCounts({ pley: 0 });
-    setVariantDurations({ pley: 0 });
+    setVariantDurations({ pley: 86400 }); // 24h record
     setVariantFirstClickTime({ pley: 0 });
     setSurvivors([]);
     setEliminated([]);
@@ -5373,58 +5383,70 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
-  // Timer countdown
+  // Day-change detection and automated reset
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => Math.max(0, prev - 1));
-      }, 1000);
-    } else if (isActive && timeLeft === 0) {
-      // If timer ran out, end the challenge
-      setIsActive(false);
-      setIsChallengeEnded(true);
-      
-      // Timer ran out, remaining posts are survivors
-      if (visiblePosts.length > 0) {
-        const remainingSurvivors = visiblePosts.map(p => ({ 
-          id: p.id,
-          username: p.username, 
-          avatar: p.avatar,
-          image: p.image,
-          caption: p.caption,
-          time: p.time,
-          comments: p.comments
-        }));
+    const checkDayChange = () => {
+      const today = new Date().toDateString();
+      if (today !== currentDate) {
+        // Round ends: Archive results
+        setIsActive(false);
+        setIsChallengeEnded(true);
         
-        setSurvivors(prevSurvivors => {
-          const existingIds = new Set(prevSurvivors.map(s => s.id));
-          const uniqueNew = remainingSurvivors.filter(s => !existingIds.has(s.id));
-          return [...prevSurvivors, ...uniqueNew];
-        });
+        // Settle current round logic (moved from timer useEffect)
+        if (visiblePosts.length > 0) {
+          const remainingSurvivors = visiblePosts.map(p => ({ 
+            id: p.id,
+            username: p.username, 
+            avatar: p.avatar,
+            image: p.image,
+            caption: p.caption,
+            time: p.time,
+            comments: p.comments
+          }));
+          
+          setSurvivors(prevSurvivors => {
+            const existingIds = new Set(prevSurvivors.map(s => s.id));
+            const uniqueNew = remainingSurvivors.filter(s => !existingIds.has(s.id));
+            return [...prevSurvivors, ...uniqueNew];
+          });
 
-        const activeMode = userSelection || majorityVariant;
-        if (activeMode) {
+          const activeMode = userSelection || majorityVariant || 'pley';
           setMadeItCounts(prevCounts => ({
             ...prevCounts,
             [activeMode]: (prevCounts[activeMode] || 0) + remainingSurvivors.length
           }));
         }
+
+        // Start new round for the new day after a brief delay to allow archival
+        setTimeout(() => {
+          setCurrentDate(today);
+          setTimeLeft(getSecondsUntilMidnight());
+          setIsActive(true);
+          setIsChallengeEnded(false);
+          setVisiblePosts(allPosts); // Reset posts for new day
+        }, 100);
       }
+    };
+
+    const interval = setInterval(checkDayChange, 1000);
+    return () => clearInterval(interval);
+  }, [currentDate, visiblePosts, allPosts, majorityVariant, userSelection]);
+
+  // Timer countdown - now strictly for display and final settle at midnight
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(getSecondsUntilMidnight()); // Re-sync with clock
+      }, 1000);
+    } else if (isActive && timeLeft === 0) {
+      // Midnight reached
+      // Detection logic in the other useEffect will handle the reset
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, visiblePosts, userSelection, majorityVariant]);
+  }, [isActive, timeLeft]);
 
-  // Handle dynamic time updates when majority changes
-  useEffect(() => {
-    if (isActive && majorityVariant && timeLeft === 0 && !isDurationInitialized) {
-      const targetDuration = variantDurations[majorityVariant];
-      if (targetDuration > 0) {
-        setTimeLeft(targetDuration);
-        setIsDurationInitialized(true);
-      }
-    }
-  }, [isActive, majorityVariant, variantDurations, timeLeft, isDurationInitialized]);
+
 
   // Simulation logic
   useEffect(() => {
@@ -5448,15 +5470,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           return prevTimes;
         });
 
-        // 3. Update variant durations
-        setVariantDurations(prevDurations => {
-          if (!prevDurations[randomVariant]) {
-            const possibleDurations = [60, 300, 3600, 7200, 14400, 18000];
-            const simulatedDuration = possibleDurations[Math.floor(Math.random() * possibleDurations.length)];
-            return { ...prevDurations, [randomVariant]: simulatedDuration };
-          }
-          return prevDurations;
-        });
+        // 3. Update variant durations (fixed for 24h cycle)
+        setVariantDurations(prevDurations => ({
+          ...prevDurations,
+          [randomVariant]: 86400
+        }));
 
         // 4. Removed random elimination simulation - now depends on user actions
       }, 4000);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
-import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle } from 'lucide-react';
+import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import ChallengeTimer from '../components/ChallengeTimer';
 import { posts } from '../data/posts';
@@ -83,8 +83,7 @@ const Home = () => {
     }
   }, [allPosts, isActive, isChallengeEnded]);
 
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
+
   const [showInfo, setShowPillsInfo] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -185,24 +184,7 @@ const Home = () => {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const adjustTime = (type: 'h' | 'm', amount: number) => {
-    if (type === 'h') {
-      setHours(prev => Math.max(0, prev + amount));
-    } else {
-      setMinutes(prev => {
-        const next = prev + amount;
-        if (next >= 60) {
-          setHours(h => h + 1);
-          return 0;
-        }
-        if (next < 0 && hours > 0) {
-          setHours(h => h - 1);
-          return 45;
-        }
-        return Math.max(0, next);
-      });
-    }
-  };
+
 
   const handleDeletePost = (postId: number) => {
     const activeMode = userSelection || majorityVariant;
@@ -596,111 +578,51 @@ const Home = () => {
               <div className="h-px w-full bg-zinc-100/80" />
 
 
-              {/* Timer and Submit Logic */}
+              {/* Automated Cycle UI */}
               {activeTab && (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-zinc-100 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <img src="/duration-alarm.png" alt="Duration" className="h-[48px] w-auto object-contain" />
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest">{t('home_set_duration')}</span>
-                        <span className="text-[9px] font-bold text-zinc-400 uppercase">Min. Round Length</span>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Calendar Card */}
+                    <div className="bg-white rounded-2xl p-4 border border-zinc-100 shadow-sm flex flex-col items-center justify-center space-y-2 group hover:border-purple-200 transition-colors">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
+                        <Calendar size={24} />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest block">{t('home_calendar')}</span>
+                        <span className="text-sm font-black text-zinc-900 leading-tight">
+                          {new Date().toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-GB', { 
+                            day: '2-digit', 
+                            month: '2-digit', 
+                            year: 'numeric' 
+                          })}
+                        </span>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-4">
-                      {/* Hours Setter */}
-                      <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => adjustTime('h', -1)}
-                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
-                        >
-                          -
-                        </button>
-                        <div className="flex flex-col items-center min-w-[2.5rem]">
-                          <span className="text-sm font-black text-zinc-900 leading-none">{hours}</span>
-                          <span className="text-[8px] font-bold text-zinc-400 uppercase">hrs</span>
-                        </div>
-                        <button 
-                          onClick={() => adjustTime('h', 1)}
-                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
-                        >
-                          +
-                        </button>
+
+                    {/* Timer Card */}
+                    <div className="bg-zinc-900 rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center space-y-2 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-purple-600/10 rounded-full -mr-8 -mt-8" />
+                      <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform relative z-10">
+                        <Clock size={24} className="animate-pulse" />
                       </div>
-
-                      <div className="w-[1px] h-6 bg-zinc-100" />
-
-                      {/* Minutes Setter */}
-                      <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => adjustTime('m', -1)}
-                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
-                        >
-                          -
-                        </button>
-                        <div className="flex flex-col items-center min-w-[2.5rem]">
-                          <span className="text-sm font-black text-zinc-900 leading-none">{minutes}</span>
-                          <span className="text-[8px] font-bold text-zinc-400 uppercase">mins</span>
-                        </div>
-                        <button 
-                          onClick={() => adjustTime('m', 1)}
-                          className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 active:scale-90 transition-all font-black"
-                        >
-                          +
-                        </button>
+                      <div className="text-center relative z-10">
+                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">{t('home_next_reshuffle')}</span>
+                        <span className="text-sm font-black text-white leading-tight font-mono">
+                          {formatTime(timeLeft)}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col items-center gap-4">
                     <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[72px] w-auto object-contain" />
                     
                     <div className="h-px w-full bg-zinc-100/80" />
 
-                    <div className="flex items-center justify-end w-full gap-4">
-                      {userSelection && timeLeft > 0 && (
-                        <span className="text-[10px] font-bold text-zinc-400 italic">{t('home_selection_locked')}</span>
-                      )}
-                      <img src="/alligator-logo.png" alt="Alligator" className="h-[60px] w-auto object-contain" />
-                      <button 
-                        disabled={(!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)}
-                        onClick={() => {
-                          const totalSeconds = (hours * 3600) + (minutes * 60);
-                          if (totalSeconds > 0) {
-                            setTimeLeft(totalSeconds);
-                            setIsActive(true);
-                            if (activeTab) {
-                              setClickCounts(prev => ({ ...prev, [activeTab]: prev[activeTab] + 1 }));
-                              setVariantFirstClickTime(prev => {
-                                if (!prev[activeTab]) return { ...prev, [activeTab]: Date.now() };
-                                return prev;
-                              });
-                              setVariantDurations(prev => {
-                                if (!prev[activeTab]) return { ...prev, [activeTab]: totalSeconds };
-                                return prev;
-                              });
-                              setUserSelection(activeTab);
-                            }
-                          }
-                          setShowPills(false);
-                          setActiveTab(null);
-                          setHours(0);
-                          setMinutes(0);
-                        }}
-                        className={`transition-all transform flex items-center justify-center ${
-                          (!!userSelection && timeLeft > 0) || (hours === 0 && minutes === 0)
-                            ? 'opacity-50 grayscale cursor-not-allowed scale-100'
-                            : 'hover:scale-105 active:scale-95 hover:opacity-90'
-                        }`}
-                      >
-                        <img 
-                          src="/btn-submit.png" 
-                          alt={userSelection && timeLeft > 0 ? "Submitted" : "Submit"} 
-                          className="h-[72px] w-auto object-contain" 
-                          style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
-                        />
-                      </button>
+                    <div className="flex items-center justify-center w-full px-6 text-center">
+                      <p className="text-[11px] font-bold text-zinc-500 italic leading-relaxed">
+                        Round reshuflled automatically at midnight.<br/>All survivors archived to Hall of Fame.
+                      </p>
                     </div>
                   </div>
                 </div>
