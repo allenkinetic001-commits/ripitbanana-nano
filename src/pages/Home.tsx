@@ -89,16 +89,6 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
 
-  // Sync pills visibility with global state and selection
-  useEffect(() => {
-    if (userSelection) {
-      setShowPills(false);
-    }
-  }, [userSelection, setShowPills]);
-
-  // Helper to generate a random 4-digit number
-  // const getRandomNumber = () => Math.floor(1000 + Math.random() * 9000);
-
   // Hide pills when navigating away
   useEffect(() => {
     return () => {
@@ -364,7 +354,7 @@ const Home = () => {
       )}
 
       {/* Header */}
-      {!isChallengeEnded && (
+      (true) && (
         <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
         <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between">
           <div className="flex items-center gap-0">
@@ -392,14 +382,10 @@ const Home = () => {
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            {!isChallengeEnded && showMustache && (
+            {showMustache && (
               <button 
                 onClick={() => {
-                  if (!showPills) {
-                    setActiveTab('pley');
-                  } else {
-                    setActiveTab('pley');
-                  }
+                  setActiveTab('pley');
                   setShowPills(!showPills);
                 }}
                 className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
@@ -565,7 +551,7 @@ const Home = () => {
         )}
 
         {/* Enhanced Setup Container - Simplified for Pley-only */}
-        {showPills && !isChallengeEnded && (
+        {showPills && (
           <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="bg-zinc-50/50 rounded-[2rem] border border-zinc-100 p-4 space-y-5 shadow-sm">
               {/* Asset Section */}
