@@ -4,6 +4,7 @@ import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trop
 import ChallengeTimer from '../components/ChallengeTimer';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
+import { PixelHeart } from '../components/PixelHeart';
 
 const userPosts = [
   'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Stunning+mountain+landscape+at+dawn&image_size=square',
@@ -235,7 +236,14 @@ const Profile = () => {
         </div>
 
         <div className="space-y-1">
-          <h2 className="text-sm font-bold">{userProfile.fullName}</h2>
+          <div className="flex items-center gap-1.5">
+            <h2 className="text-sm font-bold">{userProfile.fullName}</h2>
+            <div className="flex items-center gap-0.5">
+              <PixelHeart className="w-4 h-4" />
+              <PixelHeart className="w-4 h-4" />
+              <PixelHeart className="w-4 h-4" />
+            </div>
+          </div>
           <p className="text-sm text-zinc-600">{userProfile.bio}</p>
           <a href="#" className="text-sm text-blue-900 font-medium">{userProfile.website}</a>
         </div>

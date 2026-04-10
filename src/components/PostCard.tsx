@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ArrowBigUp, ArrowBigDown, Bookmark, MoreHorizontal, MessageCircle, Send } from 'lucide-react';
+import { ArrowBigUp, ArrowBigDown, Bookmark, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
+import { PixelHeart } from './PixelHeart';
 
 interface PostProps {
   id: number;
@@ -21,6 +22,7 @@ interface PostProps {
 
 const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments }: PostProps) => {
   const [userVote, setUserVote] = useState<0 | 1 | -1>(0);
+  const [lives, setLives] = useState(3);
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const [quickComment, setQuickComment] = useState('');
   const navigate = useNavigate();
@@ -56,7 +58,11 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         return; // Downvotes only in Pley
       }
       if (vote === -1) {
-        if (onDelete) onDelete();
+        const nextLives = lives - 1;
+        setLives(nextLives);
+        if (nextLives <= 0) {
+          if (onDelete) onDelete();
+        }
         return;
       }
     }
@@ -89,16 +95,24 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
               </div>
             )}
           </div>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-black italic group-hover:text-purple-600 transition-colors">@{username}</span>
-            {isLegend(username) && (
-              <img 
-                src="/badge-legend.png" 
-                alt="Legend" 
-                className="h-5 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
-              />
-            )}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-black italic group-hover:text-purple-600 transition-colors">@{username}</span>
+              {isLegend(username) && (
+                <img 
+                  src="/badge-legend.png" 
+                  alt="Legend" 
+                  className="h-5 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              )}
+            </div>
+            {/* 3 Lives Hearts */}
+            <div className="flex items-center gap-0.5 mt-0.5">
+              <PixelHeart className="w-3 h-3" empty={lives < 1} />
+              <PixelHeart className="w-3 h-3" empty={lives < 2} />
+              <PixelHeart className="w-3 h-3" empty={lives < 3} />
+            </div>
           </div>
         </div>
          <div className="flex items-center space-x-2">
@@ -165,8 +179,8 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className={cn(
-              "flex items-center space-x-1 rounded-full px-1 transition-all duration-300",
-              userVote === 1 ? "bg-green-600" : userVote === -1 ? "bg-[#DC143C]" : "bg-zinc-100"
+              "flex items-center space-x-1 rounded-full px-1.5 py-0.5 transition-all duration-300 shadow-sm",
+              userVote === 1 ? "bg-green-600" : userVote === -1 ? "bg-[#DC143C]" : "bg-zinc-100 border border-zinc-200"
             )}>
               {!gameMode && (
                 <button 
@@ -177,10 +191,10 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                   )}
                 >
                   <ArrowBigUp 
-                    size={24} 
-                    fill="white" 
-                    stroke={userVote !== 0 ? "none" : "black"}
-                    strokeWidth={userVote !== 0 ? 0 : 2}
+                    size={22} 
+                    fill={userVote === 1 ? "white" : "transparent"} 
+                    stroke={userVote === 1 ? "white" : "black"}
+                    strokeWidth={2}
                   />
                 </button>
               )}
@@ -192,10 +206,10 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                 )}
               >
                 <ArrowBigDown 
-                  size={24} 
-                  fill="white" 
-                  stroke={userVote !== 0 ? "none" : "black"}
-                  strokeWidth={userVote !== 0 ? 0 : 2}
+                  size={22} 
+                  fill={userVote === -1 ? "white" : "transparent"} 
+                  stroke={userVote === -1 ? "white" : "black"}
+                  strokeWidth={2}
                 />
               </button>
             </div>

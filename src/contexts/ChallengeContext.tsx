@@ -99,6 +99,8 @@ interface ChallengeContextType {
   setVariantFirstClickTime: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setUserSelection: (selection: string | null) => void;
   setIsChallengeEnded: (ended: boolean) => void;
+  isEliminationRoundActive: boolean;
+  setIsEliminationRoundActive: (active: boolean) => void;
   setSurvivors: React.Dispatch<React.SetStateAction<Survivor[]>>;
   setSurvivorHistory: React.Dispatch<React.SetStateAction<Survivor[]>>;
   setRoundHistory: React.Dispatch<React.SetStateAction<RoundRecord[]>>;
@@ -3925,7 +3927,6 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s7_title': '7. Penangguhan, Reset & Pemutusan Akun',
     'terms_s7_i1': 'Akun dapat ditangguhkan, di-reset, atau dihapus jika Ketentuan dilanggar atau platform disalahgunakan.',
     'terms_s7_i2': 'Mode tertentu dapat berakibat pada reset profil sebagai bagian dari mekanik gameplay.',
-    'terms_s7_i3': 'Anda dapat menghapus akun Anda kapan saja.',
     'terms_s8_title': '8. Penafian',
     'terms_s8_i1': 'Rip It disediakan "sebagaimana adanya".',
     'terms_s8_i2': 'Kami tidak menjamin layanan tanpa gangguan.',
@@ -5037,7 +5038,10 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     pley: 0
   });
   const [userSelection, setUserSelection] = useState<string | null>(null);
-  const [isChallengeEnded, setIsChallengeEnded] = useState(false);
+  const [isChallengeEnded, setIsChallengeEnded] = useState<boolean>(() => {
+    return localStorage.getItem('isChallengeEnded') === 'true' || false;
+  });
+  const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(false);
   const [enemies, setEnemies] = useState<Survivor[]>(() => {
     const saved = localStorage.getItem('enemies');
     return saved ? JSON.parse(saved) : [];
@@ -5149,6 +5153,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem('isChallengeEnded', String(isChallengeEnded));
+  }, [isChallengeEnded]);
+
+
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
@@ -5277,6 +5287,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const startNewChallenge = () => {
     setIsActive(true);
+    setIsEliminationRoundActive(true);
     setTimeLeft(getSecondsUntilMidnight());
     setIsChallengeEnded(false);
     setIsDurationInitialized(false);
@@ -5422,6 +5433,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           setCurrentDate(today);
           setTimeLeft(getSecondsUntilMidnight());
           setIsActive(true);
+          setIsEliminationRoundActive(false);
           setIsChallengeEnded(false);
           setVisiblePosts(allPosts); // Reset posts for new day
         }, 100);
@@ -5486,14 +5498,15 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     <ChallengeContext.Provider value={{
       timeLeft, isActive, userProfile, setUserProfile, clickCounts, eliminationCounts, madeItCounts,
       variantDurations, variantFirstClickTime, userSelection, isChallengeEnded,
+      isEliminationRoundActive, setIsEliminationRoundActive,
       showPills, setShowPills, activeTab, setActiveTab,
       enemies, postComments, wallPosts, followedUsers, toggleFollow, isLegend, isSurvivor, allPosts, setAllPosts,
       visiblePosts, setVisiblePosts,
       majorityVariant, survivors, eliminated, addEliminated, survivorHistory, roundHistory,
       setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
-      setUserSelection, setIsChallengeEnded,
-      setSurvivors, setSurvivorHistory, setRoundHistory, updateHistoryVote, startNewChallenge, clearAllHistory, getVariantDisplayName,
+      setUserSelection, setIsChallengeEnded, startNewChallenge,
+      setSurvivors, setSurvivorHistory, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
       addEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, login, logout, language, setLanguage, theme, setTheme, t
     }}>
       {children}

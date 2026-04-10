@@ -12,6 +12,7 @@ const Home = () => {
   const {
     timeLeft, isActive, clickCounts, eliminationCounts, madeItCounts,
     userSelection, isChallengeEnded, survivors,
+    isEliminationRoundActive, setIsEliminationRoundActive,
     showPills, setShowPills, activeTab, setActiveTab,
     majorityVariant,
     setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
@@ -20,6 +21,7 @@ const Home = () => {
     setSurvivors, addEliminated, startNewChallenge, getVariantDisplayName, userProfile,
     allPosts, setAllPosts, wallPosts, addWallPost,
     visiblePosts, setVisiblePosts,
+    language,
     t
   } = useChallenge();
 
@@ -123,22 +125,20 @@ const Home = () => {
 
   // End challenge if all posts are judged or timer runs out
   useEffect(() => {
-    if (isActive && !isChallengeEnded) {
-      const activeMode = userSelection || majorityVariant;
-      
+    if ((isActive || isEliminationRoundActive) && !isChallengeEnded) {
       if (visiblePosts.length === 0) {
         setIsActive(false);
+        setIsEliminationRoundActive(false);
         setIsChallengeEnded(true);
         setTimeLeft(0);
         navigate('/search');
       } else if (timeLeft === 0 && isActive) {
-        // Timer ran out logic is now handled in ChallengeContext
         setIsActive(false);
         setIsChallengeEnded(true);
         navigate('/search');
       }
     }
-  }, [visiblePosts.length, isActive, isChallengeEnded, timeLeft, setSurvivors, setIsActive, setIsChallengeEnded, setTimeLeft, userSelection, majorityVariant, setMadeItCounts, navigate]);
+  }, [visiblePosts.length, isActive, isEliminationRoundActive, isChallengeEnded, timeLeft, setSurvivors, setIsActive, setIsEliminationRoundActive, setIsChallengeEnded, setTimeLeft, userSelection, majorityVariant, setMadeItCounts, navigate]);
 
   const handleTabClick = (tab: string) => {
     if (timeLeft > 0) {
@@ -390,21 +390,9 @@ const Home = () => {
                 className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
               >
                 <img 
-                  src="/nav-mustache.png" 
+                  src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"}
                   alt="Create" 
-                  className={cn(
-                    "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain",
-                    showPills ? "opacity-0" : "opacity-100"
-                  )} 
-                  style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
-                />
-                <img 
-                  src="/nav-mustache-active.png" 
-                  alt="Create Active" 
-                  className={cn(
-                    "absolute transition-opacity duration-200 h-[44px] w-[44px] object-contain",
-                    showPills ? "opacity-100" : "opacity-0"
-                  )} 
+                  className="h-[44px] w-[44px] object-contain transition-all duration-200"
                   style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
                 />
               </button>
@@ -569,8 +557,8 @@ const Home = () => {
                   <div className="grid grid-cols-2 gap-3">
                     {/* Calendar Card */}
                     <div className="bg-white rounded-2xl p-4 border border-zinc-100 shadow-sm flex flex-col items-center justify-center space-y-2 group hover:border-purple-200 transition-colors">
-                      <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-                        <Calendar size={24} />
+                      <div className="w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <img src="/calendar-pizza.png" alt="Calendar" className="w-[44px] h-[44px] object-contain" />
                       </div>
                       <div className="text-center">
                         <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest block">{t('home_calendar')}</span>
@@ -585,14 +573,14 @@ const Home = () => {
                     </div>
 
                     {/* Timer Card */}
-                    <div className="bg-zinc-900 rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center space-y-2 relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-16 h-16 bg-purple-600/10 rounded-full -mr-8 -mt-8" />
-                      <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform relative z-10">
-                        <Clock size={24} className="animate-pulse" />
+                    <div className="bg-white rounded-2xl p-4 border border-zinc-100 shadow-sm flex flex-col items-center justify-center space-y-2 relative overflow-hidden group hover:border-purple-200 transition-colors">
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-purple-50 rounded-full -mr-8 -mt-8" />
+                      <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform relative z-10">
+                        <img src="/reshuffle-keys.svg" alt="Reshuffle" className="w-[56px] h-[56px] object-contain" />
                       </div>
                       <div className="text-center relative z-10">
-                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">{t('home_next_reshuffle')}</span>
-                        <span className="text-sm font-black text-white leading-tight font-mono">
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">{t('home_next_reshuffle')}</span>
+                        <span className="text-sm font-black text-zinc-900 leading-tight font-mono mt-0.5 block">
                           {formatTime(timeLeft)}
                         </span>
                       </div>
@@ -600,14 +588,62 @@ const Home = () => {
                   </div>
 
                   <div className="flex flex-col items-center gap-4">
-                    <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[72px] w-auto object-contain" />
+                    <div className="flex items-center justify-center gap-4">
+                      <img src="/alligator-logo.png" alt="Croc" className="h-[64px] w-auto object-contain mt-8" />
+                      <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[64px] w-auto object-contain" />
+                    </div>
                     
+                    <div className="flex justify-center items-center gap-8 -mt-2">
+                      <div className="flex flex-col items-center">
+                        <span className="text-xl font-black text-rose-600">
+                          {Object.values(eliminationCounts).reduce((a, b) => a + b, 0)}
+                        </span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Eliminated</span>
+                      </div>
+                      <div className="w-px h-6 bg-zinc-200" />
+                      <div className="flex flex-col items-center">
+                        <span className="text-xl font-black text-green-600">
+                          {survivors.length}
+                        </span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Survived</span>
+                      </div>
+                    </div>
+
                     <div className="h-px w-full bg-zinc-100/80" />
 
                     <div className="flex items-center justify-center w-full px-6 text-center">
                       <p className="text-[11px] font-bold text-zinc-500 italic leading-relaxed">
                         Round reshuflled automatically at midnight.<br/>All survivors archived to Hall of Fame.
                       </p>
+                    </div>
+
+                    <div className="flex justify-end w-full pr-0">
+                      <button
+                        onClick={() => {
+                          if (isEliminationRoundActive) return;
+                          // Formal functionality of 'submit' transferred to 'start'
+                          startNewChallenge();
+                          setUserSelection('pley');
+                          setClickCounts(prev => ({
+                            ...prev,
+                            ['pley']: (prev['pley'] || 0) + 1
+                          }));
+                          setVisiblePosts(allPosts);
+                          setShowPills(false);
+                        }}
+                        disabled={isEliminationRoundActive}
+                        className={cn(
+                          "mt-4 transition-transform flex items-center justify-center",
+                          !isEliminationRoundActive && "hover:scale-105 active:scale-95"
+                        )}
+                      >
+                        <img 
+                          src={isEliminationRoundActive ? "/btn-submitted.png" : "/btn-start-elimination.png"} 
+                          alt={isEliminationRoundActive ? t('home_submitted') : "Start Elimination"} 
+                          className="h-9 w-auto object-contain drop-shadow-md" 
+                          style={{ imageRendering: '-webkit-optimize-contrast' }}
+                        />
+                      </button>
                     </div>
                   </div>
                 </div>
