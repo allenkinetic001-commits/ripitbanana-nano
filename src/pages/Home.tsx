@@ -640,7 +640,7 @@ const Home = () => {
                         <img 
                           src={isEliminationRoundActive ? "/btn-submitted.png" : "/btn-start-elimination.png"} 
                           alt={isEliminationRoundActive ? t('home_submitted') : "Start Elimination"} 
-                          className="h-9 w-auto object-contain drop-shadow-md" 
+                          className="h-10 w-auto object-contain drop-shadow-md" 
                           style={{ imageRendering: '-webkit-optimize-contrast' }}
                         />
                       </button>
