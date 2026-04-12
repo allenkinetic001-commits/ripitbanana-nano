@@ -66,7 +66,7 @@ const SettingsPage = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-32">
         {/* APP Section */}
         <div className="space-y-2">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">{t('app')}</h3>
+          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider ml-1">{t('app')}</h3>
           <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 shadow-sm">
             <div 
               onClick={() => setShowLanguageModal(true)}
@@ -76,10 +76,10 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/language-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('language')}</span>
+                <img src="/language-header.png" alt={t('language')} className="h-6 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-zinc-400 font-medium">{getLanguageName(language)}</span>
+                <span className="text-xs text-zinc-400 font-medium">{getLanguageName(language)}</span>
                 <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
               </div>
             </div>
@@ -92,10 +92,10 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/theme-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('theme')}</span>
+                <img src="/theme-header.png" alt={t('theme')} className="h-6 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-zinc-400 font-medium">{getThemeName(theme)}</span>
+                <span className="text-xs text-zinc-400 font-medium">{getThemeName(theme)}</span>
                 <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
               </div>
             </div>
@@ -108,7 +108,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/personalization-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('personalization')}</span>
+                <img src="/personalization-header.png" alt={t('personalization')} className="h-6 w-auto object-contain ml-3" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -117,7 +117,7 @@ const SettingsPage = () => {
 
         {/* ABOUT Section */}
         <div className="space-y-2">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">{t('about')}</h3>
+          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider ml-1">{t('about')}</h3>
           <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 shadow-sm">
             <div 
               onClick={() => setShowModelModal(true)}
@@ -127,7 +127,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/model-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('model')}</span>
+                <img src="/model-header.png" alt={t('model')} className="h-6 w-auto object-contain -ml-2" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -140,7 +140,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/terms-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('terms')}</span>
+                <img src="/terms-header.png" alt={t('terms')} className="h-9 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -153,7 +153,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/privacy-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('privacy')}</span>
+                <img src="/privacy-header.png" alt={t('privacy')} className="h-9 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -166,7 +166,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/about-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('about')}</span>
+                <img src="/about-header.png" alt={t('about')} className="h-7 w-auto object-contain -ml-4" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -184,7 +184,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/contact-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-zinc-900">{t('contact')}</span>
+                <img src="/contact-header.png" alt={t('contact')} className="h-8 w-auto object-contain -ml-2" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -198,7 +198,7 @@ const SettingsPage = () => {
               <div className="w-10 h-10 flex items-center justify-center">
                 <img src="/logout-icon.png" alt="" className="w-full h-full object-contain" />
               </div>
-              <span className="font-bold text-red-600">{t('logout')}</span>
+              <img src="/logout-header.png" alt={t('logout')} className="h-6 w-auto object-contain ml-4" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
           </div>
         </div>
@@ -215,12 +215,12 @@ const SettingsPage = () => {
               <img 
                 src="/about-header.png" 
                 alt="About" 
-                className="h-24 w-auto object-contain" 
+                className="h-16 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
             
-            <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
+            <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
                 <div className="space-y-1">
                     <p className="font-bold text-zinc-800">{t('about_tagline')}</p>
                 </div>
@@ -232,10 +232,6 @@ const SettingsPage = () => {
                         <span className="font-bold text-zinc-900 block mb-1">{t('about_pley_title')}</span>
                         <p>{t('about_pley_desc')}</p>
                     </div>
-
-
-
-                    
                 </div>
 
                 <p>{t('about_desc2')}</p>
@@ -250,7 +246,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-close.png" 
                 alt="Close" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>
@@ -269,12 +265,12 @@ const SettingsPage = () => {
               <img 
                 src="/contact-header.png" 
                 alt="Contact Us" 
-                className="h-24 w-auto object-contain" 
+                className="h-16 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
             
-            <div className="space-y-4 text-sm text-zinc-600">
+            <div className="space-y-4 text-xs text-zinc-600">
               <p className="font-medium text-zinc-800">{t('contact_desc')}</p>
               
               <div className="space-y-2">
@@ -299,7 +295,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-close.png" 
                 alt="Close" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>
@@ -318,7 +314,7 @@ const SettingsPage = () => {
               <img 
                 src="/language-header.png" 
                 alt="Language" 
-                className="h-24 w-auto object-contain" 
+                className="h-16 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
@@ -370,7 +366,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-cancel.png" 
                 alt="Cancel" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>
@@ -389,7 +385,7 @@ const SettingsPage = () => {
               <img 
                 src="/theme-header.png" 
                 alt="Theme" 
-                className="h-24 w-auto object-contain" 
+                className="h-16 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
@@ -425,7 +421,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-cancel-red.png" 
                 alt="Cancel" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>
@@ -444,12 +440,12 @@ const SettingsPage = () => {
               <img 
                 src="/personalization-header.png" 
                 alt="Personalization" 
-                className="h-32 w-auto object-contain" 
+                className="h-20 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
             
-            <div className="space-y-4 text-sm text-zinc-600">
+            <div className="space-y-4 text-xs text-zinc-600">
               <p className="font-medium text-zinc-800">{t('pers_subtitle')}</p>
               <p>{t('pers_desc')}</p>
               
@@ -471,7 +467,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-got-it.png" 
                 alt="Got it" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>
@@ -490,12 +486,12 @@ const SettingsPage = () => {
               <img 
                 src="/privacy-header.png" 
                 alt="Privacy Policy" 
-                className="h-24 w-auto object-contain" 
+                className="h-16 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
             
-            <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
+            <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
                 <div className="space-y-1">
                     <p className="font-bold text-zinc-800">{t('priv_subtitle')}</p>
                     <p className="text-xs text-zinc-500">{t('priv_effective')}</p>
@@ -555,14 +551,6 @@ const SettingsPage = () => {
                         <li>{t('priv_s6_i2')}</li>
                     </ul>
                 </div>
-
-                <div className="space-y-2">
-                    <h4 className="font-bold text-zinc-900">{t('priv_s7_title')}</h4>
-                    <ul className="list-disc list-inside pl-2 space-y-1">
-                        <li>{t('priv_s7_i1')}</li>
-                        <li>{t('priv_s7_i2')}</li>
-                    </ul>
-                </div>
             </div>
 
             <button
@@ -572,7 +560,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-close.png" 
                 alt="Close" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>
@@ -591,12 +579,12 @@ const SettingsPage = () => {
               <img 
                 src="/terms-header.png" 
                 alt="Terms of Service" 
-                className="h-24 w-auto object-contain" 
+                className="h-16 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
             
-            <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
+            <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
                 <div className="space-y-1">
                     <p className="font-bold text-zinc-800">{t('terms_tagline')}</p>
                     <p className="text-xs text-zinc-500">{t('terms_effective')}</p>
@@ -706,7 +694,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-cancel-red-solid.png" 
                 alt="Cancel" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>
@@ -725,15 +713,15 @@ const SettingsPage = () => {
               <img 
                 src="/model-header.png" 
                 alt="Model" 
-                className="h-24 w-auto object-contain" 
+                className="h-16 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
             
-            <div className="space-y-6 text-sm text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
+            <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
               {/* Core Concept */}
               <div className="space-y-2">
-                <h4 className="font-bold text-zinc-900 text-base">{t('model_concept_title')}</h4>
+                <h4 className="font-bold text-zinc-900 text-sm">{t('model_concept_title')}</h4>
                 <p>
                   {t('model_concept_desc')}
                 </p>
@@ -741,7 +729,7 @@ const SettingsPage = () => {
 
               {/* Modes */}
               <div className="space-y-3">
-                <h4 className="font-bold text-zinc-900 text-base">{t('model_modes_title')}</h4>
+                <h4 className="font-bold text-zinc-900 text-sm">{t('model_modes_title')}</h4>
                 
                 <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
                   <span className="font-bold text-zinc-900 block mb-1">{t('model_pley_title')}</span>
@@ -752,15 +740,11 @@ const SettingsPage = () => {
                     <li>{t('model_pley_item4')}</li>
                   </ul>
                 </div>
-
-
-
-                
               </div>
 
               {/* Personalization */}
               <div className="space-y-2">
-                <h4 className="font-bold text-zinc-900 text-base">{t('model_pers_title')}</h4>
+                <h4 className="font-bold text-zinc-900 text-sm">{t('model_pers_title')}</h4>
                 <ul className="space-y-1 list-disc list-inside marker:text-pink-500">
                   <li>{t('model_pers_item1')}</li>
                   <li>{t('model_pers_item2')}</li>
@@ -777,7 +761,7 @@ const SettingsPage = () => {
               <img 
                 src="/btn-close.png" 
                 alt="Close" 
-                className="h-12 w-auto object-contain" 
+                className="h-10 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </button>

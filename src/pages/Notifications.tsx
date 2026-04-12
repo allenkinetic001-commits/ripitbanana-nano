@@ -57,11 +57,6 @@ const Notifications = () => {
             style={{ imageRendering: '-webkit-optimize-contrast' }} 
           />
         </h1>
-        {isActive && (
-          <div className="mt-2 w-full min-w-[200px]">
-            <ChallengeTimer />
-          </div>
-        )}
       </header>
 
       <div className="flex flex-col divide-y divide-zinc-50">
@@ -82,7 +77,12 @@ const Notifications = () => {
                   className="transition-all active:scale-95 hover:scale-105"
                 >
                   {followedUsers.includes(notif.user) ? (
-                    <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
+                    <img 
+                      src="/btn-following.png" 
+                      alt="Following" 
+                      className="h-7 w-auto object-contain" 
+                      style={{ imageRendering: '-webkit-optimize-contrast' }}
+                    />
                   ) : (
                     <img 
                       src="/btn-follow.png" 

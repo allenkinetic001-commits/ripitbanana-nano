@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { PixelHeart } from './PixelHeart';
+import { ProfileHeartsToggle } from './ProfileHeartsToggle';
+import { useLongPress } from '../hooks/useLongPress';
 
 interface PostProps {
   id: number;
@@ -24,13 +26,31 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
   const [userVote, setUserVote] = useState<0 | 1 | -1>(0);
   const [lives, setLives] = useState(3);
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
+  const [hasActed, setHasActed] = useState(false);
+  const [isSwornLocal, setIsSwornLocal] = useState(false);
   const [quickComment, setQuickComment] = useState('');
+  const [showHearts, setShowHearts] = useState(false);
+  const [isTraitor, setIsTraitor] = useState(false);
   const navigate = useNavigate();
-  const { addEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t } = useChallenge();
+  const { addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t } = useChallenge();
 
-  const isEnemy = enemies.some(e => e.id === id);
+  const { handlers: heartsHandlers } = useLongPress(() => {
+    setShowHearts(prev => !prev);
+  }, 400);
+
+  const isEnemy = enemies.some(e => e.username === username);
+  const isSwornEnemy = enemies.find(e => e.username === username)?.isSworn || false;
   const isMe = username === userProfile.username;
   const localComments = postComments[id] || [];
+
+  const { handlers: enemyLongPress } = useLongPress(() => {
+    setIsSwornLocal(prev => !prev);
+  }, 400);
+
+  const toggleTraitor = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsTraitor(!isTraitor);
+  };
 
   const handlePostComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +60,16 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
     // Removed navigation to let user stay on Home screen
   };
 
-  const handleAddEnemy = () => {
-    if (isEnemy) return;
-    addEnemy({ id, username, avatar, image, caption, time, comments });
+  const handleAddEnemy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const survivorData = { id, username, avatar, image, caption, time, comments };
+    if (isSwornLocal) {
+      addSwornEnemy(survivorData);
+    } else {
+      addEnemy(survivorData);
+    }
     setShowAddedFeedback(true);
-    setTimeout(() => setShowAddedFeedback(false), 1000);
+    setHasActed(true);
   };
 
   const handleVote = (vote: 1 | -1) => {
@@ -81,11 +106,12 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         <div 
           onClick={() => navigate(`/user/${username}`)}
           className="flex items-center space-x-3 cursor-pointer group"
+          {...heartsHandlers}
         >
           <div className="relative">
-            <img src={avatar} alt={username} className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-purple-100 transition-all shadow-sm" />
+            <img src={avatar} alt={username} className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-rose-100 transition-all shadow-sm" />
             {isLegend(username) && (
-              <div className="absolute -bottom-2 -right-2 flex items-center justify-center">
+              <div className="absolute -bottom-2 -right-2 flex items-center justify-center pointer-events-none">
                 <img 
                   src="/pley-badge.png" 
                   alt="Survivor" 
@@ -97,57 +123,84 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
-              <span className="text-sm font-black italic group-hover:text-purple-600 transition-colors">@{username}</span>
-              {isLegend(username) && (
-                <img 
-                  src="/badge-legend.png" 
-                  alt="Legend" 
-                  className="h-5 w-auto object-contain" 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
-              )}
+              <span className="text-sm font-black italic transition-colors">@{username}</span>
             </div>
             {/* 3 Lives Hearts */}
             <div className="flex items-center gap-0.5 mt-0.5">
-              <PixelHeart className="w-3 h-3" empty={lives < 1} />
-              <PixelHeart className="w-3 h-3" empty={lives < 2} />
-              <PixelHeart className="w-3 h-3" empty={lives < 3} />
+              <ProfileHeartsToggle isVisible={showHearts} lives={lives} heartClassName="w-4 h-4" />
             </div>
           </div>
         </div>
-         <div className="flex items-center space-x-2">
-          {!isMe && (
-             <div className="flex items-center">
+          <div className="flex items-center space-x-2">
+            {isTraitor ? (
               <button 
                 onClick={handleAddEnemy}
-                className="transition-all duration-300 transform hover:opacity-80 active:scale-95 drop-shadow-sm"
+                className="animate-pop-in transition-all active:scale-95 flex items-center justify-center p-1"
+                title="Trigger Traitor Action"
               >
                 <img 
-                  src="/add-enemy.png" 
-                  alt={isEnemy ? t('home_added_enemy') : t('home_add_enemy')} 
-                  className="h-[44px] w-auto object-contain rounded-xl"
-                />
-              </button>
-            </div>
-          )}
-          {!isMe && isSurvivor(username) && (
-            <button 
-              onClick={() => toggleFollow(username)}
-              className="transition-all active:scale-95 hover:scale-105"
-            >
-              {followedUsers.includes(username) ? (
-                <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
-              ) : (
-                <img 
-                  src="/btn-follow.png" 
-                  alt="Follow" 
-                  className="h-7 w-auto object-contain" 
+                  src="/traitor.png" 
+                  alt="Traitor" 
+                  className="h-8 w-auto object-contain" 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
-              )}
-            </button>
-          )}
-        </div>
+              </button>
+            ) : (
+              <>
+                {username !== userProfile.username && (
+                <div className="flex items-center">
+                  <button 
+                  onClick={handleAddEnemy}
+                  {...enemyLongPress}
+                  className="active:scale-95 drop-shadow-sm"
+                >
+                  {showAddedFeedback ? (
+                    <img 
+                      src="/btn-added.png" 
+                      alt="Added" 
+                      className="h-[28px] w-auto object-contain"
+                    />
+                  ) : isSwornLocal ? (
+                    <img 
+                      src="/btn-sworn.png" 
+                      alt="Sworn Enemy" 
+                      className="h-[28px] w-auto object-contain"
+                    />
+                  ) : (
+                    <img 
+                      src="/add-enemy.png" 
+                      alt={t('home_add_enemy')} 
+                      className="h-[44px] w-auto object-contain rounded-xl"
+                    />
+                  )}
+                </button>
+              </div>
+                )}
+                {!isMe && isSurvivor(username) && (
+                  <button 
+                    onClick={() => toggleFollow(username)}
+                    className="transition-all active:scale-95 hover:scale-105"
+                  >
+                    {followedUsers.includes(username) ? (
+                      <img 
+                        src="/btn-following.png" 
+                        alt="Following" 
+                        className="h-8 w-auto object-contain" 
+                        style={{ imageRendering: '-webkit-optimize-contrast' }}
+                      />
+                    ) : (
+                      <img 
+                        src="/btn-follow.png" 
+                        alt="Follow" 
+                        className="h-8 w-auto object-contain" 
+                        style={{ imageRendering: '-webkit-optimize-contrast' }}
+                      />
+                    )}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
       </div>
 
       {/* Media Content */}
@@ -220,8 +273,17 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
             >
               <MessageCircle size={20} stroke="black" />
             </button>
+            {!hasActed && (
+              <div 
+                onClick={toggleTraitor}
+                className="w-20 h-12 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-xl hover:bg-zinc-100/50 active:scale-95 touch-none"
+                title="Traitor Toggle"
+              >
+                <div className="w-2 h-2 rounded-full bg-zinc-200/40" />
+              </div>
+            )}
           </div>
-          <button className="text-zinc-700 hover:text-zinc-400 transition-colors">
+          <button className="text-zinc-700 hover:text-rose-600 transition-colors">
             <Bookmark size={24} />
           </button>
         </div>
@@ -231,7 +293,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           <p className="text-sm">
             <span 
               onClick={() => navigate(`/user/${username}`)}
-              className="font-black italic mr-1 cursor-pointer hover:text-purple-600 transition-colors"
+              className="font-black italic mr-1 cursor-pointer transition-colors"
             >
               @{username}
             </span>
@@ -241,7 +303,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           {comments.length > 0 && (
             <button 
               onClick={() => navigate(`/post/${id}`)}
-              className="text-xs text-zinc-500 font-medium hover:text-zinc-700 transition-colors"
+              className="text-[10px] text-zinc-500 font-bold mt-1 hover:text-rose-600 transition-colors"
             >
               {t('post_view_comments')} ({localComments.length})
             </button>
@@ -250,14 +312,6 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           {localComments.slice(-2).map((comment, idx) => (
             <p key={idx} className="text-xs flex items-center gap-1">
               <span className="font-bold">@{comment.username}</span>
-              {isLegend(comment.username) && (
-                <img 
-                  src="/badge-legend.png" 
-                  alt="Legend" 
-                  className="h-5 w-auto object-contain" 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
-              )}
               <span className="text-zinc-700 ml-1">{comment.text}</span>
             </p>
           ))}

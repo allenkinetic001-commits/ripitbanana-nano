@@ -204,7 +204,7 @@ const Chat = () => {
             </button>
             <div className="flex items-center gap-2">
               <img src="/nav-chat-v3.png" alt="" className="h-8 w-8 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
-              <img src="/nav-message-text-v2.png" alt="Messages" className="h-[20px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }} />
+              <img src="/nav-message-text-v2.png" alt="Messages" className="h-[20px] object-contain mt-1" style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }} />
             </div>
           </div>
           <button className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
@@ -380,7 +380,7 @@ const Chat = () => {
                 <input 
                   type="text" 
                   placeholder="Message..." 
-                  className="bg-transparent border-none outline-none text-[15px] flex-1 placeholder:text-zinc-400"
+                  className="bg-transparent border-none outline-none text-[15px] flex-1 placeholder:text-zinc-400 mt-1"
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   onFocus={() => setShowEmojiPicker(false)}

@@ -18,6 +18,7 @@ interface Survivor {
   userVote?: 'up' | 'down' | null;
   rankingRule?: string | null;
   madeIt?: boolean;
+  isSworn?: boolean;
 }
 
 interface RoundRecord {
@@ -109,6 +110,7 @@ interface ChallengeContextType {
   clearAllHistory: () => void;
   getVariantDisplayName: (key: string | null) => string;
   addEnemy: (survivor: Survivor) => void;
+  addSwornEnemy: (survivor: Survivor) => void;
   removeEnemy: (enemyId: number) => void;
   addComment: (postId: number, text: string) => void;
   addWallPost: (text: string, targetUser?: string) => void;
@@ -320,12 +322,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'You can update or delete your account anytime.',
     'priv_s5_i2': 'You can control visibility of your profile and activity in the app.',
     'priv_s5_i3': 'You can opt out of non-essential communications.',
-    'priv_s6_title': '6️⃣ Children',
-    'priv_s6_i1': 'Rip It is not intended for users under 13.',
-    'priv_s6_i2': 'Accounts found belonging to underage users may be deleted.',
-    'priv_s7_title': '7️⃣ Changes to Privacy Policy',
-    'priv_s7_i1': 'Updates may happen as the app evolves.',
-    'priv_s7_i2': 'Major changes will be announced in-app.',
+    'priv_s6_title': '6️⃣ Changes to Privacy Policy',
+    'priv_s6_i1': 'Updates may happen as the app evolves.',
+    'priv_s6_i2': 'Major changes will be announced in-app.',
 
     // Terms Modal
     'terms_tagline': 'Tagline: Survive. Reset. Evolve.',
@@ -582,12 +581,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': '언제든지 계정을 업데이트하거나 삭제할 수 있습니다.',
     'priv_s5_i2': '앱 내에서 프로필 및 활동의 가시성을 제어할 수 있습니다.',
     'priv_s5_i3': '비필수 커뮤니케이션을 거부할 수 있습니다.',
-    'priv_s6_title': '6️⃣ 아동',
-    'priv_s6_i1': 'Rip It은 13세 미만 사용자를 대상으로 하지 않습니다.',
-    'priv_s6_i2': '미성년자 사용자의 계정으로 확인될 경우 삭제될 수 있습니다.',
-    'priv_s7_title': '7️⃣ 개인정보 처리방침 변경',
-    'priv_s7_i1': '앱이 발전함에 따라 업데이트가 발생할 수 있습니다.',
-    'priv_s7_i2': '주요 변경 사항은 앱 내에서 공지됩니다.',
+    'priv_s6_title': '6️⃣ 개인정보 처리방침 변경',
+    'priv_s6_i1': '앱이 발전함에 따라 업데이트가 발생할 수 있습니다.',
+    'priv_s6_i2': '주요 변경 사항은 앱 내에서 공지됩니다.',
 
     // Terms Modal
     'terms_tagline': '슬로건: 생존. 리셋. 진화.',
@@ -1617,12 +1613,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': '你可以随时更新或删除你的账户。',
     'priv_s5_i2': '你可以控制你的资料和活动在应用中的可见性。',
     'priv_s5_i3': '你可以选择退出非必要的沟通。',
-    'priv_s6_title': '6️⃣ 儿童',
-    'priv_s6_i1': 'Rip It 不面向 13 岁以下的用户。',
-    'priv_s6_i2': '发现属于未成年用户的账户可能会被删除。',
-    'priv_s7_title': '7️⃣ 隐私政策的变更',
-    'priv_s7_i1': '随着应用的发展，可能会进行更新。',
-    'priv_s7_i2': '重大变更将在应用内公布。',
+    'priv_s6_title': '6️⃣ 隐私政策的变更',
+    'priv_s6_i1': '随着应用的发展，可能会进行更新。',
+    'priv_s6_i2': '重大变更将在应用内公布。',
 
     // Terms Modal
     'terms_tagline': '口号：生存。重置。进化。',
@@ -1878,12 +1871,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'Du kannst dein Konto jederzeit aktualisieren oder löschen.',
     'priv_s5_i2': 'Du kannst die Sichtbarkeit deines Profils und deiner Aktivitäten in der App steuern.',
     'priv_s5_i3': 'Du kannst dich von nicht wesentlichen Kommunikationen abmelden.',
-    'priv_s6_title': '6️⃣ Kinder',
-    'priv_s6_i1': 'Rip It ist nicht für Nutzer unter 13 Jahren bestimmt.',
-    'priv_s6_i2': 'Konten, die minderjährigen Nutzern gehören, können gelöscht werden.',
-    'priv_s7_title': '7️⃣ Änderungen der Datenschutzrichtlinie',
-    'priv_s7_i1': 'Updates können im Zuge der Weiterentwicklung der App erfolgen.',
-    'priv_s7_i2': 'Größere Änderungen werden in der App bekannt gegeben.',
+    'priv_s6_title': '6️⃣ Änderungen der Datenschutzrichtlinie',
+    'priv_s6_i1': 'Updates können im Zuge der Weiterentwicklung der App erfolgen.',
+    'priv_s6_i2': 'Größere Änderungen werden in der App bekannt gegeben.',
 
     // Terms Modal
     'terms_tagline': 'Slogan: Überleben. Zurücksetzen. Entwickeln.',
@@ -2140,12 +2130,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'Ви можете оновити або видалити свій обліковий запис у будь-який час.',
     'priv_s5_i2': 'Ви можете керувати видимістю свого профілю та активності в додатку.',
     'priv_s5_i3': 'Ви можете відмовитися від необов\'язкових повідомлень.',
-    'priv_s6_title': '6️⃣ Діти',
-    'priv_s6_i1': 'Rip It не призначений для користувачів віком до 13 років.',
-    'priv_s6_i2': 'Облікові записи, що належать неповнолітнім користувачам, можуть бути видалені.',
-    'priv_s7_title': '7️⃣ Зміни до Політики конфіденційності',
-    'priv_s7_i1': 'Оновлення можуть відбуватися в міру розвитку додатка.',
-    'priv_s7_i2': 'Про основні зміни буде повідомлено в додатку.',
+    'priv_s6_title': '6️⃣ Зміни до Політики конфіденційності',
+    'priv_s6_i1': 'Оновлення можуть відбуватися в міру розвитку додатка.',
+    'priv_s6_i2': 'Про основні зміни буде повідомлено в додатку.',
 
     // Terms Modal
     'terms_tagline': 'Слоган: Виживай. Скидай. Еволюціонуй.',
@@ -2402,12 +2389,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'Вы можете обновить или удалить свою учетную запись в любое время.',
     'priv_s5_i2': 'Вы можете управлять видимостью своего профиля и активности в приложении.',
     'priv_s5_i3': 'Вы можете отказаться от необязательных сообщений.',
-    'priv_s6_title': '6️⃣ Дети',
-    'priv_s6_i1': 'Rip It не предназначен для пользователей младше 13 лет.',
-    'priv_s6_i2': 'Учетные записи, принадлежащие несовершеннолетним пользователям, могут быть удалены.',
-    'priv_s7_title': '7️⃣ Изменения в Политике конфиденциальности',
-    'priv_s7_i1': 'Обновления могут происходить по мере развития приложения.',
-    'priv_s7_i2': 'О крупных изменениях будет объявлено в приложении.',
+    'priv_s6_title': '6️⃣ Изменения в Политике конфиденциальности',
+    'priv_s6_i1': 'Обновления могут происходить по мере развития приложения.',
+    'priv_s6_i2': 'О крупных изменениях будет объявлено в приложении.',
 
     // Terms Modal
     'terms_tagline': 'Слоган: Выживай. Сбрасывай. Эволюционируй.',
@@ -3616,12 +3600,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'يمكنك تحديث أو حذف حسابك في أي وقت.',
     'priv_s5_i2': 'يمكنك التحكم في رؤية ملفك الشخصي ونشاطك في التطبيق.',
     'priv_s5_i3': 'يمكنك اختيار عدم تلقي الاتصالات غير الضرورية.',
-    'priv_s6_title': '6️⃣ الأطفال',
-    'priv_s6_i1': 'Rip It غير مخصص للمستخدمين تحت سن 13 عاماً.',
-    'priv_s6_i2': 'قد يتم حذف الحسابات التي يتبين أنها تنتمي لمستخدمين تحت السن القانوني.',
-    'priv_s7_title': '7️⃣ التغييرات في سياسة الخصوصية',
-    'priv_s7_i1': 'قد تحدث تحديثات مع تطور التطبيق.',
-    'priv_s7_i2': 'سيتم الإعلان عن التغييرات الكبيرة داخل التطبيق.',
+    'priv_s6_title': '6️⃣ التغييرات في سياسة الخصوصية',
+    'priv_s6_i1': 'قد تحدث تحديثات مع تطور التطبيق.',
+    'priv_s6_i2': 'سيتم الإعلان عن التغييرات الكبيرة داخل التطبيق.',
 
     // Terms Modal
     'terms_tagline': 'الشعار: انجُ. أعد الضبط. تطور.',
@@ -3878,12 +3859,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'Anda dapat memperbarui atau menghapus akun Anda kapan saja.',
     'priv_s5_i2': 'Anda dapat mengontrol visibilitas profil dan aktivitas Anda di aplikasi.',
     'priv_s5_i3': 'Anda dapat memilih keluar dari komunikasi non-esensial.',
-    'priv_s6_title': '6️⃣ Anak-anak',
-    'priv_s6_i1': 'Rip It tidak ditujukan untuk pengguna di bawah 13 tahun.',
-    'priv_s6_i2': 'Akun yang ditemukan milik pengguna di bawah umur dapat dihapus.',
-    'priv_s7_title': '7️⃣ Perubahan Kebijakan Privasi',
-    'priv_s7_i1': 'Pembaruan mungkin terjadi seiring berkembangnya aplikasi.',
-    'priv_s7_i2': 'Perubahan besar akan diumumkan di dalam aplikasi.',
+    'priv_s6_title': '6️⃣ Perubahan Kebijakan Privasi',
+    'priv_s6_i1': 'Pembaruan mungkin terjadi seiring berkembangnya aplikasi.',
+    'priv_s6_i2': 'Perubahan besar akan diumumkan di dalam aplikasi.',
 
     // Terms Modal
     'terms_tagline': 'Tagline: Bertahan. Reset. Evolusi.',
@@ -4139,12 +4117,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'آپ کسی بھی وقت اپنا اکاؤنٹ اپ ڈیٹ یا حذف کر سکتے ہیں۔',
     'priv_s5_i2': 'آپ ایپ میں اپنے پروفائل اور سرگرمی کی نمائش کو کنٹرول کر سکتے ہیں۔',
     'priv_s5_i3': 'آپ غیر ضروری مواصلات سے آپٹ آؤٹ کر سکتے ہیں۔',
-    'priv_s6_title': '6️⃣ بچے',
-    'priv_s6_i1': 'Rip It 13 سال سے کم عمر کے صارفین کے لیے نہیں ہے۔',
-    'priv_s6_i2': 'کم عمر صارفین کے اکاؤنٹس حذف کیے جا سکتے ہیں۔',
-    'priv_s7_title': '7️⃣ رازداری کی پالیسی میں تبدیلیاں',
-    'priv_s7_i1': 'ایپ کے تیار ہونے کے ساتھ ساتھ اپ ڈیٹس ہو سکتے ہیں۔',
-    'priv_s7_i2': 'بڑی تبدیلیوں کا اعلان ایپ میں کیا جائے گا۔',
+    'priv_s6_title': '6️⃣ رازداری کی پالیسی میں تبدیلیاں',
+    'priv_s6_i1': 'ایپ کے تیار ہونے کے ساتھ ساتھ اپ ڈیٹس ہو سکتے ہیں۔',
+    'priv_s6_i2': 'بڑی تبدیلیوں کا اعلان ایپ میں کیا جائے گا۔',
 
     // Terms Modal
     'terms_tagline': 'ٹیگ لائن: بچیں۔ ری سیٹ کریں۔ تیار ہوں۔',
@@ -4401,12 +4376,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'شما می‌توانید در هر زمان حساب خود را به‌روزرسانی یا حذف کنید.',
     'priv_s5_i2': 'شما می‌توانید مشاهده پروفایل و فعالیت خود را در اپلیکیشن کنترل کنید.',
     'priv_s5_i3': 'شما می‌توانید از دریافت ارتباطات غیرضروری انصراف دهید.',
-    'priv_s6_title': '6️⃣ کودکان',
-    'priv_s6_i1': 'Rip It برای کاربران زیر ۱۳ سال در نظر گرفته نشده است.',
-    'priv_s6_i2': 'حساب‌هایی که متعلق به کاربران زیر سن قانونی باشد ممکن است حذف شوند.',
-    'priv_s7_title': '7️⃣ تغییرات در سیاست حریم خصوصی',
-    'priv_s7_i1': 'به‌روزرسانی‌ها ممکن است همزمان با تکامل اپلیکیشن اتفاق بیفتد.',
-    'priv_s7_i2': 'تغییرات عمده در اپلیکیشن اعلام خواهد شد.',
+    'priv_s6_title': '6️⃣ تغییرات در سیاست حریم خصوصی',
+    'priv_s6_i1': 'به‌روزرسانی‌ها ممکن است همزمان با تکامل اپلیکیشن اتفاق بیفتد.',
+    'priv_s6_i2': 'تغییرات عمده در اپلیکیشن اعلام خواهد شد.',
 
     // Terms Modal
     'terms_tagline': 'شعار: زنده بمان. ری‌ست شو. تکامل یاب.',
@@ -4663,12 +4635,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'Puedes actualizar o eliminar tu cuenta en cualquier momento.',
     'priv_s5_i2': 'Puedes controlar la visibilidad de tu perfil y actividad en la aplicación.',
     'priv_s5_i3': 'Puedes optar por no recibir comunicaciones no esenciales.',
-    'priv_s6_title': '6️⃣ Niños',
-    'priv_s6_i1': 'Rip It no está destinado a usuarios menores de 13 años.',
-    'priv_s6_i2': 'Las cuentas que se descubra que pertenecen a usuarios menores de edad pueden ser eliminadas.',
-    'priv_s7_title': '7️⃣ Cambios en la Política de Privacidad',
-    'priv_s7_i1': 'Pueden ocurrir actualizaciones a medida que la aplicación evoluciona.',
-    'priv_s7_i2': 'Los cambios importantes se anunciarán en la aplicación.',
+    'priv_s6_title': '6️⃣ Cambios en la Política de Privacidad',
+    'priv_s6_i1': 'Pueden ocurrir actualizaciones a medida que la aplicación evoluciona.',
+    'priv_s6_i2': 'Los cambios importantes se anunciarán en la aplicación.',
 
     // Terms Modal
     'terms_tagline': 'Eslogan: Sobrevive. Reinicia. Evoluciona.',
@@ -4926,12 +4895,9 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s5_i1': 'Maaari mong i-update o burahin ang iyong account anumang oras.',
     'priv_s5_i2': 'Maaari mong kontrolin ang pagpapakita ng iyong profile at aktibidad sa app.',
     'priv_s5_i3': 'Maaari kang mag-opt out sa mga hindi mahahalagang komunikasyon.',
-    'priv_s6_title': '6️⃣ Mga Bata',
-    'priv_s6_i1': 'Ang Rip It ay hindi inilaan para sa mga user na wala pang 13 taong gulang.',
-    'priv_s6_i2': 'Ang mga account na mapapatunayang pagmamay-ari ng mga menor de edad na user ay maaaring burahin.',
-    'priv_s7_title': '7️⃣ Mga Pagbabago sa Patakaran sa Privacy',
-    'priv_s7_i1': 'Maaaring magkaroon ng mga update habang nag-e-evolve ang app.',
-    'priv_s7_i2': 'Ang mga malalaking pagbabago ay iaanunsyo sa loob ng app.',
+    'priv_s6_title': '6️⃣ Mga Pagbabago sa Patakaran sa Privacy',
+    'priv_s6_i1': 'Maaaring magkaroon ng mga update habang nag-e-evolve ang app.',
+    'priv_s6_i2': 'Ang mga malalaking pagbabago ay iaanunsyo sa loob ng app.',
 
     // Terms Modal
     'terms_tagline': 'Tagline: Mabuhay. Mag-reset. Mag-evolve.',
@@ -5210,8 +5176,18 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (survivor.username === userProfile.username) return;
     
     setEnemies(prev => {
-      if (prev.find(e => e.id === survivor.id)) return prev;
-      return [...prev, survivor];
+      const filtered = prev.filter(e => e.username !== survivor.username);
+      return [...filtered, { ...survivor, isSworn: false }];
+    });
+  };
+
+  const addSwornEnemy = (survivor: Survivor) => {
+    // Prevent adding self as enemy
+    if (survivor.username === userProfile.username) return;
+    
+    setEnemies(prev => {
+      const filtered = prev.filter(e => e.username !== survivor.username);
+      return [...filtered, { ...survivor, isSworn: true }];
     });
   };
 
@@ -5297,7 +5273,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     setClickCounts({ pley: 0 });
     setEliminationCounts({ pley: 0 });
     setMadeItCounts({ pley: 0 });
-    setVariantDurations({ pley: 86400 }); // 24h record
+    setVariantDurations({ pley: 86400 }); // 24hr cycle
     setVariantFirstClickTime({ pley: 0 });
     setSurvivors([]);
     setEliminated([]);
@@ -5394,16 +5370,14 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
-  // Day-change detection and automated reset
+  // Day-change detection and automated reset (Changed to 1 minute end logic for testing)
   useEffect(() => {
-    const checkDayChange = () => {
-      const today = new Date().toDateString();
-      if (today !== currentDate) {
+    if (isActive && timeLeft === 0) {
         // Round ends: Archive results
         setIsActive(false);
         setIsChallengeEnded(true);
         
-        // Settle current round logic (moved from timer useEffect)
+        // Settle current round logic
         if (visiblePosts.length > 0) {
           const remainingSurvivors = visiblePosts.map(p => ({ 
             id: p.id,
@@ -5428,32 +5402,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           }));
         }
 
-        // Start new round for the new day after a brief delay to allow archival
-        setTimeout(() => {
-          setCurrentDate(today);
-          setTimeLeft(getSecondsUntilMidnight());
-          setIsActive(true);
-          setIsEliminationRoundActive(false);
-          setIsChallengeEnded(false);
-          setVisiblePosts(allPosts); // Reset posts for new day
-        }, 100);
-      }
-    };
+    }
+  }, [timeLeft, isActive, visiblePosts, allPosts, majorityVariant, userSelection, isEliminationRoundActive]);
 
-    const interval = setInterval(checkDayChange, 1000);
-    return () => clearInterval(interval);
-  }, [currentDate, visiblePosts, allPosts, majorityVariant, userSelection]);
-
-  // Timer countdown - now strictly for display and final settle at midnight
+  // Timer countdown
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft(getSecondsUntilMidnight()); // Re-sync with clock
+        setTimeLeft(prev => prev - 1);
       }, 1000);
-    } else if (isActive && timeLeft === 0) {
-      // Midnight reached
-      // Detection logic in the other useEffect will handle the reset
     }
     return () => clearInterval(interval);
   }, [isActive, timeLeft]);
@@ -5507,7 +5465,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
       setUserSelection, setIsChallengeEnded, startNewChallenge,
       setSurvivors, setSurvivorHistory, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
-      addEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, login, logout, language, setLanguage, theme, setTheme, t
+      addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, login, logout, language, setLanguage, theme, setTheme, t
     }}>
       {children}
     </ChallengeContext.Provider>

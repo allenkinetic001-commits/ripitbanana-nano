@@ -1,11 +1,92 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
-import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar } from 'lucide-react';
+import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar, ChevronRight } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
-import ChallengeTimer from '../components/ChallengeTimer';
 import { posts } from '../data/posts';
 import { cn } from '../utils';
+import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
+import { useLongPress } from '../hooks/useLongPress';
+
+const HomeUserItem = ({ user, index, navigate, isSearch = false }: any) => {
+  const [showHearts, setShowHearts] = useState(false);
+  const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
+  const { followedUsers, toggleFollow, isSurvivor, addEnemy, enemies } = useChallenge();
+  const isFollowing = followedUsers.includes(user.username);
+  const [isTraitor, setIsTraitor] = useState(false);
+  const hasActed = enemies.some((e: any) => e.username === user.username);
+
+  const toggleTraitor = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsTraitor(!isTraitor);
+  };
+
+  return (
+    <button 
+      onClick={() => navigate(`/profile/${user.username}`)}
+      className="flex items-center p-3 hover:bg-zinc-50 transition-colors w-full text-left"
+    >
+      <div className="relative shrink-0">
+        <div className="w-12 h-12 rounded-full border border-zinc-200 overflow-hidden">
+          <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+        </div>
+      </div>
+      <div className="flex-1 ml-3 overflow-hidden">
+        <p className="text-sm font-bold text-zinc-900 truncate">@{user.username}</p>
+        <p className="text-xs text-zinc-500 truncate">
+          {isSearch ? 'Survivor' : user.caption}
+        </p>
+      </div>
+      <div className="flex items-center gap-1 shrink-0 ml-2">
+        {isTraitor ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              addEnemy(user);
+            }}
+            className="animate-pop-in transition-all active:scale-95 flex items-center justify-center p-1"
+          >
+            <img src="/traitor.png" alt="Traitor" className="h-6 w-auto object-contain" />
+          </button>
+        ) : (
+          isSurvivor(user.username) && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFollow(user.username);
+              }}
+              className="transition-all active:scale-95 hover:scale-105"
+            >
+              {isFollowing ? (
+                <img
+                  src="/btn-following.png"
+                  alt="Following"
+                  className="h-8 w-auto object-contain"
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              ) : (
+                <img
+                  src="/btn-follow.png"
+                  alt="Follow"
+                  className="h-8 w-auto object-contain"
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              )}
+            </button>
+          )
+        )}
+        {!hasActed && (
+          <div 
+            onClick={toggleTraitor}
+            className="w-20 h-12 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-xl hover:bg-zinc-100/50 active:scale-95 touch-none"
+          >
+            <div className="w-2 h-2 rounded-full bg-zinc-200/40" />
+          </div>
+        )}
+      </div>
+    </button>
+  );
+};
 
 const Home = () => {
   const navigate = useNavigate();
@@ -63,7 +144,7 @@ const Home = () => {
       avatar: userProfile.avatar,
       image: selectedFile,
       type: fileType,
-      caption: captionText || (fileType === 'video' ? 'Just uploaded a video! ðŸŽ¥' : 'Just uploaded a photo! ðŸ“¸'),
+      caption: captionText || (fileType === 'video' ? 'Just uploaded a video! 🎥' : 'Just uploaded a photo! 📸'),
       likes: 0,
       time: 'Just now',
       comments: []
@@ -354,6 +435,7 @@ const Home = () => {
       )}
 
       {/* Header */}
+      {!isChallengeEnded && (
       <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
         <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between">
           <div className="flex items-center gap-0">
@@ -375,7 +457,7 @@ const Home = () => {
               <img 
                 src="/header-logo-text.png" 
                 alt="RipIt" 
-                className="h-6 w-auto object-contain ml-4" 
+                className="h-6 w-auto object-contain ml-4 mt-1" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </Link>
@@ -399,13 +481,13 @@ const Home = () => {
             )}
             <button 
               onClick={() => navigate('/chat')}
-              className="text-zinc-700 hover:text-purple-600 transition-colors"
+              className="text-zinc-700 hover:text-zinc-400 transition-colors"
             >
               <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             <button 
               onClick={() => fileInputRef.current?.click()}
-              className="text-zinc-700 hover:text-purple-600 transition-colors"
+              className="text-zinc-700 hover:text-zinc-400 transition-colors"
             >
               <img src="/nav-camera-v3.png" alt="Camera" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
@@ -430,18 +512,7 @@ const Home = () => {
             </button>
           </div>
         </div>
-        {/* Timer row — shown below all icons when a round is active */}
-        {isActive && (
-          <div className="px-4 pb-2 flex items-center gap-3 border-t border-zinc-50">
-            <ChallengeTimer />
-            {Object.values(eliminationCounts).reduce((a, b) => a + b, 0) > 0 && (
-              <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">
-                💀 {Object.values(eliminationCounts).reduce((a, b) => a + b, 0)} eliminated
-              </span>
-            )}
-          </div>
-        )}
-        
+
         {/* Search Modal */}
         {showSearchModal && (
           <div className="fixed inset-0 z-[120] flex items-start justify-center pt-20 px-4">
@@ -490,26 +561,12 @@ const Home = () => {
                         }
                       }, [])
                       .map((user) => (
-                        <button
-                          key={user.id}
-                          onClick={() => {
-                            setShowSearchModal(false);
-                            setSearchQuery('');
-                            navigate('/profile');
-                          }}
-                          className="w-full flex items-center gap-3 p-3 hover:bg-zinc-50 rounded-2xl transition-all group"
-                        >
-                          <div className="w-12 h-12 rounded-full overflow-hidden border border-zinc-100 group-hover:scale-105 transition-transform shrink-0">
-                            <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
-                          </div>
-                          <div className="flex-1 text-left min-w-0">
-                            <p className="font-bold text-zinc-900 truncate">@{user.username}</p>
-                            <p className="text-xs text-zinc-400 truncate">Survivor</p>
-                          </div>
-                          <div className="w-8 h-8 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-300 group-hover:text-purple-600 group-hover:bg-purple-50 transition-all">
-                            <Users size={16} />
-                          </div>
-                        </button>
+                        <HomeUserItem 
+                          key={user.id} 
+                          user={user} 
+                          navigate={navigate} 
+                          isSearch={true} 
+                        />
                       ))
                     }
                     {allPosts.filter(post => post.username.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
@@ -652,6 +709,7 @@ const Home = () => {
           </div>
         )}
       </header>
+      )}
 
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
@@ -694,21 +752,13 @@ const Home = () => {
                 <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
                   <div className="max-h-[200px] overflow-y-auto divide-y divide-zinc-50">
                     {survivors.map((survivor, index) => (
-                      <div key={survivor.id} className="flex items-center gap-3 p-3 hover:bg-zinc-50 transition-colors">
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-zinc-100 shrink-0">
-                          <img src={survivor.avatar} alt={survivor.username} className="w-full h-full object-cover" />
-                        </div>
-                        <div className="flex-1 text-left min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm truncate">{survivor.username}</span>
-                              <span className="text-[9px] font-black text-green-600 bg-green-50 px-1.5 rounded-md">
-                                #{index + 1}
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-zinc-400 truncate">{survivor.caption}</p>
-                          </div>
-                        </div>
-                      ))}
+                      <HomeUserItem 
+                        key={survivor.id} 
+                        user={survivor} 
+                        index={index} 
+                        navigate={navigate} 
+                      />
+                    ))}
                   </div>
                 </div>
               </div>

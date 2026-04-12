@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageCircle, Send, Heart, Bookmark, MoreHorizontal, X } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Send, Bookmark, MoreHorizontal, X } from 'lucide-react';
+import { PixelHeart } from '../components/PixelHeart';
 import { posts } from '../data/posts';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
+import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
+import { useLongPress } from '../hooks/useLongPress';
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -14,7 +17,12 @@ const PostDetail = () => {
   const post = posts.find(p => p.id === postId);
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [showHearts, setShowHearts] = useState(false);
   const localComments = postComments[postId] || [];
+
+  const { handlers: heartsHandlers } = useLongPress(() => {
+    setShowHearts(prev => !prev);
+  }, 400);
 
   if (!post) {
     return (
@@ -22,7 +30,7 @@ const PostDetail = () => {
         <h2 className="text-xl font-bold">Post not found</h2>
         <button 
           onClick={() => navigate('/')}
-          className="mt-4 text-purple-600 font-semibold"
+          className="mt-4 text-zinc-900 font-semibold underline"
         >
           Back to Home
         </button>
@@ -58,13 +66,20 @@ const PostDetail = () => {
       </div>
 
       {/* Post Content Summary */}
-      <div className="p-4 border-b border-zinc-50 flex gap-3">
+      <div 
+        className="p-4 border-b border-zinc-50 flex gap-3 cursor-pointer" 
+        {...heartsHandlers}
+        onClick={() => navigate(`/user/${post.username}`)}
+      >
         <img src={post.avatar} alt={post.username} className="w-8 h-8 rounded-full object-cover shrink-0" />
         <div className="flex-1">
-          <p className="text-sm">
-            <span className="font-bold mr-2">{post.username}</span>
-            {post.caption}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm">
+              <span className="font-bold mr-2">{post.username}</span>
+              {post.caption}
+            </p>
+            <ProfileHeartsToggle isVisible={showHearts} heartClassName="w-3.5 h-3.5" />
+          </div>
           <p className="text-[10px] text-zinc-400 mt-1 uppercase">{post.time}</p>
         </div>
       </div>
@@ -87,13 +102,13 @@ const PostDetail = () => {
                 <p className="text-sm text-zinc-700 mt-0.5">{comment.text}</p>
                 <button 
                   onClick={() => setReplyingTo(comment.username)}
-                  className="text-[10px] text-zinc-500 font-bold mt-1 hover:text-purple-600 transition-colors"
+                  className="text-[10px] text-zinc-500 font-bold mt-1 transition-colors"
                 >
                   Reply
                 </button>
               </div>
               <button className="text-zinc-400">
-                <Heart size={12} />
+                <PixelHeart className="w-3 h-3" />
               </button>
             </div>
           ))
@@ -110,7 +125,7 @@ const PostDetail = () => {
         {replyingTo && (
           <div className="flex items-center justify-between bg-zinc-50 px-3 py-2 mb-2 rounded-lg border border-zinc-100 animate-in fade-in slide-in-from-bottom-1 duration-200">
             <p className="text-[10px] text-zinc-500 font-medium">
-              Replying to <span className="font-bold text-purple-600">@{replyingTo}</span>
+              Replying to <span className="font-bold text-zinc-900">@{replyingTo}</span>
             </p>
             <button 
               onClick={() => setReplyingTo(null)}
@@ -124,7 +139,7 @@ const PostDetail = () => {
           <input 
             type="text" 
             placeholder="Add a comment..."
-            className="flex-1 bg-transparent border-none outline-none text-sm py-1"
+            className="flex-1 bg-transparent border-none outline-none text-sm pt-1"
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
@@ -133,7 +148,7 @@ const PostDetail = () => {
             onClick={handleSendComment}
             disabled={!commentText.trim()}
             className={cn(
-              "text-purple-600 font-bold text-sm transition-opacity",
+              "text-zinc-900 font-bold text-sm transition-opacity",
               !commentText.trim() && "opacity-30"
             )}
           >

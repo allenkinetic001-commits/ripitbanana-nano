@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles } from 'lucide-react';
-import ChallengeTimer from '../components/ChallengeTimer';
+import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles, MessageSquare } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
+import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
+import { useLongPress } from '../hooks/useLongPress';
 
 const userPosts = [
   'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Stunning+mountain+landscape+at+dawn&image_size=square',
@@ -17,12 +18,19 @@ const userPosts = [
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [showHearts, setShowHearts] = useState(false);
   const { 
     enemies, removeEnemy, userProfile, setUserProfile, 
     followedUsers, toggleFollow, isLegend, survivorHistory,
+    wallPosts, addWallPost,
     t
   } = useChallenge();
-  const [viewMode, setViewMode] = useState<'posts' | 'enemies' | 'following'>('enemies');
+
+  const { handlers: heartsHandlers } = useLongPress(() => {
+    setShowHearts(prev => !prev);
+  }, 400);
+  const [viewMode, setViewMode] = useState<'posts' | 'wall' | 'enemies' | 'following'>('posts');
+  const [wallInput, setWallInput] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditEditForm] = useState(userProfile);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +66,18 @@ const Profile = () => {
     }
   };
 
+  const handlePostToWall = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wallInput.trim()) return;
+    addWallPost(wallInput.trim(), userProfile.username);
+    setWallInput('');
+  };
+
+  const userWallPosts = wallPosts.filter(p => p.targetUser === userProfile.username);
+
+  const hasActed = false; // Mock for own profile
+  const toggleTraitor = () => {}; // Mock for own profile
+
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">
       <input 
@@ -70,22 +90,13 @@ const Profile = () => {
       <header className="px-4 h-14 flex items-center justify-between border-b border-zinc-100 sticky top-0 bg-white z-10">
         <div className="flex items-center gap-1">
           <h1 className="text-lg font-bold">{userProfile.username}</h1>
-          {isLegend(userProfile.username) && (
-            <img 
-              src="/badge-legend.png" 
-              alt="Legend" 
-              className="h-5 w-auto object-contain" 
-              style={{ imageRendering: '-webkit-optimize-contrast' }}
-            />
-          )}
         </div>
         <div className="flex items-center gap-3">
-          <ChallengeTimer />
           <button 
             onClick={() => setViewMode(viewMode === 'following' ? 'enemies' : 'following')}
             className={cn(
               "transition-all duration-300",
-              viewMode === 'enemies' ? "text-rose-600" : "text-zinc-700 hover:text-purple-600"
+              viewMode === 'enemies' ? "text-rose-600" : "text-zinc-700"
             )}
             title={viewMode === 'enemies' ? "Switch to Following" : "Switch to Enemies"}
           >
@@ -94,7 +105,7 @@ const Profile = () => {
           <div className="relative">
             <button 
               onClick={() => navigate('/settings')}
-              className="text-zinc-700 hover:bg-zinc-100 p-2 rounded-full transition-colors"
+              className="text-zinc-700 hover:text-zinc-400 transition-colors"
             >
               <Menu size={24} />
             </button>
@@ -110,7 +121,7 @@ const Profile = () => {
               <X size={24} />
             </button>
             <h2 className="font-bold">Edit Profile</h2>
-            <button onClick={handleSaveProfile} className="text-purple-600 font-bold">
+            <button onClick={handleSaveProfile} className="text-zinc-900 font-bold">
               <Check size={24} />
             </button>
           </header>
@@ -132,7 +143,7 @@ const Profile = () => {
               </div>
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="text-purple-600 text-sm font-bold"
+                className="text-zinc-900 text-sm font-bold underline"
               >
                 Change profile photo
               </button>
@@ -145,7 +156,7 @@ const Profile = () => {
                   type="text" 
                   value={editForm.fullName}
                   onChange={(e) => setEditEditForm({...editForm, fullName: e.target.value})}
-                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-purple-600 transition-colors"
+                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-zinc-900 transition-colors"
                 />
               </div>
               <div className="space-y-1">
@@ -154,7 +165,7 @@ const Profile = () => {
                   type="text" 
                   value={editForm.username}
                   onChange={(e) => setEditEditForm({...editForm, username: e.target.value})}
-                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-purple-600 transition-colors"
+                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-zinc-900 transition-colors"
                 />
               </div>
               <div className="space-y-1">
@@ -163,7 +174,7 @@ const Profile = () => {
                   type="text" 
                   value={editForm.website}
                   onChange={(e) => setEditEditForm({...editForm, website: e.target.value})}
-                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-purple-600 transition-colors"
+                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-zinc-900 transition-colors"
                 />
               </div>
               <div className="space-y-1">
@@ -172,7 +183,7 @@ const Profile = () => {
                   rows={3}
                   value={editForm.bio}
                   onChange={(e) => setEditEditForm({...editForm, bio: e.target.value})}
-                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-purple-600 transition-colors resize-none"
+                  className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-rose-600 transition-colors resize-none"
                 />
               </div>
             </div>
@@ -190,7 +201,7 @@ const Profile = () => {
               className="w-full h-full object-cover"
             />
             {isLegend(userProfile.username) && (
-              <div className="absolute -bottom-3 -right-3 flex items-center justify-center">
+              <div className="absolute -bottom-3 -right-3 flex items-center justify-center pointer-events-none">
                 <img 
                   src="/pley-badge.png" 
                   alt="Survivor" 
@@ -204,7 +215,7 @@ const Profile = () => {
             </div>
             <button 
               onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 bg-white p-1 rounded-full border border-zinc-200 shadow-sm hover:bg-zinc-50 transition-colors"
+              className="absolute bottom-0 right-0 bg-white p-1 rounded-full border border-zinc-200 shadow-sm hover:bg-zinc-50 transition-colors z-20"
             >
               <Camera size={12} className="text-zinc-600" />
             </button>
@@ -235,13 +246,11 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="space-y-1">
+        <div className="flex flex-col" {...heartsHandlers}>
           <div className="flex items-center gap-1.5">
             <h2 className="text-sm font-bold">{userProfile.fullName}</h2>
             <div className="flex items-center gap-0.5">
-              <PixelHeart className="w-4 h-4" />
-              <PixelHeart className="w-4 h-4" />
-              <PixelHeart className="w-4 h-4" />
+              <ProfileHeartsToggle isVisible={showHearts} />
             </div>
           </div>
           <p className="text-sm text-zinc-600">{userProfile.bio}</p>
@@ -269,8 +278,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-t border-zinc-100 mt-4">
+      <div className="flex border-t border-zinc-100 mt-4 items-center">
         <button 
           onClick={() => setViewMode('posts')}
           className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'posts' ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-400'}`}
@@ -278,16 +286,31 @@ const Profile = () => {
           <Grid size={24} />
         </button>
         <button 
+          onClick={() => setViewMode('following')}
+          className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'following' ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-400'}`}
+        >
+          <UserPlus size={24} />
+        </button>
+        {!hasActed && (
+          <div 
+            onClick={toggleTraitor}
+            className="w-20 h-12 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-xl hover:bg-zinc-100/50 active:scale-95"
+            title="Traitor Toggle"
+          >
+            <div className="w-2 h-2 rounded-full bg-zinc-200/40" />
+          </div>
+        )}
+        <button 
           onClick={() => setViewMode('enemies')}
           className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'enemies' ? 'border-rose-600 text-rose-600' : 'border-transparent text-zinc-400'}`}
         >
           <ShieldAlert size={24} />
         </button>
         <button 
-          onClick={() => setViewMode('following')}
-          className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'following' ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-400'}`}
+          className="flex-1 flex items-center justify-center h-12 border-b-2 border-transparent text-zinc-400 opacity-20 cursor-not-allowed"
+          title="Trophies coming soon"
         >
-          <UserPlus size={24} />
+          <Trophy size={20} />
         </button>
       </div>
 
@@ -295,106 +318,66 @@ const Profile = () => {
       {viewMode === 'posts' ? (
         <div className="grid grid-cols-3 gap-0.5 pb-4">
           {userPosts.map((post, index) => (
-            <div key={index} className="aspect-square bg-zinc-100 overflow-hidden">
+            <div 
+              key={index} 
+              className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+            >
               <img src={post} alt={`Post ${index}`} className="w-full h-full object-cover" />
             </div>
           ))}
         </div>
       ) : viewMode === 'enemies' ? (
-        <div className="flex-1 bg-zinc-50/50 p-4 space-y-3">
-          {enemies.length > 0 ? (
-            enemies.map((enemy) => (
-              <div key={enemy.id} className="bg-white p-3 rounded-2xl border border-zinc-100 flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center gap-3">
-                  <img src={enemy.avatar} alt={enemy.username} className="w-12 h-12 rounded-full object-cover border-2 border-rose-100 shadow-sm" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-black text-zinc-900">@{enemy.username}</span>
-                    <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">{t('profile_marked_enemy')}</span>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => removeEnemy(enemy.id)}
-                  className="p-2 text-zinc-300 hover:text-rose-600 hover:bg-rose-50 transition-all rounded-full"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            ))
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-              <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center">
-                <ShieldAlert size={32} className="text-zinc-300" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-black text-zinc-900 uppercase">{t('profile_no_enemies')}</p>
-                <p className="text-xs text-zinc-400 font-medium">{t('profile_enemies_desc')}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : viewMode === 'following' ? (
-        <div className="flex-1 bg-zinc-50/50 p-4 space-y-3">
-          {followedUsersData.length > 0 ? (
-            followedUsersData.map((user) => (
-              <div key={user.username} className="bg-white p-3 rounded-2xl border border-zinc-100 flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div 
-                  className="flex items-center gap-3 cursor-pointer"
-                  onClick={() => navigate(`/profile/${user.username}`)}
-                >
-                  <div className="relative">
-                    <img src={user.avatar} alt={user.username} className="w-12 h-12 rounded-full object-cover border-2 border-zinc-100 shadow-sm" />
-                    {user.isLegend && (
-                      <div className="absolute -bottom-2 -right-2 flex items-center justify-center">
-                        <img src="/pley-badge.png" alt="Legend" className="w-11 h-11 object-contain" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm font-black text-zinc-900">@{user.username}</span>
-                      {user.isLegend && (
-                        <img 
-                          src="/badge-legend.png" 
-                          alt="Legend" 
-                          className="h-5 w-auto object-contain" 
-                          style={{ imageRendering: '-webkit-optimize-contrast' }}
-                        />
-                      )}
+        <div className="flex-1 bg-zinc-50/50 p-4">
+          <div className="space-y-3">
+            {enemies.length > 0 ? (
+              enemies.map((enemy) => (
+                <div key={enemy.id} className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-rose-600">
+                      <ShieldAlert size={20} />
                     </div>
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('profile_following')}</span>
+                    <span className="font-bold text-sm">@{enemy.username}</span>
                   </div>
+                  <button 
+                    onClick={() => removeEnemy(enemy.id)}
+                    className="text-xs text-zinc-400 font-bold hover:text-zinc-600 transition-colors"
+                  >
+                    Remove
+                  </button>
                 </div>
-                <button 
-                  onClick={() => toggleFollow(user.username)}
-                  className="transition-all active:scale-95 hover:scale-105"
-                >
-                  {followedUsers.includes(user.username) ? (
-                    <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-zinc-100 text-zinc-400 border border-zinc-200">Following</span>
-                  ) : (
-                    <img 
-                      src="/btn-follow.png" 
-                      alt="Follow" 
-                      className="h-7 w-auto object-contain" 
-                      style={{ imageRendering: '-webkit-optimize-contrast' }}
-                    />
-                  )}
-                </button>
+              ))
+            ) : (
+              <div className="text-center py-8 text-zinc-400 text-sm">
+                No enemies yet
               </div>
-            ))
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-              <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center">
-                <UserPlus size={32} className="text-zinc-300" />
+            )}
+          </div>
+          </div>
+        ) : viewMode === 'following' ? (
+          <div className="space-y-3">
+            {followedUsers.length > 0 ? (
+              followedUsers.map((username) => (
+                <div key={username} className="bg-white rounded-xl p-3 border border-zinc-100 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <img src={`https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+${username}&image_size=square`} className="w-10 h-10 rounded-full border border-zinc-50" alt={username} />
+                    <span className="font-bold text-sm">@{username}</span>
+                  </div>
+                  <button 
+                    onClick={() => toggleFollow(username)}
+                    className="text-xs text-rose-600 font-black uppercase tracking-widest"
+                  >
+                    Following
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-zinc-400 text-sm">
+                No followed users yet
               </div>
-              <div className="space-y-1">
-                <p className="text-sm font-black text-zinc-900 uppercase">{t('profile_no_following')}</p>
-                <p className="text-xs text-zinc-400 font-medium">{t('profile_following_desc')}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : null}
-    </div>
+            )}
+          </div>
+        ) : null}
+      </div>
   );
 };
 
