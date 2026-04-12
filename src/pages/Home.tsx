@@ -580,9 +580,7 @@ const Home = () => {
                   </div>
                 ) : (
                   <div className="p-8 text-center space-y-4">
-                    <div className="w-16 h-16 rounded-3xl bg-purple-50 flex items-center justify-center mx-auto text-purple-400">
-                      <Sparkles size={32} />
-                    </div>
+                    <img src="/nav-chair-v3.png" alt="Empty Chair" className="w-32 h-32 mx-auto object-contain mb-2 opacity-80" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                     <div className="space-y-1">
                       <p className="text-zinc-900 font-bold">Find Survivors</p>
                       <p className="text-sm text-zinc-400">Type a username to search through the elite who survived the Rip It rounds.</p>
