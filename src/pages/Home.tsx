@@ -506,7 +506,10 @@ const Home = () => {
             </button>
             <button 
               className="text-zinc-700 transition-all active:scale-90 hover:opacity-70"
-              onClick={() => setShowSearchModal(true)}
+              onClick={() => {
+                setShowSearchModal(true);
+                setShowBottomNav(false);
+              }}
             >
               <img src="/header-search-v3.png" alt="Search" className="h-[26px] w-[26px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
@@ -515,33 +518,49 @@ const Home = () => {
 
         {/* Search Modal */}
         {showSearchModal && (
-          <div className="fixed inset-0 z-[120] flex items-start justify-center pt-20 px-4">
+          <div className="fixed inset-0 z-[120] flex items-start justify-center pt-10 px-4">
             <div 
               className="absolute inset-0 bg-zinc-900/40 backdrop-blur-sm"
               onClick={() => {
                 setShowSearchModal(false);
+                setShowBottomNav(true);
                 setSearchQuery('');
               }}
             />
             <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-in slide-in-from-top-4 duration-300">
-              <div className="p-4 border-b border-zinc-100 flex items-center gap-3">
-                <Search size={20} className="text-zinc-400" />
-                <input 
-                  autoFocus
-                  type="text"
-                  placeholder="Search by username..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none text-zinc-900 font-medium placeholder:text-zinc-400"
+              <div className="p-4 border-b border-zinc-100 flex items-center gap-2">
+                <img 
+                  src="/search-input-icon.png" 
+                  alt="" 
+                  className="h-7 w-auto object-contain opacity-50" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
+                <div className="flex-1 relative flex items-center">
+                  <input 
+                    autoFocus
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent border-none outline-none text-zinc-900 font-medium placeholder:text-transparent"
+                  />
+                  {!searchQuery && (
+                    <img 
+                      src="/search-placeholder.png" 
+                      alt="" 
+                      className="absolute left-0 top-1/2 -translate-y-1/2 h-[35px] w-auto object-contain pointer-events-none opacity-40 ml-1" 
+                      style={{ imageRendering: '-webkit-optimize-contrast' }}
+                    />
+                  )}
+                </div>
                 <button 
                   onClick={() => {
                     setShowSearchModal(false);
+                    setShowBottomNav(true);
                     setSearchQuery('');
                   }}
-                  className="text-zinc-400 hover:text-zinc-900 font-bold text-sm"
+                  className="transition-all active:scale-95 hover:opacity-70 px-2"
                 >
-                  Cancel
+                  <img src="/search-cancel-text.png" alt="Cancel" className="h-[20px] w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                 </button>
               </div>
 
@@ -570,19 +589,19 @@ const Home = () => {
                       ))
                     }
                     {allPosts.filter(post => post.username.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
-                      <div className="py-12 text-center space-y-2">
-                        <div className="w-12 h-12 rounded-full bg-zinc-50 flex items-center justify-center mx-auto text-zinc-300">
-                          <Search size={24} />
+                      <div className="pt-1 pb-16 text-center space-y-2">
+                        <div className="flex items-center justify-center mx-auto mb-2">
+                          <img src="/search-input-icon.png" alt="Not found" className="w-12 h-12 object-contain opacity-30" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                         </div>
-                        <p className="text-sm font-medium text-zinc-400 italic">No survivors found matching "@{searchQuery}"</p>
+                        <p className="text-sm font-medium text-zinc-400 italic">no people found on that place "@{searchQuery}"</p>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="p-8 text-center space-y-4">
-                    <img src="/nav-chair-v3.png" alt="Empty Chair" className="w-32 h-32 mx-auto object-contain mb-2 opacity-80" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                    <img src="/search-chair-final.png" alt="Empty Chair" className="w-32 h-auto mx-auto object-contain mb-4" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                     <div className="space-y-1">
-                      <p className="text-zinc-900 font-bold">Find Survivors</p>
+                      <img src="/search-header-text.png" alt="Find people" className="h-10 w-auto mx-auto object-contain mb-2" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                       <p className="text-sm text-zinc-400">Type a username to search through the elite who survived the Rip It rounds.</p>
                     </div>
                   </div>

@@ -94,7 +94,7 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                   src="/nav-search-text.png" 
                   alt="Search" 
                   className={cn(
-                    "h-full w-auto object-contain transition-all duration-300", 
+                    "h-[12px] w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}

@@ -574,7 +574,7 @@ const Search = () => {
           (true) && (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-700">
               <div className="relative mb-8">
-                <img src="/empty-dog.png" alt="Empty" className="w-64 h-auto object-contain animate-in fade-in zoom-in duration-1000" />
+                <img src="/search-chair-final.png" alt="Empty" className="w-48 h-auto object-contain mx-auto animate-in fade-in zoom-in duration-1000" />
               </div>
               <div className="mb-4">
                 {isActive ? (
@@ -582,7 +582,7 @@ const Search = () => {
                     {t('search_waiting')}
                   </h2>
                 ) : (
-                  <img src="/nobody-yet.png" alt="NoBody yet" className="w-72 h-auto object-contain mx-auto" />
+                  <div className="h-8" />
                 )}
               </div>
               <p className="text-zinc-400 text-[10px] font-bold tracking-[0.3em] uppercase max-w-[200px] leading-relaxed">

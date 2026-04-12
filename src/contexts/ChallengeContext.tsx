@@ -142,7 +142,7 @@ const translations: Record<string, Record<string, string>> = {
     
     // BottomNav
     'nav_home': 'Home',
-    'nav_search': 'only1',
+    'nav_search': 'public',
     'nav_create': 'Create',
     'nav_notifications': 'Activity',
     'nav_profile': 'Profile',
