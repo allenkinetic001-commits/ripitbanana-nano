@@ -70,6 +70,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
     }
     setShowAddedFeedback(true);
     setHasActed(true);
+    setIsTraitor(false);
   };
 
   const handleVote = (vote: 1 | -1) => {

@@ -63,6 +63,7 @@ const UserDetail = () => {
     
     setShowAddedFeedback(true);
     setHasActed(true);
+    setIsTraitor(false);
   };
 
   const handlePostToWall = (e: React.FormEvent) => {

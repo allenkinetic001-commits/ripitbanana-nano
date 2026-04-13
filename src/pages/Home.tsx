@@ -38,11 +38,12 @@ const HomeUserItem = ({ user, index, navigate, isSearch = false }: any) => {
         </p>
       </div>
       <div className="flex items-center gap-1 shrink-0 ml-2">
-        {isTraitor ? (
+        {(isTraitor && !hasActed) ? (
           <button
             onClick={(e) => {
               e.stopPropagation();
               addEnemy(user);
+              setIsTraitor(false);
             }}
             className="animate-pop-in transition-all active:scale-95 flex items-center justify-center p-1"
           >

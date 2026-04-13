@@ -76,7 +76,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/language-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <img src="/language-header.png" alt={t('language')} className="h-6 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                <img src="/language-header.png" alt={t('language')} className="h-8 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-zinc-400 font-medium">{getLanguageName(language)}</span>
@@ -140,7 +140,7 @@ const SettingsPage = () => {
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img src="/terms-icon.png" alt="" className="w-full h-full object-contain" />
                 </div>
-                <img src="/terms-header.png" alt={t('terms')} className="h-9 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                <img src="/terms-header.png" alt={t('terms')} className="h-11 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -278,9 +278,7 @@ const SettingsPage = () => {
                   <span className="text-xl">📧</span>
                   <div className="flex flex-col">
                     <span className="font-bold text-zinc-900">{t('contact_email_label')}</span>
-                    <a href="mailto:casperthefriendlyghost90210@gmail.com" className="text-blue-600 hover:underline break-all">casperthefriendlyghost90210@gmail.com</a>
-                    <span className="text-xs text-zinc-400 my-0.5">{t('contact_email_or')}</span>
-                    <a href="mailto:manbirdglobal@gmail.com" className="text-blue-600 hover:underline break-all">manbirdglobal@gmail.com</a>
+                    <a href="mailto:ripit90210@gmail.com" className="text-blue-600 hover:underline break-all">ripit90210@gmail.com</a>
                   </div>
                 </div>
               </div>
@@ -314,7 +312,7 @@ const SettingsPage = () => {
               <img 
                 src="/language-header.png" 
                 alt="Language" 
-                className="h-16 w-auto object-contain" 
+                className="h-19 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>
@@ -579,7 +577,7 @@ const SettingsPage = () => {
               <img 
                 src="/terms-header.png" 
                 alt="Terms of Service" 
-                className="h-16 w-auto object-contain" 
+                className="h-19 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
             </div>

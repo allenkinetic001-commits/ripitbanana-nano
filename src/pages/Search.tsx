@@ -324,83 +324,78 @@ const Search = () => {
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">
       {/* Header */}
       {!isChallengeEnded && (
-      <div className="pl-2 pr-4 py-4 bg-white z-30 flex items-center border-b border-zinc-100">
-        <div className="flex-1 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {selectedRoundId && (
-              <button 
-                onClick={() => setSelectedRoundId(null)}
-                className="p-2 hover:bg-zinc-100 rounded-full transition-colors"
-              >
-                <ChevronLeft size={32} className="text-zinc-900" />
-              </button>
-            )}
-            
-            <div className="flex flex-col">
-              <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-3 border-none">
-                {selectedRoundId ? (
-                  <span className="ml-2">{t('search_header_details')}</span>
-                ) : viewMode === 'hall_of_fame' ? (
-                  <div className="flex items-center gap-3 -ml-1">
-                    <img 
-                      src="/guacamole-trophy.png" 
-                      alt="" 
-                      className="h-20 w-auto object-contain" 
-                      style={{ imageRendering: '-webkit-optimize-contrast' }} 
-                    />
-                    <span>{t('search_header_hall')}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-16 ml-1">
-                    <img 
-                      src="/round-outro-icon.png" 
-                      alt="" 
-                      className="h-16 w-auto object-contain" 
-                      style={{ imageRendering: '-webkit-optimize-contrast' }} 
-                    />
-                    <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] whitespace-nowrap">
-                      {t('search_recent_outcomes')}
-                    </span>
-                  </div>
-                )}
-              </h2>
-              {selectedRoundId && selectedRound && (
-                <span className="text-sm font-bold text-purple-600 uppercase tracking-widest mt-1 ml-2">
-                  {selectedRound.durationLabel} Round • {selectedRound.date}
-                </span>
-              )}
-            </div>
-          </div>
+      <div className="px-4 py-2 bg-white z-30 flex items-center border-b border-zinc-100 relative min-h-[4rem]">
+        {/* Left Side: Navigation */}
+        <div className="absolute left-4">
+          {selectedRoundId && (
+            <button 
+              onClick={() => setSelectedRoundId(null)}
+              className="p-2 hover:bg-zinc-100 rounded-full transition-colors"
+            >
+              <ChevronLeft size={32} className="text-zinc-900" />
+            </button>
+          )}
+        </div>
 
-          <div className="flex items-center gap-3">
-            {!isActive && (
-              <>
-                <button
-                  onClick={() => {
-                    if (window.confirm('Clear all round history and Hall of Fame? This cannot be undone.')) {
-                      clearAllHistory();
-                    }
-                  }}
-                  className="p-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition-all rounded-full"
-                  title={t('search_clear_history')}
-                >
-                  <Trash2 size={18} />
-                </button>
-                {!totalElimination && (
-                  <button 
-                    onClick={handleJoinNextTask}
-                    className="transition-all hover:scale-105 active:scale-95 flex items-center justify-center ml-2"
-                  >
-                    <img 
-                      src="/btn-get-started-v2.png" 
-                      alt={t('search_start_round')} 
-                      className="h-[40px] w-auto object-contain" 
-                    />
-                  </button>
-                )}
-              </>
+        {/* Center Side: Title */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-3 border-none">
+            {selectedRoundId ? (
+              <span className="ml-2">{t('search_header_details')}</span>
+            ) : viewMode === 'hall_of_fame' ? (
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/guacamole-trophy.png" 
+                  alt="" 
+                  className="h-20 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+                <span>{t('search_header_hall')}</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-6">
+                <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] whitespace-nowrap">
+                  {t('search_recent_outcomes')}
+                </span>
+              </div>
             )}
-          </div>
+          </h2>
+          {selectedRoundId && selectedRound && (
+            <span className="text-sm font-bold text-purple-600 uppercase tracking-widest mt-1">
+              {selectedRound.durationLabel} Round • {selectedRound.date}
+            </span>
+          )}
+        </div>
+
+        {/* Right Side: Actions */}
+        <div className="absolute right-4 flex items-center gap-3">
+          {!isActive && (
+            <>
+              <button
+                onClick={() => {
+                  if (window.confirm('Clear all round history and Hall of Fame? This cannot be undone.')) {
+                    clearAllHistory();
+                  }
+                }}
+                className="p-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition-all rounded-full"
+                title={t('search_clear_history')}
+              >
+                <Trash2 size={18} />
+              </button>
+              {!totalElimination && (
+                <button 
+                  onClick={handleJoinNextTask}
+                  className="transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
+                >
+                  <img 
+                    src="/btn-get-started-v2.png" 
+                    alt={t('search_start_round')} 
+                    className="h-[40px] w-auto object-contain" 
+                  />
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
       )}
