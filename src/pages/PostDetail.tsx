@@ -104,7 +104,7 @@ const PostDetail = () => {
         {isOwner && (
           <button
             onClick={handleDelete}
-            className="text-rose-500 hover:text-rose-600 transition-colors p-1.5 rounded-full hover:bg-rose-50"
+            className="ml-auto text-rose-500 hover:text-rose-600 transition-colors p-1.5 rounded-full hover:bg-rose-50"
             title="Delete post"
           >
             <Trash2 size={18} />
