@@ -129,6 +129,7 @@ const Home = () => {
         
         // If there are brand new posts from the DB, inject them into the feed
         if (newPosts.length > 0 && prevAll.length > 0) {
+          setIsChallengeEnded(false);
           setVisiblePosts(prevVisible => {
             const visibleIds = new Set(prevVisible.map(p => p.id));
             const uniqueNew = newPosts.filter(p => !visibleIds.has(p.id));
@@ -136,8 +137,8 @@ const Home = () => {
           });
         }
         
-        // Initial load or not active: full sync
-        if (prevAll.length === 0 || !isActive) {
+        // Initial load or not active or feed empty: full sync
+        if (prevAll.length === 0 || !isActive || (!isChallengeEnded && formatted.length > 0)) {
           setVisiblePosts(formatted);
         }
         
@@ -839,7 +840,7 @@ const Home = () => {
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
             <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Loading...</p>
           </div>
-        ) : visiblePosts.length > 0 && !isChallengeEnded ? (
+        ) : visiblePosts.length > 0 ? (
           /* ── Posts feed ── */
           visiblePosts.map((post) => (
             <PostCard 

@@ -107,6 +107,8 @@ export default function Signup() {
         setError('That username is already taken. Please choose another.');
       } else if (msg.toLowerCase().includes('password')) {
         setError('Password is too weak. Please use at least 6 characters.');
+      } else if (msg.toLowerCase().includes('rate limit')) {
+        setError('Too many attempts. Please wait a few minutes before trying to register again.');
       } else {
         setError(err.message || 'Something went wrong. Please try again.');
       }

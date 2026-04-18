@@ -22,7 +22,10 @@ export function useSupabasePosts() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = async () => {
-    setLoading(true);
+    // Only set loading to true if we have no posts (to avoid flickering on background refresh)
+    if (posts.length === 0) {
+      setLoading(true);
+    }
     const { data, error: fetchError } = await supabase
       .from('posts')
       .select(`
@@ -45,6 +48,29 @@ export function useSupabasePosts() {
 
   useEffect(() => {
     fetchPosts();
+
+    const channel = supabase
+      .channel('public:posts')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, async (payload) => {
+        // Fetch the profile for the new post to maintain JOIN consistency
+        const { data: newPostWithProfile } = await supabase
+          .from('posts')
+          .select('*, profiles(username, full_name, avatar_url)')
+          .eq('id', payload.new.id)
+          .single();
+          
+        if (newPostWithProfile) {
+          setPosts(prev => [newPostWithProfile as SupabasePost, ...prev]);
+        }
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'posts' }, (payload) => {
+        setPosts(prev => prev.filter(post => post.id !== payload.old.id));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return { posts, loading, error, refetch: fetchPosts };
@@ -117,6 +143,16 @@ export async function createPost(userId: string, caption: string, imageUrl: stri
     .single();
 
   return { data: data as SupabasePost | null, error };
+}
+
+// Delete a post
+export async function deletePost(postId: string) {
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', postId);
+
+  return { error };
 }
 
 // Fetch comments for a post

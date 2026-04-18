@@ -25,7 +25,7 @@ const EmptyFeed: React.FC<EmptyFeedProps> = ({
         <img 
           src={icon} 
           alt="Empty" 
-          className="w-48 h-auto object-contain mx-auto animate-in fade-in zoom-in duration-1000" 
+          className="w-48 h-auto object-contain mx-auto" 
         />
       </div>
       <h2 className="text-2xl font-black text-zinc-900 tracking-tighter uppercase mb-12">

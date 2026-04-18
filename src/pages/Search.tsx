@@ -340,7 +340,7 @@ const Search = () => {
             <img 
               src="/ice-bear.png" 
               alt="Empty" 
-              className="h-64 w-auto object-contain drop-shadow-2xl animate-float" 
+              className="h-64 w-auto object-contain drop-shadow-2xl" 
             />
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-2 bg-zinc-900/5 rounded-full blur-md" />
           </div>

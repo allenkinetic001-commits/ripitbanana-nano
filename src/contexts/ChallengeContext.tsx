@@ -4996,8 +4996,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [eliminationCounts, setEliminationCounts] = useState<Record<string, number>>({
     pley: 0
   });
-  const [madeItCounts, setMadeItCounts] = useState<Record<string, number>>({
-    pley: 0
+  const [madeItCounts, setMadeItCounts] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('madeItCounts');
+    return saved ? JSON.parse(saved) : { pley: 0 };
   });
   const [variantDurations, setVariantDurations] = useState<Record<string, number>>({
     pley: 0
@@ -5012,24 +5013,55 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(false);
   const [enemies, setEnemies] = useState<Survivor[]>(() => {
     const saved = localStorage.getItem('enemies');
+    const initialEnemies = saved ? JSON.parse(saved) : [];
+    // Remove mock data: John Doe (888) and Modern Designer (999)
+    return initialEnemies.filter((e: any) => 
+      e.id !== 888 && 
+      e.id !== 999 && 
+      e.username !== 'John Doe' && 
+      e.username !== 'Modern Designer'
+    );
+  });
+  const [allPosts, setAllPosts] = useState<any[]>(() => {
+    const saved = localStorage.getItem('allPosts');
     return saved ? JSON.parse(saved) : [];
   });
-  const [allPosts, setAllPosts] = useState<any[]>([]);
-  const [visiblePosts, setVisiblePosts] = useState<any[]>([]);
+  const [visiblePosts, setVisiblePosts] = useState<any[]>(() => {
+    const saved = localStorage.getItem('visiblePosts');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [wallPosts, setWallPosts] = useState<WallPost[]>(() => {
     const saved = localStorage.getItem('wallPosts');
     return saved ? JSON.parse(saved) : [];
   });
   const [followedUsers, setFollowedUsers] = useState<string[]>(() => {
     const saved = localStorage.getItem('followedUsers');
-    return saved ? JSON.parse(saved) : [];
+    const initialFollowing = saved ? JSON.parse(saved) : [];
+    // Remove mock following: John Doe and Modern Designer
+    return initialFollowing.filter((u: string) => 
+      u !== 'John Doe' && 
+      u !== 'Modern Designer'
+    );
   });
-  const [postComments, setPostComments] = useState<Record<number, Comment[]>>({});
+  const [postComments, setPostComments] = useState<Record<number, Comment[]>>(() => {
+    const saved = localStorage.getItem('postComments');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
-  const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>([]);
-  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>([]);
+  const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>(() => {
+    const saved = localStorage.getItem('survivorHistory');
+    const initialHistory = saved ? JSON.parse(saved) : [];
+    return initialHistory.filter((s: any) => 
+      s.username !== 'John Doe' && 
+      s.username !== 'Modern Designer'
+    );
+  });
+  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>(() => {
+    const saved = localStorage.getItem('roundHistory');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   // Persist history to localStorage
   useEffect(() => {
@@ -5116,6 +5148,28 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setIsAuthenticated(!!session);
       if (session?.user) {
         fetchUserProfile(session.user.id);
+        const prevUserId = localStorage.getItem('supabaseUserId');
+        if (prevUserId !== session.user.id) {
+          localStorage.removeItem('enemies');
+          localStorage.removeItem('followedUsers');
+          localStorage.removeItem('wallPosts');
+          localStorage.removeItem('allPosts');
+          localStorage.removeItem('visiblePosts');
+          localStorage.removeItem('postComments');
+          localStorage.removeItem('survivorHistory');
+          localStorage.removeItem('roundHistory');
+          setEnemies([]);
+          setFollowedUsers([]);
+          setWallPosts([]);
+          setAllPosts([]);
+          setVisiblePosts([]);
+          setPostComments({});
+          setSurvivorHistory([]);
+          setRoundHistory([]);
+          setIsChallengeEnded(false);
+          localStorage.setItem('isChallengeEnded', 'false');
+          localStorage.setItem('supabaseUserId', session.user.id);
+        }
       }
       setAuthLoading(false);
     });
@@ -5124,10 +5178,33 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setIsAuthenticated(!!session);
       if (session?.user) {
         fetchUserProfile(session.user.id);
+        const prevUserId = localStorage.getItem('supabaseUserId');
+        if (prevUserId !== session.user.id) {
+          localStorage.removeItem('enemies');
+          localStorage.removeItem('followedUsers');
+          localStorage.removeItem('wallPosts');
+          localStorage.removeItem('allPosts');
+          localStorage.removeItem('visiblePosts');
+          localStorage.removeItem('postComments');
+          localStorage.removeItem('survivorHistory');
+          localStorage.removeItem('roundHistory');
+          setEnemies([]);
+          setFollowedUsers([]);
+          setWallPosts([]);
+          setAllPosts([]);
+          setVisiblePosts([]);
+          setPostComments({});
+          setSurvivorHistory([]);
+          setRoundHistory([]);
+          setIsChallengeEnded(false);
+          localStorage.setItem('isChallengeEnded', 'false');
+          localStorage.setItem('supabaseUserId', session.user.id);
+        }
       } else {
         setUserProfile({
           username: '', fullName: '', bio: '', avatar: '', website: ''
         });
+        localStorage.removeItem('supabaseUserId');
       }
     });
 

@@ -104,7 +104,7 @@ const UserDetail = () => {
     const survivorData = userPosts[0] || {
       id: Date.now(),
       username: username || '',
-      avatar: userPosts[0]?.avatar || `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${username}&image_size=square`,
+      avatar: userPosts[0]?.avatar || "/custom-empty-profile.png",
       image: '',
       caption: 'Survivor',
       time: 'Just now',
@@ -144,7 +144,7 @@ const UserDetail = () => {
         <div className="flex items-center space-x-8">
           <div className="w-20 h-20 rounded-full border border-zinc-200 overflow-hidden relative">
             <img
-              src={userPosts[0]?.avatar || `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${username}&image_size=square`}
+              src={userPosts[0]?.avatar || "/custom-empty-profile.png"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
@@ -169,7 +169,7 @@ const UserDetail = () => {
               <span className="text-xs text-zinc-500">Followers</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold">0</span>
+              <span className="font-bold">{isMe ? followedUsers.length : 0}</span>
               <span className="text-xs text-zinc-500">Following</span>
             </div>
           </div>
@@ -183,7 +183,7 @@ const UserDetail = () => {
                 <ProfileHeartsToggle isVisible={showHearts} />
               </div>
             </div>
-            <p className="text-sm text-zinc-600">Digital Creator | Explorer 🌍</p>
+            <p className="text-sm text-zinc-600">{profileData?.bio || 'Surviving the round ⚡'}</p>
           </div>
           <div className="flex items-center space-x-2">
             {isTraitor ? (

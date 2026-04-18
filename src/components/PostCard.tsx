@@ -323,20 +323,20 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
 
           <form 
             onSubmit={handlePostComment}
-            className="flex items-center gap-2 pt-3 mt-2 border-t border-zinc-50 group"
+            className="flex items-center gap-3 pt-3 mt-2 border-t border-zinc-50 group"
           >
-            <div className="w-8 h-8 rounded-full border border-zinc-200 overflow-hidden shrink-0 bg-zinc-50">
+            <div className="w-9 h-9 rounded-full border border-zinc-200 overflow-hidden shrink-0 bg-zinc-50 shadow-sm">
               <img 
                 src={userProfile.avatar || "/custom-empty-profile.png"} 
                 className="w-full h-full object-cover" 
                 alt="Me" 
               />
             </div>
-            <div className="flex-1 flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 bg-zinc-100 rounded-full px-4 py-1.5 focus-within:bg-zinc-200/50 transition-colors">
               <input 
                 type="text"
                 placeholder={t('post_write_comment')}
-                className="flex-1 text-xs bg-zinc-50 border border-zinc-100 rounded-full px-4 py-2 outline-none focus:border-purple-300 focus:bg-white transition-all"
+                className="flex-1 text-xs bg-transparent border-none outline-none py-1"
                 value={quickComment}
                 onChange={(e) => setQuickComment(e.target.value)}
               />
@@ -348,7 +348,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                   quickComment.trim() ? "opacity-100 hover:opacity-80" : "opacity-30 cursor-not-allowed grayscale"
                 )}
               >
-                <img src="/btn-post-comment.png" alt="Post" className="h-[52px] w-auto object-contain" />
+                <img src="/btn-post-comment.png" alt="Post" className="h-[44px] w-auto object-contain" />
               </button>
             </div>
           </form>

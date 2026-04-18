@@ -52,7 +52,7 @@ const Profile = () => {
     const historyData = survivorHistory.find(s => s.username === username);
     return {
       username,
-      avatar: historyData?.avatar || `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${username}&image_size=square`,
+      avatar: historyData?.avatar || "/custom-empty-profile.png",
       isLegend: isLegend(username)
     };
   });
@@ -250,14 +250,14 @@ const Profile = () => {
               onClick={() => setViewMode('following')}
               className="flex flex-col items-center cursor-pointer"
             >
-              <span className="font-bold">0</span>
+              <span className="font-bold">{followedUsers.length}</span>
               <span className="text-xs text-zinc-500">{t('profile_following')}</span>
             </div>
             <div 
               onClick={() => setViewMode('enemies')}
               className="flex flex-col items-center text-rose-600 cursor-pointer"
             >
-              <span className="font-bold">0</span>
+              <span className="font-bold">{enemies.length}</span>
               <span className="text-xs font-bold uppercase tracking-tighter">{t('profile_enemies')}</span>
             </div>
           </div>
@@ -342,6 +342,7 @@ const Profile = () => {
             {userPosts.map((post, index) => (
               <div 
                 key={index} 
+                onClick={() => navigate(`/post/${post.id}`)}
                 className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
               >
                 <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
@@ -375,7 +376,6 @@ const Profile = () => {
               <EmptyFeed 
                 className="min-h-[40vh] pt-16" 
                 subtitle="Nobody yet" 
-                icon="/custom-empty-profile.png"
               />
             )}
           </div>
@@ -386,7 +386,7 @@ const Profile = () => {
             followedUsers.map((username) => (
               <div key={username} className="bg-white rounded-xl p-3 border border-zinc-100 shadow-sm flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <img src={`https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+${username}&image_size=square`} className="w-10 h-10 rounded-full border border-zinc-50" alt={username} />
+                  <img src="/custom-empty-profile.png" className="w-10 h-10 rounded-full border border-zinc-50" alt={username} />
                   <span className="font-bold text-sm">@{username}</span>
                 </div>
                 <button 

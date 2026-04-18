@@ -50,7 +50,7 @@ const Chat = () => {
         setSelectedChat({
           id: Date.now(),
           username: routeUsername,
-          avatar: `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${routeUsername}&image_size=square`,
+          avatar: "/custom-empty-profile.png",
           lastMessage: '',
           time: 'now',
           unreadCount: 0,
