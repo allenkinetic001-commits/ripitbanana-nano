@@ -38,7 +38,7 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
       label: t('nav_profile'), 
       path: '/profile', 
       isImage: true,
-      className: "rounded-full aspect-square object-cover border border-zinc-200"
+      className: "object-cover rounded-none"
     },
   ];
 
