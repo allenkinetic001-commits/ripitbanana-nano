@@ -89,7 +89,8 @@ export default function Login() {
                 <img src="/login-email-icon.png" alt="" className="w-6 h-6 object-contain" />
               </div>
               <input
-                type="email"
+                type="text"
+                name="user_email_login"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -99,6 +100,7 @@ export default function Login() {
                   error ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10' : 'border-zinc-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10'
                 }`}
                 placeholder="Enter your email"
+                autoComplete="off"
                 required
               />
             </div>
@@ -112,10 +114,12 @@ export default function Login() {
               </div>
               <input
                 type={showPassword ? "text" : "password"}
+                name="user_password_login"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl py-4 pl-12 pr-12 font-medium outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all placeholder:text-zinc-400"
                 placeholder="Enter your password"
+                autoComplete="off"
                 required
               />
               <button

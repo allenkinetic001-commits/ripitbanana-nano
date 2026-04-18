@@ -184,6 +184,7 @@ export default function Signup() {
               </div>
               <input
                 type="text"
+                name="signup_username_field"
                 value={username}
                 onChange={(e) => { setUsername(e.target.value); setError(''); }}
                 className={`w-full bg-zinc-50 border rounded-2xl py-4 pl-12 pr-12 font-medium outline-none transition-all placeholder:text-zinc-400 ${
@@ -194,7 +195,7 @@ export default function Signup() {
                     : 'border-zinc-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10'
                 }`}
                 placeholder="Choose a username"
-                autoComplete="username"
+                autoComplete="off"
                 required
               />
               {/* Status icon */}
@@ -219,7 +220,8 @@ export default function Signup() {
                 <img src="/login-email-icon.png" alt="" className="w-6 h-6 object-contain" />
               </div>
               <input
-                type="email"
+                type="text"
+                name="signup_email_field"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(''); }}
                 className={`w-full bg-zinc-50 border rounded-2xl py-4 pl-12 pr-4 font-medium outline-none transition-all placeholder:text-zinc-400 ${
@@ -227,7 +229,7 @@ export default function Signup() {
                   : 'border-zinc-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10'
                 }`}
                 placeholder="Enter your email"
-                autoComplete="email"
+                autoComplete="off"
                 required
               />
             </div>
@@ -242,11 +244,12 @@ export default function Signup() {
               </div>
               <input
                 type={showPassword ? 'text' : 'password'}
+                name="signup_password_field"
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl py-4 pl-12 pr-12 font-medium outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all placeholder:text-zinc-400"
                 placeholder="Create a password (min 6 chars)"
-                autoComplete="new-password"
+                autoComplete="off"
                 required
               />
               <button
