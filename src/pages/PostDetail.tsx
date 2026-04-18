@@ -1,28 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageCircle, Send, Bookmark, MoreHorizontal, X } from 'lucide-react';
 import { PixelHeart } from '../components/PixelHeart';
-import { posts } from '../data/posts';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
+import { supabase } from '../lib/supabase';
 
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { postComments, addComment } = useChallenge();
+  const { postComments, addComment, allPosts } = useChallenge();
   
-  const postId = Number(id);
-  const post = posts.find(p => p.id === postId);
+  const postId = id;
+  
+  // Try to find the post from context first, then fall back to a loading state
+  const contextPost = allPosts.find((p: any) => String(p.id) === String(id));
+  const [post, setPost] = useState<any>(contextPost || null);
+  const [loading, setLoading] = useState(!contextPost);
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [showHearts, setShowHearts] = useState(false);
-  const localComments = postComments[postId] || [];
+  const localComments = postComments[Number(id)] || [];
+
+  // Fetch from Supabase if not in context
+  useEffect(() => {
+    if (!contextPost && id) {
+      const fetchPost = async () => {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*, profiles(username, full_name, avatar_url)')
+          .eq('id', id)
+          .single();
+        if (data) {
+          setPost({
+            id: data.id,
+            username: data.profiles?.username || 'unknown',
+            avatar: data.profiles?.avatar_url || '',
+            image: data.image_url || '',
+            caption: data.caption || '',
+            likes: data.likes_count || 0,
+            time: 'Recently',
+            comments: [],
+          });
+        }
+        setLoading(false);
+      };
+      fetchPost();
+    }
+  }, [id, contextPost]);
 
   const { handlers: heartsHandlers } = useLongPress(() => {
     setShowHearts(prev => !prev);
   }, 400);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin w-8 h-8 border-2 border-zinc-300 border-t-zinc-900 rounded-full" />
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -41,7 +80,7 @@ const PostDetail = () => {
   const handleSendComment = () => {
     if (!commentText.trim()) return;
     const finalComment = replyingTo ? `@${replyingTo} ${commentText}` : commentText;
-    addComment(postId, finalComment);
+    addComment(Number(postId), finalComment);
     setCommentText('');
     setReplyingTo(null);
   };

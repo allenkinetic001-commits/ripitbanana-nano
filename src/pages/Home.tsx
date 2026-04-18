@@ -3,10 +3,12 @@ import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar, ChevronRight } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
-import { posts } from '../data/posts';
+import { useSupabasePosts, createPost, formatPostForUI } from '../hooks/useSupabase';
+import { supabase } from '../lib/supabase';
 import { cn } from '../utils';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
+import EmptyFeed from '../components/Empty';
 
 const HomeUserItem = ({ user, index, navigate, isSearch = false }: any) => {
   const [showHearts, setShowHearts] = useState(false);
@@ -23,12 +25,16 @@ const HomeUserItem = ({ user, index, navigate, isSearch = false }: any) => {
 
   return (
     <button 
-      onClick={() => navigate(`/profile/${user.username}`)}
+      onClick={() => navigate(`/user/${user.username}`)}
       className="flex items-center p-3 hover:bg-zinc-50 transition-colors w-full text-left"
     >
       <div className="relative shrink-0">
-        <div className="w-12 h-12 rounded-full border border-zinc-200 overflow-hidden">
-          <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+        <div className="w-12 h-12 rounded-full border border-zinc-200 overflow-hidden bg-zinc-50">
+          <img 
+            src={user.avatar || "/custom-empty-profile.png"} 
+            alt={user.username} 
+            className="w-full h-full object-cover" 
+          />
         </div>
       </div>
       <div className="flex-1 ml-3 overflow-hidden">
@@ -109,9 +115,42 @@ const Home = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Fetch posts from Supabase
+  const { posts: supabasePosts, loading: postsLoading, refetch: refetchPosts } = useSupabasePosts();
+
+  // Sync Supabase posts into context on load
+  useEffect(() => {
+    if (!postsLoading) {
+      const formatted = supabasePosts.map(formatPostForUI);
+      
+      setAllPosts(prevAll => {
+        const existingIds = new Set(prevAll.map(p => p.id));
+        const newPosts = formatted.filter(p => !existingIds.has(p.id));
+        
+        // If there are brand new posts from the DB, inject them into the feed
+        if (newPosts.length > 0 && prevAll.length > 0) {
+          setVisiblePosts(prevVisible => {
+            const visibleIds = new Set(prevVisible.map(p => p.id));
+            const uniqueNew = newPosts.filter(p => !visibleIds.has(p.id));
+            return [...uniqueNew, ...prevVisible];
+          });
+        }
+        
+        // Initial load or not active: full sync
+        if (prevAll.length === 0 || !isActive) {
+          setVisiblePosts(formatted);
+        }
+        
+        return formatted;
+      });
+    }
+  }, [supabasePosts, postsLoading, isActive]);
+
   // New state for upload modal
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [rawFile, setRawFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [fileType, setFileType] = useState<'image' | 'video'>('image');
   const [captionText, setCaptionText] = useState('');
   const [showMustache, setShowMustache] = useState(true);
@@ -120,10 +159,12 @@ const Home = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const fileUrl = URL.createObjectURL(file);
-      setSelectedFile(fileUrl);
-      setFileType(file.type.startsWith('video/') ? 'video' : 'image');
+      const isVideo = file.type.startsWith('video/');
+      setFileType(isVideo ? 'video' : 'image');
       setUploadModalOpen(true);
+      // Instant preview
+      setSelectedFile(URL.createObjectURL(file));
+      setRawFile(file);
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -132,32 +173,67 @@ const Home = () => {
 
   const handleCloseModal = () => {
     setUploadModalOpen(false);
+    if (selectedFile) URL.revokeObjectURL(selectedFile);
     setSelectedFile(null);
+    setRawFile(null);
     setCaptionText('');
+    setIsUploading(false);
   };
 
-  const handleCreatePost = () => {
-    if (!selectedFile) return;
+  const handleCreatePost = async () => {
+    if (!selectedFile || !rawFile) return;
+    setIsUploading(true);
 
-    const newPost = {
+    const caption = captionText || (fileType === 'video' ? 'Just uploaded a video! 🎥' : 'Just uploaded a photo! 📸');
+
+    // Convert file to base64 just in time for upload
+    const base64Data = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.readAsDataURL(rawFile);
+    });
+
+    // Get current user session
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session?.user) {
+      const { data: newPost, error } = await createPost(session.user.id, caption, base64Data);
+      
+      if (error) {
+        console.error('Failed to create post:', error);
+        createLocalPostFallback(caption, base64Data);
+      } else if (newPost) {
+        // Re-fetch posts to get the new one with proper data
+        refetchPosts();
+      }
+    } else {
+      console.warn('No active session, creating local post fallback');
+      createLocalPostFallback(caption, base64Data);
+    }
+    
+    // Reset and close
+    setUploadModalOpen(false);
+    if (selectedFile) URL.revokeObjectURL(selectedFile);
+    setSelectedFile(null);
+    setRawFile(null);
+    setCaptionText('');
+    setIsUploading(false);
+  };
+
+  const createLocalPostFallback = (caption: string, imageUrl: string) => {
+    const localPost = {
       id: Date.now(),
       username: userProfile.username,
       avatar: userProfile.avatar,
-      image: selectedFile,
+      image: imageUrl,
       type: fileType,
-      caption: captionText || (fileType === 'video' ? 'Just uploaded a video! 🎥' : 'Just uploaded a photo! 📸'),
+      caption,
       likes: 0,
       time: 'Just now',
       comments: []
     };
-    
-    setAllPosts(prev => [newPost, ...prev]);
-    setVisiblePosts(prev => [newPost, ...prev]);
-    
-    // Reset and close
-    setUploadModalOpen(false);
-    setSelectedFile(null);
-    setCaptionText('');
+    setAllPosts(prev => [localPost, ...prev]);
+    setVisiblePosts(prev => [localPost, ...prev]);
   };
 
   // Sync visible posts with master list when starting a round or on mount
@@ -208,7 +284,8 @@ const Home = () => {
   // End challenge if all posts are judged or timer runs out
   useEffect(() => {
     if ((isActive || isEliminationRoundActive) && !isChallengeEnded) {
-      if (visiblePosts.length === 0) {
+      // Only end automatically if there were posts to judge and they are all gone
+      if (visiblePosts.length === 0 && allPosts.length > 0) {
         setIsActive(false);
         setIsEliminationRoundActive(false);
         setIsChallengeEnded(true);
@@ -328,9 +405,14 @@ const Home = () => {
             className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm"
             onClick={handleCloseModal}
           />
-          <div className="bg-white w-full max-w-md max-h-[90vh] flex flex-col rounded-3xl shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50 shrink-0">
-              <h2 className="text-lg font-bold font-serif text-zinc-900">{t('home_upload_modal_title')}</h2>
+          <div className="bg-white w-full max-w-md max-h-[90vh] flex flex-col rounded-3xl overflow-hidden shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50 shrink-0">
+              <img 
+                src="/modal-new-post.png" 
+                alt={t('home_upload_modal_title')} 
+                className="h-6 w-auto object-contain ml-2"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
               <button 
                 onClick={handleCloseModal}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 text-zinc-400 hover:text-zinc-900 transition-all"
@@ -341,29 +423,38 @@ const Home = () => {
             
             <div className="p-4 space-y-4 overflow-y-auto flex-1">
               {/* Media Preview */}
-              <div className="w-full bg-zinc-100 rounded-xl overflow-hidden relative max-h-[40vh]">
-                {fileType === 'video' ? (
+              <div id="preview-container" className="aspect-square w-full bg-zinc-900 rounded-2xl flex items-center justify-center overflow-hidden relative min-h-[300px]">
+                {!selectedFile ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
+                    <span className="text-white/30 text-xs">Loading preview...</span>
+                  </div>
+                ) : fileType === 'video' ? (
                   <video 
-                    src={selectedFile!} 
-                    className="w-full h-full object-contain bg-black" 
+                    src={selectedFile} 
+                    className="w-full h-full object-contain relative z-20" 
                     controls 
-                    autoPlay
-                    loop
-                    muted
+                    autoPlay 
+                    muted 
+                    loop 
                   />
                 ) : (
                   <img 
-                    src={selectedFile || ''} 
+                    src={selectedFile} 
                     alt="Preview" 
-                    className="w-full h-full object-contain bg-zinc-100" 
+                    className="w-full h-full object-contain relative z-20" 
                   />
                 )}
               </div>
 
               {/* Caption Input */}
               <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-zinc-200">
-                  <img src={userProfile.avatar} alt={userProfile.username} className="w-full h-full object-cover" />
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-zinc-200 bg-zinc-50">
+                  <img 
+                    src={userProfile?.avatar || "/custom-empty-profile.png"} 
+                    alt={userProfile?.username || "Me"} 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
                 <textarea
                   placeholder={t('home_upload_caption_placeholder')}
@@ -375,18 +466,33 @@ const Home = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="p-4 border-t border-zinc-100 bg-white rounded-b-3xl shrink-0 flex justify-end gap-3">
+            <div className="p-4 border-t border-zinc-100 bg-white rounded-b-3xl shrink-0 flex items-center justify-end gap-4">
               <button
                 onClick={handleCloseModal}
-                className="px-6 py-2 rounded-full text-sm font-bold text-zinc-500 hover:bg-zinc-100 transition-all"
+                disabled={isUploading}
+                className="px-6 py-2 rounded-full text-sm font-bold text-zinc-400 hover:bg-zinc-100 transition-all disabled:opacity-50"
               >
                 {t('home_upload_cancel')}
               </button>
               <button
                 onClick={handleCreatePost}
-                className="px-6 py-2 rounded-full text-sm font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-95"
+                disabled={isUploading}
+                className="transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center relative min-w-[80px] h-9"
               >
-                {t('home_upload_post')}
+                {isUploading ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/40 rounded-xl backdrop-blur-[2px] z-10">
+                    <div className="w-5 h-5 rounded-full border-[3px] border-red-500/20 border-t-red-600 animate-spin shadow-sm" />
+                  </div>
+                ) : null}
+                <img 
+                  src="/btn-post-modal.png" 
+                  alt={t('home_upload_post')} 
+                  className={cn(
+                    "h-9 w-auto object-contain drop-shadow-md transition-all duration-300", 
+                    isUploading && "grayscale opacity-80"
+                  )}
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
               </button>
             </div>
           </div>
@@ -436,7 +542,6 @@ const Home = () => {
       )}
 
       {/* Header */}
-      {!isChallengeEnded && (
       <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
         <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between">
           <div className="flex items-center gap-0">
@@ -464,22 +569,20 @@ const Home = () => {
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            {showMustache && (
-              <button 
-                onClick={() => {
-                  setActiveTab('pley');
-                  setShowPills(!showPills);
-                }}
-                className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
-              >
-                <img 
-                  src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"}
-                  alt="Create" 
-                  className="h-[44px] w-[44px] object-contain transition-all duration-200"
-                  style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
-                />
-              </button>
-            )}
+            <button 
+              onClick={() => {
+                setActiveTab('pley');
+                setShowPills(!showPills);
+              }}
+              className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
+            >
+              <img 
+                src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"}
+                alt="Create" 
+                className="h-[44px] w-[44px] object-contain transition-all duration-200"
+                style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
+              />
+            </button>
             <button 
               onClick={() => navigate('/chat')}
               className="text-zinc-700 hover:text-zinc-400 transition-colors"
@@ -727,11 +830,17 @@ const Home = () => {
           </div>
         )}
       </header>
-      )}
 
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
-        {visiblePosts.length > 0 && !isChallengeEnded ? (
+        {postsLoading ? (
+          /* ── Loading state ── */
+          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+            <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
+            <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Loading...</p>
+          </div>
+        ) : visiblePosts.length > 0 && !isChallengeEnded ? (
+          /* ── Posts feed ── */
           visiblePosts.map((post) => (
             <PostCard 
               key={post.id} 
@@ -741,7 +850,26 @@ const Home = () => {
               onPass={() => handlePassPost(post.id)}
             />
           ))
+        ) : allPosts.length === 0 ? (
+          /* ── Empty feed ── */
+          <EmptyFeed 
+            className="min-h-[60vh]"
+            actionButton={
+              <button
+                onClick={() => setUploadModalOpen(true)}
+                className="transition-all active:scale-95 hover:scale-105"
+              >
+                <img 
+                  src="/btn-post-first.png" 
+                  alt="Post First" 
+                  className="h-14 w-auto object-contain drop-shadow-md" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              </button>
+            }
+          />
         ) : (
+          /* ── Challenge ended / all posts judged ── */
           <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20">
             <div className="space-y-4 mb-8 mt-20">
               <img src="/the-end.png" alt={t('home_the_end')} className="h-16 w-auto object-contain mx-auto" />
@@ -813,4 +941,3 @@ const Home = () => {
 };
 
 export default Home;
-

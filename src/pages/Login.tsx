@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useChallenge } from '../contexts/ChallengeContext';
-import { Sparkles, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useChallenge();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email: string) => {
@@ -16,7 +16,7 @@ export default function Login() {
     return re.test(email);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -26,10 +26,21 @@ export default function Login() {
     }
 
     if (email && password) {
-      // Extract username from email for mock login
-      const username = email.split('@')[0];
-      login(username);
-      navigate('/');
+      setLoading(true);
+      try {
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (signInError) throw signInError;
+        
+        navigate('/');
+      } catch (err: any) {
+        setError(err.message || 'An error occurred during log in.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -125,14 +136,22 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full h-32 transition-all duration-300 active:scale-95 hover:scale-105 mt-6 relative"
+            disabled={loading}
+            className={`w-full h-32 transition-all duration-300 active:scale-95 hover:scale-105 mt-6 relative ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            <img 
-              src="/btn-sign-in.png" 
-              alt="Sign In" 
-              className="w-full h-full object-contain drop-shadow-xl" 
-              style={{ imageRendering: '-webkit-optimize-contrast' }}
-            />
+            {loading ? (
+              <div className="h-16 flex items-center justify-center gap-3 bg-zinc-100 rounded-2xl w-full">
+                <Loader2 size={20} className="animate-spin text-zinc-500" />
+                <span className="text-zinc-500 font-bold text-sm">Signing in…</span>
+              </div>
+            ) : (
+              <img
+                src="/btn-sign-in.png"
+                alt="Sign In"
+                className="w-full h-full object-contain drop-shadow-xl"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
+            )}
           </button>
         </form>
 

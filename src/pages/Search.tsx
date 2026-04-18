@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Skull, Trophy, Sparkles, MessageCircle, Bookmark, MoreHorizontal, ArrowBigUp, ArrowBigDown, Zap, Filter, Clock, History, ChevronLeft, Trash2, Send } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn, formatDate } from '../lib/utils';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
+import EmptyFeed from '../components/Empty';
 
 const VariantPill = ({ variant }: { variant: string | null | undefined }) => {
   if (!variant) return null;
@@ -244,9 +245,9 @@ const SurvivorRow = ({ survivor, isSurvivor, toggleFollow, followedUsers, naviga
 const Search = () => {
   const navigate = useNavigate();
   const { 
-    isChallengeEnded, survivors, survivorHistory, roundHistory, isActive, 
+    isChallengeEnded, survivors, eliminated, survivorHistory, roundHistory, isActive, 
     startNewChallenge, clearAllHistory, updateHistoryVote, getVariantDisplayName,
-    toggleFollow, followedUsers, isLegend, setShowPills, setActiveTab, isSurvivor, t
+    toggleFollow, followedUsers, isLegend, setShowPills, activeTab, setActiveTab, isSurvivor, t
   } = useChallenge();
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
@@ -266,7 +267,7 @@ const Search = () => {
     return null;
   }, [survivors]);
 
-  const totalElimination = isChallengeEnded && survivors.length === 0;
+  const totalElimination = isChallengeEnded && survivors.length === 0 && eliminated.length > 0;
 
   // Find selected round data
   const selectedRound = useMemo(() => {
@@ -322,272 +323,38 @@ const Search = () => {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">
-      {/* Header */}
-      {!isChallengeEnded && (
-      <div className="px-4 py-2 bg-white z-30 flex items-center border-b border-zinc-100 relative min-h-[4rem]">
-        {/* Left Side: Navigation */}
-        <div className="absolute left-4">
-          {selectedRoundId && (
-            <button 
-              onClick={() => setSelectedRoundId(null)}
-              className="p-2 hover:bg-zinc-100 rounded-full transition-colors"
-            >
-              <ChevronLeft size={32} className="text-zinc-900" />
-            </button>
-          )}
-        </div>
-
-        {/* Center Side: Title */}
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-[0.2em] flex items-center gap-3 border-none">
-            {selectedRoundId ? (
-              <span className="ml-2">{t('search_header_details')}</span>
-            ) : viewMode === 'hall_of_fame' ? (
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/guacamole-trophy.png" 
-                  alt="" 
-                  className="h-20 w-auto object-contain" 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
-                />
-                <span>{t('search_header_hall')}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-6">
-                <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] whitespace-nowrap">
-                  {t('search_recent_outcomes')}
-                </span>
-              </div>
-            )}
-          </h2>
-          {selectedRoundId && selectedRound && (
-            <span className="text-sm font-bold text-purple-600 uppercase tracking-widest mt-1">
-              {selectedRound.durationLabel} Round • {selectedRound.date}
-            </span>
-          )}
-        </div>
-
-        {/* Right Side: Actions */}
-        <div className="absolute right-4 flex items-center gap-3">
-          {!isActive && (
-            <>
-              <button
-                onClick={() => {
-                  if (window.confirm('Clear all round history and Hall of Fame? This cannot be undone.')) {
-                    clearAllHistory();
-                  }
-                }}
-                className="p-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition-all rounded-full"
-                title={t('search_clear_history')}
-              >
-                <Trash2 size={18} />
-              </button>
-              {!totalElimination && (
-                <button 
-                  onClick={handleJoinNextTask}
-                  className="transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
-                >
-                  <img 
-                    src="/btn-get-started-v2.png" 
-                    alt={t('search_start_round')} 
-                    className="h-[40px] w-auto object-contain" 
-                  />
-                </button>
-              )}
-            </>
-          )}
-        </div>
+      {/* Stripped Header */}
+      <div className="px-4 py-2 bg-white z-30 flex items-center border-b border-zinc-100 relative min-h-[4rem] justify-center">
+        <h1 className="text-lg font-black text-zinc-900 uppercase tracking-tighter">
+          {viewMode === 'hall_of_fame' ? t('search_header_hall') : t('search_header_history')}
+        </h1>
       </div>
-      )}
 
-      {/* Result/History View */}
-      <div className="flex-1 flex flex-col">
-        {/* Filter Bar removed as requested */}
-
-        {isChallengeEnded && totalElimination && (
-          <div className="flex flex-col items-center justify-center p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="space-y-6 py-12">
-              <div className="flex items-center justify-center mx-auto text-rose-600">
-                <img src="/elimination-protocol.png" alt="Total P-Termination" className="w-96 h-96 object-contain" />
-              </div>
-              <div className="space-y-2">
-                  <h2 className="text-5xl font-black text-rose-600 tracking-tighter uppercase leading-none">
-                    TOTAL P-TERMINATION
-                  </h2>
-                  <p className="text-zinc-400 text-xs font-bold tracking-[0.3em] uppercase">
-                    No profiles pleyed this round
-                  </p>
-                </div>
-              </div>
+      {/* Main Empty State Content */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 animate-in fade-in zoom-in duration-700">
+        <div className="flex items-center gap-10 bg-zinc-50/50 p-16 rounded-[4rem] border border-zinc-100 shadow-sm relative overflow-hidden group">
+          {/* Decorative background element */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-100/30 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110 duration-700" />
+          
+          <div className="relative">
+            <img 
+              src="/ice-bear.png" 
+              alt="Empty" 
+              className="h-64 w-auto object-contain drop-shadow-2xl animate-float" 
+            />
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-2 bg-zinc-900/5 rounded-full blur-md" />
           </div>
-        )}
-
-        {(displaySurvivors.length > 0 || displayLogs.length > 0) ? (
+          
           <div className="flex flex-col">
-            {!(isChallengeEnded && totalElimination) && (
-            <div className={cn(
-              "p-6 border-b border-zinc-50 bg-zinc-50/30 flex items-center justify-between z-10",
-            )}>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center">
-                  <img src="/round-trophy.png" alt="" className="w-24 h-24 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
-                </div>
-                <div className="flex flex-col">
-                  <h2 className="text-lg font-black text-zinc-900 tracking-tight uppercase leading-none flex items-center gap-2">
-                    {selectedRoundId 
-                      ? (selectedRound?.variant === 'pley' ? 'people that made it' : 'people that survived')
-                      : isChallengeEnded ? 'people that survived' : viewMode === 'hall_of_fame' ? 'Hall of Fame' : (
-                        <>
-                          <img src="/round-history-icon.png" alt="" className="w-12 h-12 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
-                          Round History
-                        </>
-                      )}
-                  </h2>
-                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1 flex items-center">
-                    {selectedRoundId && selectedRound ? (
-                      <>
-                        {selectedRound.survivorCount} {selectedRound.survivorCount === 1 ? 'Person' : 'People'}
-                        <span className="ml-1">
-                          {selectedRound.variant === 'pley' ? 'Pleyed' : 'Saved'}
-                        </span>
-                        <VariantPill variant={selectedRound.variant} />
-                      </>
-                    ) : isChallengeEnded ? (
-                      (survivors.length === 1 ? 'The Ultimate Survivor' : `${survivors.length} Profiles Remaining`)
-                    ) : viewMode === 'hall_of_fame' ? (
-                      `${displaySurvivors.length} Total Winners Displayed`
-                    ) : (
-                      `${displayLogs.length} Rounds Recorded`
-                    )}
-                  </p>
-                </div>
-              </div>
-              {/* Join next task button moved to bottom of list */}
-            </div>
-            )}
-
-            {viewMode === 'hall_of_fame' || isChallengeEnded || selectedRoundId ? (
-              <div className="flex-1 space-y-8 py-6">
-                {(selectedRoundId ? selectedRound?.survivors?.filter(s => s.madeIt !== false) : displaySurvivors)?.map((survivor, idx) => (
-                  <SurvivorRow 
-                    key={`${survivor.id}-${idx}`}
-                    survivor={survivor}
-                    isSurvivor={isSurvivor}
-                    toggleFollow={toggleFollow}
-                    followedUsers={followedUsers}
-                    navigate={navigate}
-                  />
-                ))}
-                
-                {isChallengeEnded && !selectedRoundId && (
-                  <div className="flex justify-center -mt-4 pt-0 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
-                    <button 
-                      onClick={handleJoinNextTask}
-                      className="hover:scale-105 active:scale-95 transition-transform"
-                    >
-                      <img src="/btn-join-next-task.png" alt={t('search_join_next')} className="h-12 w-auto object-contain drop-shadow-md" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex-1 p-6 space-y-4">
-                {displayLogs.map((log) => (
-                  <button 
-                    key={log.id} 
-                    onClick={() => setSelectedRoundId(log.id)}
-                    className="w-full text-left bg-white rounded-2xl border border-zinc-100 p-4 shadow-sm hover:shadow-md hover:border-purple-200 transition-all active:scale-[0.98]"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center",
-                          log.outcome === 'SURVIVAL' ? "bg-green-100" : "bg-zinc-100"
-                        )}>
-                          {log.outcome === 'SURVIVAL' ? (
-                            <img 
-                              src="/guacamole-trophy.png" 
-                              alt="Survival" 
-                              className="h-[24px] w-auto object-contain" 
-                              style={{ imageRendering: '-webkit-optimize-contrast' }}
-                            />
-                          ) : (
-                            <img 
-                              src="/elimination-protocol.png" 
-                              className="h-[36px] w-auto object-contain" 
-                              alt="Elimination" 
-                              style={{ imageRendering: '-webkit-optimize-contrast' }}
-                            />
-                          )}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-[11px] font-black text-zinc-900 uppercase tracking-tight mb-0.5">
-                            {log.date} • {log.time}
-                          </span>
-                          <span className="text-[10px] font-bold uppercase tracking-wider opacity-70 text-zinc-700 hover:text-zinc-400">
-                            {log.outcome === 'SURVIVAL' 
-                              ? `${getVariantDisplayName(log.variant)} Success` 
-                              : `${getVariantDisplayName(log.variant)} Termination`}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="bg-zinc-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-                        <img src="/duration-alarm.png" alt="" className="h-5 w-auto object-contain mr-0.5 relative -top-[0.5px]" style={{ imageRendering: '-webkit-optimize-contrast' }} />
-                        <span className="text-[9px] font-black text-zinc-900 uppercase">{log.durationLabel} Round</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Outcome</span>
-                        <div className="flex items-center mt-0.5">
-                          <span className="text-sm font-black text-zinc-900">
-                            {log.survivorCount} {log.survivorCount === 1 ? 'Person' : 'People'} {log.variant === 'pley' ? 'Pleyed' : 'Survived'}
-                          </span>
-                          <VariantPill variant={log.variant} />
-                        </div>
-                      </div>
-                      {log.survivors.length > 0 && (
-                        <div className="flex -space-x-2">
-                          {log.survivors.slice(0, 3).map((s, i) => (
-                            <img key={i} src={s.avatar} className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" alt="Survivor" />
-                          ))}
-                          {log.survivors.length > 3 && (
-                            <div className="w-8 h-8 rounded-full bg-zinc-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-zinc-600">
-                              +{log.survivors.length - 3}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+            <h2 className="text-4xl font-black text-zinc-900 tracking-tighter uppercase leading-tight italic">
+              It's Quiet Here
+            </h2>
+            <div className="h-[3px] w-full bg-zinc-900 mt-2" />
+            <p className="text-zinc-400 text-[12px] font-black tracking-[0.4em] uppercase mt-4">
+              Nobody yet
+            </p>
           </div>
-        ) : (
-          (true) && (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-700">
-              <div className="relative mb-8">
-                <img src="/search-chair-final.png" alt="Empty" className="w-48 h-auto object-contain mx-auto animate-in fade-in zoom-in duration-1000" />
-              </div>
-              <div className="mb-4">
-                {isActive ? (
-                  <h2 className="text-2xl font-black text-zinc-900 tracking-tighter uppercase mb-2">
-                    {t('search_waiting')}
-                  </h2>
-                ) : (
-                  <div className="h-8" />
-                )}
-              </div>
-              <p className="text-zinc-400 text-[10px] font-bold tracking-[0.3em] uppercase max-w-[200px] leading-relaxed">
-                {isActive 
-                  ? t('search_waiting_desc')
-                  : t('search_start_desc')}
-              </p>
-            </div>
-          )
-        )}
+        </div>
       </div>
     </div>
   );

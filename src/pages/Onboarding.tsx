@@ -75,6 +75,10 @@ export default function Onboarding() {
     }
   ];
 
+  const handleSkip = () => {
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background Elements */}
@@ -83,8 +87,16 @@ export default function Onboarding() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-red-100 rounded-full blur-[100px] opacity-20" />
       </div>
 
-      <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-500 flex flex-col items-center">
+      <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-500 flex flex-col items-center mt-8">
         
+        {/* Skip Button */}
+        <button 
+          onClick={handleSkip}
+          className="absolute top-[-2rem] right-0 z-50 p-2 hover:scale-105 active:scale-95 transition-all duration-200"
+        >
+          <img src="/onboarding-skip.png" alt="Skip" className="h-6 w-auto mix-blend-multiply drop-shadow-sm" />
+        </button>
+
         {/* Dynamic Content */}
         <div className="min-h-[40rem] flex flex-col items-center justify-center text-center space-y-4 w-full px-4" key={step}>
           {!stepsContent[step - 1].image && (
@@ -152,19 +164,11 @@ export default function Onboarding() {
             onClick={handleNext}
             className="hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center"
           >
-            {step < totalSteps ? (
-              <img 
-                src="/onboarding-continue.png" 
-                alt="Continue" 
-                className="h-32 w-auto object-contain"
-              />
-            ) : (
-              <img 
-                src="/get-started-v3.png" 
-                alt="Get Started" 
-                className="h-24 w-auto object-contain"
-              />
-            )}
+            <img 
+              src="/onboarding-continue.png" 
+              alt={step < totalSteps ? "Continue" : "Get Started"} 
+              className="h-32 w-auto object-contain"
+            />
           </button>
         </div>
 

@@ -6,15 +6,11 @@ import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
+import { supabase } from '../lib/supabase';
+import { fetchPostsByUsername, formatPostForUI } from '../hooks/useSupabase';
+import EmptyFeed from '../components/Empty';
 
-const userPosts = [
-  'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Stunning+mountain+landscape+at+dawn&image_size=square',
-  'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Modern+desk+setup+with+multiple+monitors+and+mechanical+keyboard&image_size=square',
-  'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Delicious+plate+of+sushi+artfully+arranged&image_size=square',
-  'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Abstract+digital+art+with+vibrant+colors&image_size=square',
-  'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Beautiful+sunset+over+a+tropical+beach+with+palm+trees&image_size=square',
-  'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Close-up+of+a+gourmet+burger+with+melted+cheese+and+crispy+fries&image_size=square',
-];
+// Removed hardcoded userPosts
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -33,7 +29,23 @@ const Profile = () => {
   const [wallInput, setWallInput] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditEditForm] = useState(userProfile);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchUserPosts = async () => {
+      if (!userProfile?.username) return;
+      setLoadingPosts(true);
+      const { data, error } = await fetchPostsByUsername(userProfile.username);
+      if (data) {
+        setUserPosts(data.map(formatPostForUI));
+      }
+      setLoadingPosts(false);
+    };
+
+    fetchUserPosts();
+  }, [userProfile?.username]);
 
   // Get data for followed users from history or default data
   const followedUsersData = followedUsers.map(username => {
@@ -133,8 +145,11 @@ const Profile = () => {
                 className="relative group cursor-pointer"
               >
                 <img 
-                  src={editForm.avatar} 
-                  className="w-24 h-24 rounded-full object-cover border border-zinc-200"
+                  src={editForm.avatar || "/custom-empty-profile.png"} 
+                  className={cn(
+                    "w-24 h-24 rounded-full object-cover border border-zinc-200 shadow-sm",
+                    !editForm.avatar && "p-0 bg-white"
+                  )}
                   alt="Avatar"
                 />
                 <div className="absolute inset-0 bg-black/20 rounded-full flex items-center justify-center group-hover:bg-black/40 transition-colors">
@@ -194,12 +209,23 @@ const Profile = () => {
       {/* Profile Info */}
       <div className="p-4 space-y-4">
         <div className="flex items-center space-x-8">
-          <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden relative group shadow-lg">
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="w-24 h-24 rounded-full border-4 border-white overflow-hidden relative group shadow-lg cursor-pointer"
+          >
             <img 
-              src={userProfile.avatar}
+              src={userProfile.avatar || "/custom-empty-profile.png"}
               alt="Profile"
-              className="w-full h-full object-cover"
+              className={cn(
+                "w-full h-full object-cover",
+                !userProfile.avatar && "p-0 bg-white"
+              )}
             />
+            {!userProfile.avatar && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <Camera size={28} className="text-white drop-shadow-md" />
+              </div>
+            )}
             {isLegend(userProfile.username) && (
               <div className="absolute -bottom-3 -right-3 flex items-center justify-center pointer-events-none">
                 <img 
@@ -210,37 +236,28 @@ const Profile = () => {
                 />
               </div>
             )}
-            <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              <Camera size={20} className="text-white" />
-            </div>
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 bg-white p-1 rounded-full border border-zinc-200 shadow-sm hover:bg-zinc-50 transition-colors z-20"
-            >
-              <Camera size={12} className="text-zinc-600" />
-            </button>
           </div>
           <div className="flex-1 flex justify-around">
             <div className="flex flex-col items-center">
-              <span className="font-bold">24</span>
+              <span className="font-bold">{userPosts.length}</span>
               <span className="text-xs text-zinc-500">{t('profile_posts')}</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold">1.2k</span>
+              <span className="font-bold">0</span>
               <span className="text-xs text-zinc-500">{t('profile_followers')}</span>
             </div>
             <div 
               onClick={() => setViewMode('following')}
               className="flex flex-col items-center cursor-pointer"
             >
-              <span className="font-bold">{followedUsers.length}</span>
+              <span className="font-bold">0</span>
               <span className="text-xs text-zinc-500">{t('profile_following')}</span>
             </div>
             <div 
               onClick={() => setViewMode('enemies')}
               className="flex flex-col items-center text-rose-600 cursor-pointer"
             >
-              <span className="font-bold">{enemies.length}</span>
+              <span className="font-bold">0</span>
               <span className="text-xs font-bold uppercase tracking-tighter">{t('profile_enemies')}</span>
             </div>
           </div>
@@ -316,16 +333,24 @@ const Profile = () => {
 
       {/* Content */}
       {viewMode === 'posts' ? (
-        <div className="grid grid-cols-3 gap-0.5 pb-4">
-          {userPosts.map((post, index) => (
-            <div 
-              key={index} 
-              className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-            >
-              <img src={post} alt={`Post ${index}`} className="w-full h-full object-cover" />
-            </div>
-          ))}
-        </div>
+        loadingPosts ? (
+          <div className="flex items-center justify-center p-12">
+            <div className="w-8 h-8 border-4 border-zinc-200 border-t-zinc-900 rounded-full animate-spin" />
+          </div>
+        ) : userPosts.length > 0 ? (
+          <div className="grid grid-cols-3 gap-0.5 pb-4">
+            {userPosts.map((post, index) => (
+              <div 
+                key={index} 
+                className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyFeed className="min-h-[40vh] pt-16" subtitle="Nobody yet" />
+        )
       ) : viewMode === 'enemies' ? (
         <div className="flex-1 bg-zinc-50/50 p-4">
           <div className="space-y-3">
@@ -347,36 +372,38 @@ const Profile = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-zinc-400 text-sm">
-                No enemies yet
-              </div>
+              <EmptyFeed 
+                className="min-h-[40vh] pt-16" 
+                subtitle="Nobody yet" 
+                icon="/custom-empty-profile.png"
+              />
             )}
           </div>
-          </div>
-        ) : viewMode === 'following' ? (
-          <div className="space-y-3">
-            {followedUsers.length > 0 ? (
-              followedUsers.map((username) => (
-                <div key={username} className="bg-white rounded-xl p-3 border border-zinc-100 shadow-sm flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img src={`https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+${username}&image_size=square`} className="w-10 h-10 rounded-full border border-zinc-50" alt={username} />
-                    <span className="font-bold text-sm">@{username}</span>
-                  </div>
-                  <button 
-                    onClick={() => toggleFollow(username)}
-                    className="text-xs text-rose-600 font-black uppercase tracking-widest"
-                  >
-                    Following
-                  </button>
+        </div>
+      ) : viewMode === 'following' ? (
+        <div className="space-y-3 p-4">
+          {followedUsers.length > 0 ? (
+            followedUsers.map((username) => (
+              <div key={username} className="bg-white rounded-xl p-3 border border-zinc-100 shadow-sm flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <img src={`https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Avatar+for+${username}&image_size=square`} className="w-10 h-10 rounded-full border border-zinc-50" alt={username} />
+                  <span className="font-bold text-sm">@{username}</span>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-zinc-400 text-sm">
-                No followed users yet
+                <button 
+                  onClick={() => toggleFollow(username)}
+                  className="text-xs text-rose-600 font-black uppercase tracking-widest"
+                >
+                  Following
+                </button>
               </div>
-            )}
-          </div>
-        ) : null}
+            ))
+          ) : (
+            <EmptyFeed className="min-h-[40vh] pt-16" subtitle="Nobody yet" />
+          )}
+        </div>
+      ) : (
+        <EmptyFeed className="min-h-[40vh] pt-16" subtitle="Nobody yet" />
+      )}
       </div>
   );
 };

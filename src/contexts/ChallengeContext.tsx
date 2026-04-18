@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { posts } from '../data/posts';
 import { formatDate } from '../lib/utils';
+import { supabase } from '../lib/supabase';
 
 interface Survivor {
   id: number;
@@ -115,6 +116,7 @@ interface ChallengeContextType {
   addComment: (postId: number, text: string) => void;
   addWallPost: (text: string, targetUser?: string) => void;
   isAuthenticated: boolean;
+  authLoading: boolean;
   login: (username: string) => void;
   logout: () => void;
   language: string;
@@ -4961,6 +4963,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [language, setLanguage] = useState<string>(() => {
     return localStorage.getItem('language') || 'en';
   });
@@ -4979,13 +4982,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isActive, setIsActive] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date().toDateString());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-    const saved = localStorage.getItem('userProfile');
-    return saved ? JSON.parse(saved) : {
-      username: 'allen_dev',
-      fullName: 'Allen | Full Stack Dev',
-      bio: 'Building cool stuff with React & Tailwind 🚀',
-      avatar: 'https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Portrait+of+a+smiling+young+man+with+glasses&image_size=square',
-      website: 'github.com/allen-dev'
+    return {
+      username: '',
+      fullName: '',
+      bio: '',
+      avatar: '',
+      website: ''
     };
   });
   const [clickCounts, setClickCounts] = useState<Record<string, number>>({
@@ -5012,14 +5014,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const saved = localStorage.getItem('enemies');
     return saved ? JSON.parse(saved) : [];
   });
-  const [allPosts, setAllPosts] = useState<any[]>(() => {
-    const saved = localStorage.getItem('allPosts');
-    return saved ? JSON.parse(saved) : posts;
-  });
-  const [visiblePosts, setVisiblePosts] = useState<any[]>(() => {
-    const saved = localStorage.getItem('visiblePosts');
-    return saved ? JSON.parse(saved) : posts;
-  });
+  const [allPosts, setAllPosts] = useState<any[]>([]);
+  const [visiblePosts, setVisiblePosts] = useState<any[]>([]);
   const [wallPosts, setWallPosts] = useState<WallPost[]>(() => {
     const saved = localStorage.getItem('wallPosts');
     return saved ? JSON.parse(saved) : [];
@@ -5028,48 +5024,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const saved = localStorage.getItem('followedUsers');
     return saved ? JSON.parse(saved) : [];
   });
-  const [postComments, setPostComments] = useState<Record<number, Comment[]>>(() => {
-    const saved = localStorage.getItem('postComments');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      let needsUpdate = false;
-      Object.keys(parsed).forEach(postIdStr => {
-        const postId = Number(postIdStr);
-        parsed[postId] = parsed[postId].map((c: any) => {
-          if (!c.avatar) {
-            needsUpdate = true;
-            const post = posts.find((p: any) => p.id === postId);
-            const defaultComment = post?.comments.find((dc: any) => dc.id === c.id);
-            return {
-              ...c,
-              avatar: defaultComment?.avatar || `https://coreva-normal.trae.ai/api/ide/v1/text_to_image?prompt=Profile+avatar+for+${c.username}&image_size=square`
-            };
-          }
-          return c;
-        });
-      });
-      if (needsUpdate) localStorage.setItem('postComments', JSON.stringify(parsed));
-      return parsed;
-    }
-    
-    // Initialize with default comments from data
-    const initialComments: Record<number, Comment[]> = {};
-    posts.forEach(post => {
-      initialComments[post.id] = post.comments;
-    });
-    return initialComments;
-  });
+  const [postComments, setPostComments] = useState<Record<number, Comment[]>>({});
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
-  const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>(() => {
-    const saved = localStorage.getItem('survivorHistory');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>(() => {
-    const saved = localStorage.getItem('roundHistory');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>([]);
+  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>([]);
 
   // Persist history to localStorage
   useEffect(() => {
@@ -5132,13 +5092,54 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     document.documentElement.classList.remove('dark');
   }, [theme]);
 
+  const fetchUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+      
+    if (data && !error) {
+      setUserProfile((prev: any) => ({
+        ...prev,
+        username: data.username || '',
+        fullName: data.full_name || '',
+        bio: data.bio || '',
+        avatar: data.avatar_url || '',
+        website: data.website || ''
+      }));
+    }
+  };
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
+      setAuthLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setUserProfile({
+          username: '', fullName: '', bio: '', avatar: '', website: ''
+        });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const login = (username: string) => {
-    setIsAuthenticated(true);
-    setUserProfile(prev => ({ ...prev, username }));
+    // Deprecated for manual use, Auth handles state via onAuthStateChange
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
+    supabase.auth.signOut();
   };
 
   const t = (key: string): string => {
@@ -5465,7 +5466,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
       setUserSelection, setIsChallengeEnded, startNewChallenge,
       setSurvivors, setSurvivorHistory, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
-      addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, login, logout, language, setLanguage, theme, setTheme, t
+      addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, authLoading, login, logout, language, setLanguage, theme, setTheme, t
     }}>
       {children}
     </ChallengeContext.Provider>

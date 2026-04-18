@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Grid, ShieldAlert, Send, Trash2, MessageSquare, List, Trophy, UserPlus } from 'lucide-react';
-import { posts } from '../data/posts';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
+import { supabase } from '../lib/supabase';
+import EmptyFeed from '../components/Empty';
 
 const UserDetail = () => {
   const { username } = useParams();
@@ -14,7 +15,7 @@ const UserDetail = () => {
   const [showHearts, setShowHearts] = useState(false);
   const { 
     addEnemy, addSwornEnemy, enemies, removeEnemy, wallPosts, addWallPost, userProfile,
-    toggleFollow, followedUsers, isLegend, isSurvivor
+    toggleFollow, followedUsers, isLegend, isSurvivor, allPosts
   } = useChallenge();
   const [wallInput, setWallInput] = useState('');
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
@@ -22,6 +23,69 @@ const UserDetail = () => {
   const [isSwornLocal, setIsSwornLocal] = useState(false);
   const [viewMode, setViewMode] = useState<'posts' | 'wall'>('posts');
   const [isTraitor, setIsTraitor] = useState(false);
+
+  // Supabase data
+  const [profileData, setProfileData] = useState<any>(null);
+  const [userPostsFromDB, setUserPostsFromDB] = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [profileNotFound, setProfileNotFound] = useState(false);
+
+  useEffect(() => {
+    if (!username) return;
+    setLoadingPosts(true);
+    setProfileNotFound(false);
+
+    const fetchUserData = async () => {
+      // Fetch profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', username)
+        .single();
+      
+      if (!profile || profileError) {
+        setProfileNotFound(true);
+        setLoadingPosts(false);
+        return;
+      }
+
+      setProfileData(profile);
+      
+      // Fetch their posts
+      const { data: posts } = await supabase
+        .from('posts')
+        .select('*, profiles(username, avatar_url)')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false });
+      
+      if (posts) {
+        setUserPostsFromDB(posts.map((p: any) => ({
+          id: p.id,
+          username: p.profiles?.username || username,
+          avatar: p.profiles?.avatar_url || profile.avatar_url || '',
+          image: p.image_url || '',
+          caption: p.caption || '',
+          likes: p.likes_count || 0,
+          time: 'Recently',
+          comments: [],
+        })));
+      }
+      setLoadingPosts(false);
+    };
+
+    fetchUserData();
+  }, [username]);
+
+  // Merge context posts with DB posts (context might have locally created posts)
+  const contextPosts = allPosts.filter((p: any) => p.username === username);
+  const userPosts = userPostsFromDB.length > 0 ? userPostsFromDB : contextPosts;
+
+  const isEnemy = enemies.some(e => e.username === username);
+  const isSwornEnemy = enemies.find(e => e.username === username)?.isSworn || false;
+  const userWallPosts = wallPosts.filter(p => p.targetUser === username);
+  const userIsLegend = username ? isLegend(username) : false;
+  const isFollowing = username ? followedUsers.includes(username) : false;
+  const isMe = username === userProfile.username;
 
   const toggleTraitor = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -31,14 +95,6 @@ const UserDetail = () => {
   const { handlers: heartsHandlers } = useLongPress(() => {
     setShowHearts(prev => !prev);
   }, 400);
-
-  const userPosts = posts.filter(p => p.username === username);
-  const isEnemy = enemies.some(e => e.username === username);
-  const isSwornEnemy = enemies.find(e => e.username === username)?.isSworn || false;
-  const userWallPosts = wallPosts.filter(p => p.targetUser === username);
-  const userIsLegend = username ? isLegend(username) : false;
-  const isFollowing = username ? followedUsers.includes(username) : false;
-  const isMe = username === userProfile.username;
 
   const { handlers: enemyLongPress } = useLongPress(() => {
     setIsSwornLocal(prev => !prev);
@@ -109,11 +165,11 @@ const UserDetail = () => {
               <span className="text-xs text-zinc-500">Posts</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold">842</span>
+              <span className="font-bold">0</span>
               <span className="text-xs text-zinc-500">Followers</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold">156</span>
+              <span className="font-bold">0</span>
               <span className="text-xs text-zinc-500">Following</span>
             </div>
           </div>
@@ -250,17 +306,31 @@ const UserDetail = () => {
 
       {/* Content */}
       {viewMode === 'posts' ? (
-        <div className="grid grid-cols-3 gap-0.5 pb-4">
-          {userPosts.map((post, index) => (
-            <div 
-              key={index} 
-              onClick={() => navigate(`/post/${post.id}`)}
-              className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-            >
-              <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
-            </div>
-          ))}
-        </div>
+        loadingPosts ? (
+          <div className="flex items-center justify-center min-h-[40vh]">
+            <div className="w-8 h-8 border-4 border-zinc-200 border-t-zinc-900 rounded-full animate-spin" />
+          </div>
+        ) : profileNotFound ? (
+          <EmptyFeed
+            className="min-h-[40vh] pt-16"
+            title="User Not Found"
+            subtitle="This profile doesn't exist"
+          />
+        ) : userPosts.length > 0 ? (
+          <div className="grid grid-cols-3 gap-0.5 pb-4">
+            {userPosts.map((post, index) => (
+              <div 
+                key={index} 
+                onClick={() => navigate(`/post/${post.id}`)}
+                className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyFeed className="min-h-[40vh] pt-16" subtitle="Nobody yet" />
+        )
       ) : (
         <div className="flex-1 bg-zinc-50/50 p-4">
           {/* Default empty state or other content */}

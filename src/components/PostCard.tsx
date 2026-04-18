@@ -110,7 +110,11 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
           {...heartsHandlers}
         >
           <div className="relative">
-            <img src={avatar} alt={username} className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-rose-100 transition-all shadow-sm" />
+            <img 
+              src={avatar || "/custom-empty-profile.png"} 
+              alt={username} 
+              className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-rose-100 transition-all shadow-sm" 
+            />
             {isLegend(username) && (
               <div className="absolute -bottom-2 -right-2 flex items-center justify-center pointer-events-none">
                 <img 
@@ -321,8 +325,12 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
             onSubmit={handlePostComment}
             className="flex items-center gap-2 pt-3 mt-2 border-t border-zinc-50 group"
           >
-            <div className="w-8 h-8 rounded-full border border-zinc-200 overflow-hidden shrink-0">
-              <img src={userProfile.avatar} className="w-full h-full object-cover" alt="Me" />
+            <div className="w-8 h-8 rounded-full border border-zinc-200 overflow-hidden shrink-0 bg-zinc-50">
+              <img 
+                src={userProfile.avatar || "/custom-empty-profile.png"} 
+                className="w-full h-full object-cover" 
+                alt="Me" 
+              />
             </div>
             <div className="flex-1 flex items-center gap-2">
               <input 

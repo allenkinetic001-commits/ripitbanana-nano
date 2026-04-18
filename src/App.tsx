@@ -17,7 +17,16 @@ import Chat from "./pages/Chat";
 import { useChallenge } from "./contexts/ChallengeContext";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useChallenge();
+  const { isAuthenticated, authLoading } = useChallenge();
+  // Wait for Supabase to resolve the session before deciding to redirect
+  if (authLoading) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-zinc-50">
+        <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin"></div>
+        <p className="mt-4 text-sm font-medium text-zinc-500">Loading profile...</p>
+      </div>
+    );
+  }
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };

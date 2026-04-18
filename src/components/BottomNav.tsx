@@ -10,6 +10,7 @@ interface NavItem {
   path: string;
   isImage?: boolean;
   size?: string;
+  className?: string;
 }
 
 interface BottomNavProps {
@@ -19,7 +20,7 @@ interface BottomNavProps {
 const BottomNav = ({ visible = true }: BottomNavProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useChallenge();
+  const { t, userProfile } = useChallenge();
   const [clickedPath, setClickedPath] = useState<string | null>(null);
 
   const handleNavClick = (path: string) => {
@@ -32,7 +33,13 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
     { icon: '/nav-home-v3.png', label: t('nav_home'), path: '/', isImage: true },
     { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true, size: 'h-[50px] w-[50px]' },
     { icon: '/nav-phone-v3.png', label: t('nav_notifications'), path: '/notifications', isImage: true },
-    { icon: '/nav-profile-v3.png', label: t('nav_profile'), path: '/profile', isImage: true },
+    { 
+      icon: userProfile.avatar || '/custom-empty-profile.png', 
+      label: t('nav_profile'), 
+      path: '/profile', 
+      isImage: true,
+      className: "rounded-full aspect-square object-cover border border-zinc-200"
+    },
   ];
 
   return (
@@ -63,7 +70,8 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                     "object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100",
                     isBouncing && "animate-nav-bounce",
-                    "opacity-100"
+                    "opacity-100",
+                    item.className
                   )} 
                 />
               ) : (
