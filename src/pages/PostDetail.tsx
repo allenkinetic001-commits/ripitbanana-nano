@@ -100,7 +100,7 @@ const PostDetail = () => {
         <button onClick={() => navigate(-1)} className="text-zinc-800 hover:text-zinc-500 transition-colors">
           <ArrowLeft size={22} />
         </button>
-        <img src="/comments-header.png" alt="Comments" className="h-6 w-auto object-contain" />
+        <img src="/comments-header.png" alt="Comments" className="h-5 w-auto object-contain" />
         {isOwner && (
           <button
             onClick={handleDelete}
