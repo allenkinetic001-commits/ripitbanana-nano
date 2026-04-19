@@ -292,10 +292,15 @@ const Profile = () => {
             </div>
             <div 
               onClick={() => setViewMode('enemies')}
-              className="flex flex-col items-center text-rose-600 cursor-pointer"
+              className="flex flex-col items-center cursor-pointer group"
             >
-              <span className="font-bold">{enemies.length}</span>
-              <span className="text-xs font-bold uppercase tracking-tighter">{t('profile_enemies')}</span>
+              <span className="font-bold text-rose-600">{enemies.length}</span>
+              <img 
+                src="/enemies-title.png" 
+                alt="Enemies" 
+                className="h-3 w-auto object-contain brightness-90 group-hover:brightness-100 transition-all" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
             </div>
           </div>
         </div>
@@ -325,11 +330,16 @@ const Profile = () => {
           </button>
           <button 
             onClick={() => setViewMode('enemies')}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all duration-300 shadow-sm hover:shadow-md border ${
-              viewMode === 'enemies' ? 'bg-rose-600 text-white border-rose-500' : 'text-[#DC143C] bg-white border-red-100 hover:bg-red-50'
+            className={`flex-1 py-1.5 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md border flex items-center justify-center ${
+              viewMode === 'enemies' ? 'bg-rose-600 border-rose-500' : 'bg-white border-red-100 hover:bg-red-50'
             }`}
           >
-            {t('profile_tab_enemies')}
+            <img 
+              src="/enemies-title.png" 
+              alt="Enemies" 
+              className={`h-4 w-auto object-contain ${viewMode === 'enemies' ? 'brightness-0 invert' : ''}`} 
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
           </button>
         </div>
       </div>
