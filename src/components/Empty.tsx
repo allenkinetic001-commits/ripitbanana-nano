@@ -21,7 +21,7 @@ const EmptyFeed: React.FC<EmptyFeedProps> = ({
       "flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-700 min-h-[40vh]",
       className
     )}>
-      <div className="relative mb-6 mt-12">
+      <div className="relative mb-6 mt-20">
         <img 
           src={icon} 
           alt="Empty" 
