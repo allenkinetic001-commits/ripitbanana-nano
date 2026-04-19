@@ -339,9 +339,14 @@ const Profile = () => {
               setEditEditForm(userProfile);
               setIsEditing(true);
             }}
-            className="flex-1 bg-zinc-100 py-1.5 rounded-lg text-sm font-semibold"
+            className="flex-1 bg-zinc-100 py-1.5 rounded-lg flex items-center justify-center transition-all hover:bg-zinc-200 active:scale-95"
           >
-            {t('profile_edit')}
+            <img 
+              src="/edit-profile-title.png" 
+              alt="Edit Profile" 
+              className="h-4 w-auto object-contain" 
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
           </button>
           <button 
             onClick={() => setViewMode('enemies')}
