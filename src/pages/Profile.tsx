@@ -293,7 +293,12 @@ const Profile = () => {
               className="flex flex-col items-center cursor-pointer"
             >
               <span className="font-bold">{followedUsers.length}</span>
-              <span className="text-xs text-zinc-500">{t('profile_following')}</span>
+              <img 
+                src="/following-title.png" 
+                alt="Following" 
+                className="h-3 w-auto object-contain opacity-40" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
             </div>
             <div 
               onClick={() => setViewMode('enemies')}
