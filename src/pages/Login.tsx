@@ -156,7 +156,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full h-32 transition-all duration-300 active:scale-95 hover:scale-105 mt-6 relative ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full h-24 transition-all duration-300 active:scale-95 hover:scale-105 mt-4 relative ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {loading ? (
               <div className="h-16 flex items-center justify-center gap-3 bg-zinc-100 rounded-2xl w-full">
