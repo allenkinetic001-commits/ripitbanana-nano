@@ -124,6 +124,13 @@ interface ChallengeContextType {
   theme: string;
   setTheme: (theme: string) => void;
   t: (key: string) => string;
+  userVotes: Record<string, number>;
+  setUserVoteForPost: (postId: string | number, vote: number) => void;
+  postLives: Record<number, number>;
+  setPostLivesForPost: (postId: number, lives: number) => void;
+  userLives: Record<string, number>;
+  setUserLivesForUser: (username: string, lives: number) => void;
+  isEliminated: boolean;
 }
 
 const translations: Record<string, Record<string, string>> = {
@@ -4982,6 +4989,14 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isActive, setIsActive] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date().toDateString());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
+    const saved = localStorage.getItem('userProfile');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse userProfile', e);
+      }
+    }
     return {
       username: '',
       fullName: '',
@@ -5006,83 +5021,101 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [variantFirstClickTime, setVariantFirstClickTime] = useState<Record<string, number>>({
     pley: 0
   });
+  const [isEliminated, setIsEliminated] = useState(false);
   const [userSelection, setUserSelection] = useState<string | null>(null);
   const [isChallengeEnded, setIsChallengeEnded] = useState<boolean>(() => {
     return localStorage.getItem('isChallengeEnded') === 'true' || false;
   });
   const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(false);
-  const [enemies, setEnemies] = useState<Survivor[]>(() => {
-    const saved = localStorage.getItem('enemies');
-    const initialEnemies = saved ? JSON.parse(saved) : [];
-    // Remove mock data: John Doe (888) and Modern Designer (999)
-    return initialEnemies.filter((e: any) => 
-      e.id !== 888 && 
-      e.id !== 999 && 
-      e.username !== 'John Doe' && 
-      e.username !== 'Modern Designer'
-    );
-  });
-  const [allPosts, setAllPosts] = useState<any[]>(() => {
-    const saved = localStorage.getItem('allPosts');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [visiblePosts, setVisiblePosts] = useState<any[]>(() => {
-    const saved = localStorage.getItem('visiblePosts');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [wallPosts, setWallPosts] = useState<WallPost[]>(() => {
-    const saved = localStorage.getItem('wallPosts');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [followedUsers, setFollowedUsers] = useState<string[]>(() => {
-    const saved = localStorage.getItem('followedUsers');
-    const initialFollowing = saved ? JSON.parse(saved) : [];
-    // Remove mock following: John Doe and Modern Designer
-    return initialFollowing.filter((u: string) => 
-      u !== 'John Doe' && 
-      u !== 'Modern Designer'
-    );
-  });
-  const [postComments, setPostComments] = useState<Record<number, Comment[]>>(() => {
-    const saved = localStorage.getItem('postComments');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [enemies, setEnemies] = useState<Survivor[]>([]);
+  const [allPosts, setAllPosts] = useState<any[]>([]);
+  const [visiblePosts, setVisiblePosts] = useState<any[]>([]);
+  const [wallPosts, setWallPosts] = useState<WallPost[]>([]);
+  const [followedUsers, setFollowedUsers] = useState<string[]>([]);
+  const [postComments, setPostComments] = useState<Record<number, Comment[]>>({});
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
-  const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>(() => {
-    const saved = localStorage.getItem('survivorHistory');
-    const initialHistory = saved ? JSON.parse(saved) : [];
-    return initialHistory.filter((s: any) => 
-      s.username !== 'John Doe' && 
-      s.username !== 'Modern Designer'
-    );
-  });
-  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>(() => {
-    const saved = localStorage.getItem('roundHistory');
-    return saved ? JSON.parse(saved) : [];
+  const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>([]);
+  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>([]);
+
+  const [userVotes, setUserVotes] = useState<Record<string, number>>({});
+
+  const [postLives, setPostLives] = useState<Record<number, number>>(() => {
+    const saved = localStorage.getItem('postLives_v6');
+    return saved ? JSON.parse(saved) : {};
   });
 
-  // Persist history to localStorage
+  const [userLives, setUserLives] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('userLives_v6');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  const setUserVoteForPost = (postId: string | number, vote: number) => {
+    setUserVotes(prev => ({ ...prev, [String(postId)]: vote }));
+  };
+
+  const setPostLivesForPost = (postId: number, lives: number) => {
+    setPostLives(prev => ({ ...prev, [postId]: lives }));
+  };
+
+  const setUserLivesForUser = (username: string, lives: number) => {
+    setUserLives(prev => ({ ...prev, [username]: lives }));
+  };
+
+  // Account-based scoping for private user data
+  useEffect(() => {
+    if (!userProfile.username) {
+      setEnemies([]);
+      setFollowedUsers([]);
+      setWallPosts([]);
+      setPostComments({});
+      setSurvivorHistory([]);
+      setRoundHistory([]);
+      setUserVotes({});
+      return;
+    }
+
+    const u = userProfile.username;
+    const load = (key: string, setter: (val: any) => void, fallback: any) => {
+      const saved = localStorage.getItem(`${key}_v7_${u}`);
+      setter(saved ? JSON.parse(saved) : fallback);
+    };
+
+    load('userVotes', setUserVotes, {});
+    load('enemies', setEnemies, []);
+    load('followedUsers', setFollowedUsers, []);
+    load('wallPosts', setWallPosts, []);
+    load('postComments', setPostComments, {});
+    load('survivorHistory', setSurvivorHistory, []);
+    load('roundHistory', setRoundHistory, []);
+  }, [userProfile.username]);
+
+  // Persist private data to scoped local storage
+  useEffect(() => {
+    if (!userProfile.username) return;
+    const u = userProfile.username;
+    localStorage.setItem(`userVotes_v7_${u}`, JSON.stringify(userVotes));
+    localStorage.setItem(`enemies_v7_${u}`, JSON.stringify(enemies));
+    localStorage.setItem(`followedUsers_v7_${u}`, JSON.stringify(followedUsers));
+    localStorage.setItem(`wallPosts_v7_${u}`, JSON.stringify(wallPosts));
+    localStorage.setItem(`postComments_v7_${u}`, JSON.stringify(postComments));
+    localStorage.setItem(`survivorHistory_v7_${u}`, JSON.stringify(survivorHistory));
+    localStorage.setItem(`roundHistory_v7_${u}`, JSON.stringify(roundHistory));
+  }, [userProfile.username, userVotes, enemies, followedUsers, wallPosts, postComments, survivorHistory, roundHistory]);
+
+  // Global/Public caches (not account-specific)
+  useEffect(() => {
+    localStorage.setItem('postLives_v6', JSON.stringify(postLives));
+  }, [postLives]);
+
+  useEffect(() => {
+    localStorage.setItem('userLives_v6', JSON.stringify(userLives));
+  }, [userLives]);
+
   useEffect(() => {
     localStorage.setItem('madeItCounts', JSON.stringify(madeItCounts));
   }, [madeItCounts]);
-
-  useEffect(() => {
-    localStorage.setItem('survivorHistory', JSON.stringify(survivorHistory));
-  }, [survivorHistory]);
-
-  useEffect(() => {
-    localStorage.setItem('roundHistory', JSON.stringify(roundHistory));
-  }, [roundHistory]);
-
-  useEffect(() => {
-    localStorage.setItem('enemies', JSON.stringify(enemies));
-  }, [enemies]);
-
-  useEffect(() => {
-    localStorage.setItem('postComments', JSON.stringify(postComments));
-  }, [postComments]);
 
   useEffect(() => {
     localStorage.setItem('allPosts', JSON.stringify(allPosts));
@@ -5091,14 +5124,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('visiblePosts', JSON.stringify(visiblePosts));
   }, [visiblePosts]);
-
-  useEffect(() => {
-    localStorage.setItem('wallPosts', JSON.stringify(wallPosts));
-  }, [wallPosts]);
-
-  useEffect(() => {
-    localStorage.setItem('followedUsers', JSON.stringify(followedUsers));
-  }, [followedUsers]);
 
   useEffect(() => {
     localStorage.setItem('userProfile', JSON.stringify(userProfile));
@@ -5124,7 +5149,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     document.documentElement.classList.remove('dark');
   }, [theme]);
 
-  const fetchUserProfile = async (userId: string) => {
+  const fetchUserProfile = async (userId: string, authUser?: any) => {
+    // Start with data from auth metadata as immediate fallback
+    if (authUser?.user_metadata?.username || authUser?.user_metadata?.full_name) {
+      setUserProfile((prev: any) => ({
+        ...prev,
+        username: authUser.user_metadata.username || prev.username,
+        fullName: authUser.user_metadata.full_name || prev.fullName,
+      }));
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -5140,6 +5174,18 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         avatar: data.avatar_url || '',
         website: data.website || ''
       }));
+      setIsEliminated(false);
+    } else if (error && authUser) {
+      // PGRST116 means no rows found -> Eliminated
+      if (error.code === 'PGRST116') {
+        setIsEliminated(true);
+      }
+      // If profile row is missing (Eliminated), at least keep the username from auth
+      setUserProfile((prev: any) => ({
+        ...prev,
+        username: authUser.user_metadata?.username || prev.username || 'user',
+        fullName: authUser.user_metadata?.full_name || prev.fullName || '',
+      }));
     }
   };
 
@@ -5147,7 +5193,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        fetchUserProfile(session.user.id, session.user);
         const prevUserId = localStorage.getItem('supabaseUserId');
         if (prevUserId !== session.user.id) {
           localStorage.removeItem('enemies');
@@ -5177,7 +5223,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        fetchUserProfile(session.user.id, session.user);
         const prevUserId = localStorage.getItem('supabaseUserId');
         if (prevUserId !== session.user.id) {
           localStorage.removeItem('enemies');
@@ -5204,11 +5250,38 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setUserProfile({
           username: '', fullName: '', bio: '', avatar: '', website: ''
         });
+        setEnemies([]);
+        setFollowedUsers([]);
+        setWallPosts([]);
+        setPostComments({});
+        setSurvivorHistory([]);
+        setRoundHistory([]);
+        setUserVotes({});
         localStorage.removeItem('supabaseUserId');
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Real-time listener for profile deletion (Total Destruction Detection)
+    const profileChannel = supabase
+      .channel('profile_wipe_detection')
+      .on('postgres_changes', { 
+        event: 'DELETE', 
+        schema: 'public', 
+        table: 'profiles' 
+      }, (payload) => {
+        // If the deleted profile ID matches the current user session ID
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user && payload.old.id === session.user.id) {
+            setIsEliminated(true);
+          }
+        });
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      supabase.removeChannel(profileChannel);
+    };
   }, []);
 
   const login = (username: string) => {
@@ -5543,7 +5616,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
       setUserSelection, setIsChallengeEnded, startNewChallenge,
       setSurvivors, setSurvivorHistory, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
-      addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, authLoading, login, logout, language, setLanguage, theme, setTheme, t
+      addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, authLoading, login, logout, language, setLanguage, theme, setTheme, t,
+      userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser,
+      isEliminated
     }}>
       {children}
     </ChallengeContext.Provider>

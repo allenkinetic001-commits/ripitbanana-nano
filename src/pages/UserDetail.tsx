@@ -15,7 +15,7 @@ const UserDetail = () => {
   const [showHearts, setShowHearts] = useState(false);
   const { 
     addEnemy, addSwornEnemy, enemies, removeEnemy, wallPosts, addWallPost, userProfile,
-    toggleFollow, followedUsers, isLegend, isSurvivor, allPosts
+    toggleFollow, followedUsers, isLegend, isSurvivor, allPosts, userLives
   } = useChallenge();
   const [wallInput, setWallInput] = useState('');
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
@@ -36,6 +36,9 @@ const UserDetail = () => {
     setProfileNotFound(false);
 
     const fetchUserData = async () => {
+      // Reset state for new profile to prevent flicker
+      setProfileData(null);
+      
       // Fetch profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -74,6 +77,30 @@ const UserDetail = () => {
     };
 
     fetchUserData();
+
+    const channel = supabase
+      .channel(`profile:${username}`)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles',
+        filter: `username=eq.${username}`
+      }, (payload) => {
+        setProfileData(payload.new);
+      })
+      .on('postgres_changes', { 
+        event: 'DELETE', 
+        schema: 'public', 
+        table: 'profiles',
+        filter: `username=eq.${username}`
+      }, () => {
+        navigate('/');
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [username]);
 
   // Merge context posts with DB posts (context might have locally created posts)
@@ -96,30 +123,48 @@ const UserDetail = () => {
     setShowHearts(prev => !prev);
   }, 400);
 
+  const globalLives = profileData?.lives ?? 3;
+
   const { handlers: enemyLongPress } = useLongPress(() => {
     setIsSwornLocal(prev => !prev);
   }, 400);
 
-  const handleAddEnemy = () => {
-    const survivorData = userPosts[0] || {
-      id: Date.now(),
-      username: username || '',
-      avatar: userPosts[0]?.avatar || "/custom-empty-profile.png",
-      image: '',
-      caption: 'Survivor',
-      time: 'Just now',
-      comments: []
-    };
-
-    if (isSwornLocal) {
-      addSwornEnemy(survivorData);
-    } else {
-      addEnemy(survivorData);
+  const handleAddEnemy = async () => {
+    if (profileData?.is_traitor || isTraitor) {
+      setIsTraitor(true);
+      if (username) {
+        const { setTraitorStatus } = await import('../hooks/useSupabase');
+        await setTraitorStatus(username, true);
+      }
+      return;
     }
-    
-    setShowAddedFeedback(true);
-    setHasActed(true);
-    setIsTraitor(false);
+
+    if (isEnemy) {
+      const enemyToRemove = enemies.find(e => e.username === username);
+      if (enemyToRemove) {
+        removeEnemy(enemyToRemove.id);
+      }
+      setShowAddedFeedback(false);
+      setHasActed(false);
+    } else {
+      const survivorData = userPosts[0] || {
+        id: profileData?.id || Date.now(),
+        username: username || '',
+        avatar: profileData?.avatar_url || userPosts[0]?.avatar || "/custom-empty-profile.png",
+        image: '',
+        caption: profileData?.bio || 'Survivor',
+        time: 'Just now',
+        comments: []
+      };
+
+      if (isSwornLocal) {
+        addSwornEnemy(survivorData);
+      } else {
+        addEnemy(survivorData);
+      }
+      setShowAddedFeedback(true);
+      setHasActed(true);
+    }
   };
 
   const handlePostToWall = (e: React.FormEvent) => {
@@ -144,7 +189,7 @@ const UserDetail = () => {
         <div className="flex items-center space-x-8">
           <div className="w-20 h-20 rounded-full border border-zinc-200 overflow-hidden relative">
             <img
-              src={userPosts[0]?.avatar || "/custom-empty-profile.png"}
+              src={profileData?.avatar_url || userPosts[0]?.avatar || "/custom-empty-profile.png"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
@@ -180,13 +225,13 @@ const UserDetail = () => {
             <div className="flex items-center gap-1.5">
               <h2 className="text-sm font-bold">{username}</h2>
               <div className="flex items-center gap-0.5">
-                <ProfileHeartsToggle isVisible={showHearts} />
+                <ProfileHeartsToggle isVisible={showHearts} lives={globalLives} />
               </div>
             </div>
             <p className="text-sm text-zinc-600">{profileData?.bio || 'Surviving the round ⚡'}</p>
           </div>
           <div className="flex items-center space-x-2">
-            {isTraitor ? (
+            {profileData?.is_traitor || isTraitor ? (
               <button 
                 onClick={handleAddEnemy}
                 className="animate-pop-in transition-all active:scale-95 flex items-center justify-center p-1"
@@ -201,35 +246,13 @@ const UserDetail = () => {
               </button>
             ) : (
               <>
-                {!isMe && isSurvivor(username) && (
-                  <button 
-                    onClick={() => toggleFollow(username)}
-                    className="transition-all active:scale-95 hover:scale-105"
-                  >
-                    {isFollowing ? (
-                      <img 
-                        src="/btn-following.png" 
-                        alt="Following" 
-                        className="h-8 w-auto object-contain" 
-                        style={{ imageRendering: '-webkit-optimize-contrast' }}
-                      />
-                    ) : (
-                      <img 
-                        src="/btn-follow.png" 
-                        alt="Follow" 
-                        className="h-8 w-auto object-contain" 
-                        style={{ imageRendering: '-webkit-optimize-contrast' }}
-                      />
-                    )}
-                  </button>
-                )}
                 {!isMe && (
                   <button 
                     onClick={handleAddEnemy}
                     {...enemyLongPress}
                     className="flex items-center justify-center active:scale-95 drop-shadow-sm"
                   >
-                    {showAddedFeedback ? (
+                    {showAddedFeedback || isEnemy ? (
                       <img 
                         src="/btn-added.png" 
                         alt="Added" 

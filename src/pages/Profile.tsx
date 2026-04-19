@@ -33,10 +33,30 @@ const Profile = () => {
   const [loadingPosts, setLoadingPosts] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [profileData, setProfileData] = useState<any>(null);
+
   useEffect(() => {
-    const fetchUserPosts = async () => {
-      if (!userProfile?.username) return;
+    const fetchProfileAndPosts = async () => {
+      // If username isn't available yet, wait. If we're authenticated, it will come.
+      if (!userProfile?.username) {
+        setLoadingPosts(false);
+        return;
+      }
+      
       setLoadingPosts(true);
+      
+      // Reset state for new profile
+      setProfileData(null);
+      
+      // Fetch profile for latest lives count
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', userProfile.username)
+        .single();
+      
+      if (profile) setProfileData(profile);
+
       const { data, error } = await fetchPostsByUsername(userProfile.username);
       if (data) {
         setUserPosts(data.map(formatPostForUI));
@@ -44,7 +64,24 @@ const Profile = () => {
       setLoadingPosts(false);
     };
 
-    fetchUserPosts();
+    fetchProfileAndPosts();
+
+    // Subscribe to self profile updates
+    const channel = supabase
+      .channel(`self-profile:${userProfile.username}`)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles',
+        filter: `username=eq.${userProfile.username}`
+      }, (payload) => {
+        setProfileData(payload.new);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userProfile?.username]);
 
   // Get data for followed users from history or default data
@@ -101,18 +138,18 @@ const Profile = () => {
       />
       <header className="px-4 h-14 flex items-center justify-between border-b border-zinc-100 sticky top-0 bg-white z-10">
         <div className="flex items-center gap-1">
-          <h1 className="text-lg font-bold">{userProfile.username}</h1>
+          <h1 className="text-lg font-bold">@{userProfile.username || 'user'}</h1>
         </div>
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => setViewMode(viewMode === 'following' ? 'enemies' : 'following')}
+            onClick={() => setViewMode(viewMode === 'enemies' ? 'posts' : 'enemies')}
             className={cn(
               "transition-all duration-300",
               viewMode === 'enemies' ? "text-rose-600" : "text-zinc-700"
             )}
-            title={viewMode === 'enemies' ? "Switch to Following" : "Switch to Enemies"}
+            title={viewMode === 'enemies' ? "Back to Posts" : "View Enemies"}
           >
-            {viewMode === 'enemies' ? <ShieldAlert size={24} /> : <UserPlus size={24} />}
+            <ShieldAlert size={24} />
           </button>
           <div className="relative">
             <button 
@@ -265,9 +302,11 @@ const Profile = () => {
 
         <div className="flex flex-col" {...heartsHandlers}>
           <div className="flex items-center gap-1.5">
-            <h2 className="text-sm font-bold">{userProfile.fullName}</h2>
+            <h2 className="text-sm font-bold">
+              {userProfile.fullName || (userProfile.username ? `@${userProfile.username}` : 'Loading...')}
+            </h2>
             <div className="flex items-center gap-0.5">
-              <ProfileHeartsToggle isVisible={showHearts} />
+              <ProfileHeartsToggle isVisible={showHearts} lives={profileData?.lives ?? 3} />
             </div>
           </div>
           <p className="text-sm text-zinc-600">{userProfile.bio}</p>
@@ -301,12 +340,6 @@ const Profile = () => {
           className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'posts' ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-400'}`}
         >
           <Grid size={24} />
-        </button>
-        <button 
-          onClick={() => setViewMode('following')}
-          className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'following' ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-400'}`}
-        >
-          <UserPlus size={24} />
         </button>
         {!hasActed && (
           <div 

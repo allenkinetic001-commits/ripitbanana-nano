@@ -35,6 +35,21 @@ export default function Login() {
 
         if (signInError) throw signInError;
         
+        // After successful auth, check if the profile exists
+        // If it doesn't, it means the user was eliminated (destroyed)
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', data.user.id)
+          .single();
+          
+        if (!profile || profileError) {
+          // Profile missing = Eliminated
+          await supabase.auth.signOut();
+          setError("Oops… you don’t exist here anymore.");
+          return;
+        }
+
         navigate('/');
       } catch (err: any) {
         setError(err.message || 'An error occurred during log in.');

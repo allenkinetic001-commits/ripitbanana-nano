@@ -12,6 +12,8 @@ export interface SupabasePost {
     username: string;
     full_name: string;
     avatar_url: string;
+    is_traitor: boolean;
+    lives: number;
   };
 }
 
@@ -33,7 +35,9 @@ export function useSupabasePosts() {
         profiles (
           username,
           full_name,
-          avatar_url
+          avatar_url,
+          is_traitor,
+          lives
         )
       `)
       .order('created_at', { ascending: false });
@@ -41,7 +45,7 @@ export function useSupabasePosts() {
     if (fetchError) {
       setError(fetchError.message);
     } else {
-      setPosts(data as SupabasePost[]);
+      setPosts(data as any[]);
     }
     setLoading(false);
   };
@@ -55,7 +59,7 @@ export function useSupabasePosts() {
         // Fetch the profile for the new post to maintain JOIN consistency
         const { data: newPostWithProfile } = await supabase
           .from('posts')
-          .select('*, profiles(username, full_name, avatar_url)')
+          .select('*, profiles(username, full_name, avatar_url, is_traitor, lives)')
           .eq('id', payload.new.id)
           .single();
           
@@ -65,6 +69,20 @@ export function useSupabasePosts() {
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'posts' }, (payload) => {
         setPosts(prev => prev.filter(post => post.id !== payload.old.id));
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
+        setPosts(prev => prev.map(post => {
+          if (post.user_id === payload.new.id) {
+            return {
+              ...post,
+              profiles: {
+                ...post.profiles,
+                ...payload.new
+              }
+            };
+          }
+          return post;
+        }));
       })
       .subscribe();
 
@@ -78,17 +96,26 @@ export function useSupabasePosts() {
 
 // Fetch posts by a specific username
 export async function fetchPostsByUsername(username: string) {
+  // First get the profile ID for this username
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('username', username)
+    .single();
+
+  if (!profile) return { data: [], error: null };
+
   const { data, error } = await supabase
     .from('posts')
     .select(`
       *,
-      profiles!inner (
+      profiles (
         username,
         full_name,
         avatar_url
       )
     `)
-    .eq('profiles.username', username)
+    .eq('user_id', profile.id)
     .order('created_at', { ascending: false });
 
   return { data: data as SupabasePost[] | null, error };
@@ -193,8 +220,25 @@ export async function addCommentToPost(postId: string, userId: string, text: str
   return { data, error };
 }
 
+// Set a user as a traitor globally
+export async function setTraitorStatus(username: string, status: boolean) {
+  // Use RPC to bypass RLS since users are updating OTHER users' profiles
+  if (status) {
+    const { error } = await supabase.rpc('mark_traitor', { target_username: username });
+    return { error };
+  } else {
+    return { error: null };
+  }
+}
+
+// Decrement lives globally
+export async function decrementUserLives(username: string) {
+  const { error } = await supabase.rpc('decrement_lives', { target_username: username });
+  return { error };
+}
+
 // Helper: format a SupabasePost into the shape the existing UI components expect
-export function formatPostForUI(post: SupabasePost) {
+export function formatPostForUI(post: SupabasePost & { profiles: { is_traitor?: boolean } }) {
   const timeAgo = getTimeAgo(post.created_at);
   const isVideo = post.image_url?.startsWith('data:video/') || post.image_url?.endsWith('.mp4');
   
@@ -202,10 +246,12 @@ export function formatPostForUI(post: SupabasePost) {
     id: post.id,
     username: post.profiles?.username || 'unknown',
     avatar: post.profiles?.avatar_url || '',
+    isTraitorGlobal: post.profiles?.is_traitor || false,
     image: post.image_url || '',
     type: isVideo ? 'video' : 'image',
     caption: post.caption || '',
     likes: post.likes_count || 0,
+    globalLives: post.profiles?.lives ?? 3,
     time: timeAgo,
     comments: [],
   };

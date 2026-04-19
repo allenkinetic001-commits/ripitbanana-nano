@@ -3,9 +3,11 @@ import { ArrowBigUp, ArrowBigDown, Bookmark, MessageCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
+import { setTraitorStatus } from '../hooks/useSupabase';
 import { PixelHeart } from './PixelHeart';
 import { ProfileHeartsToggle } from './ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
+import { decrementUserLives } from '../hooks/useSupabase';
 
 interface PostProps {
   id: number;
@@ -20,11 +22,11 @@ interface PostProps {
   onDelete?: () => void;
   onPass?: () => void;
   comments: { id: number; username: string; text: string; time: string; }[];
+  isTraitorGlobal?: boolean;
+  globalLives?: number;
 }
 
-const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments }: PostProps) => {
-  const [userVote, setUserVote] = useState<0 | 1 | -1>(0);
-  const [lives, setLives] = useState(3);
+const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments, isTraitorGlobal, globalLives = 3 }: PostProps) => {
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const [hasActed, setHasActed] = useState(false);
   const [isSwornLocal, setIsSwornLocal] = useState(false);
@@ -32,7 +34,18 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
   const [showHearts, setShowHearts] = useState(false);
   const [isTraitor, setIsTraitor] = useState(false);
   const navigate = useNavigate();
-  const { addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t } = useChallenge();
+  const { addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t, userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser } = useChallenge();
+
+  // Track downvote per TARGET USERNAME (not per post) — 1 click per voter per person
+  const userVote = userVotes[`user_${username}`] !== undefined ? userVotes[`user_${username}`] : 0;
+  
+  // Optimistic lives: Use global value as base, but allow instant local decrements
+  const [optimisticLives, setOptimisticLives] = useState(globalLives);
+  
+  // Sync with database when global values change
+  React.useEffect(() => {
+    setOptimisticLives(globalLives);
+  }, [globalLives]);
 
   const { handlers: heartsHandlers } = useLongPress(() => {
     setShowHearts(prev => !prev);
@@ -60,20 +73,43 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
     // Removed navigation to let user stay on Home screen
   };
 
-  const handleAddEnemy = (e: React.MouseEvent) => {
+  const handleAddEnemy = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const survivorData = { id, username, avatar, image, caption, time, comments };
-    if (isSwornLocal) {
-      addSwornEnemy(survivorData);
-    } else {
-      addEnemy(survivorData);
+    
+    if (isTraitor) {
+      // Set traitor status globally in Supabase
+      setIsTraitor(true);
+      await setTraitorStatus(username, true);
+      return;
     }
-    setShowAddedFeedback(true);
-    setHasActed(true);
-    setIsTraitor(false);
+
+    const survivorData = { id, username, avatar, image, caption, time, comments };
+    
+    if (isEnemy) {
+      const enemyToRemove = enemies.find(e => e.username === username);
+      if (enemyToRemove) {
+        removeEnemy(enemyToRemove.id);
+      }
+      setShowAddedFeedback(false);
+      setHasActed(false);
+    } else {
+      if (isSwornLocal) {
+        addSwornEnemy(survivorData);
+      } else {
+        addEnemy(survivorData);
+      }
+      setShowAddedFeedback(true);
+      setHasActed(true);
+    }
   };
 
-  const handleVote = (vote: 1 | -1) => {
+  const handleVote = async (vote: 1 | -1) => {
+    if (!userProfile.username) {
+      alert("Please log in to participate in the elimination rounds.");
+      navigate('/login');
+      return;
+    }
+
     if (!gameMode) {
       alert("Click on the purple '+' icon and select any variant for the icons to work.");
       return;
@@ -84,19 +120,29 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         return; // Downvotes only in Pley
       }
       if (vote === -1) {
-        const nextLives = lives - 1;
-        setLives(nextLives);
-        if (nextLives <= 0) {
-          if (onDelete) onDelete();
+        if (userVote === -1) {
+          // Already downvoted this USER — blocked regardless of which post
+          return;
+        } else {
+          // Apply downvote: keyed by TARGET USERNAME so 1 click = 1 heart across all their posts
+          setUserVoteForPost(`user_${username}`, -1);
+          setOptimisticLives(prev => Math.max(0, prev - 1));
+          
+          // Sync to global database
+          await decrementUserLives(username);
+          
+          if (globalLives <= 1) {
+            if (onDelete) onDelete();
+          }
         }
         return;
       }
     }
 
     if (userVote === vote) {
-      setUserVote(0);
+      setUserVoteForPost(id, 0);
     } else {
-      setUserVote(vote);
+      setUserVoteForPost(id, vote);
     }
   };
 
@@ -132,12 +178,12 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
             </div>
             {/* 3 Lives Hearts */}
             <div className="flex items-center gap-0.5 mt-0.5">
-              <ProfileHeartsToggle isVisible={showHearts} lives={lives} heartClassName="w-4 h-4" />
+              <ProfileHeartsToggle isVisible={showHearts} lives={optimisticLives} heartClassName="w-4 h-4" />
             </div>
           </div>
         </div>
           <div className="flex items-center space-x-2">
-            {isTraitor ? (
+            {isTraitorGlobal || isTraitor ? (
               <button 
                 onClick={handleAddEnemy}
                 className="animate-pop-in transition-all active:scale-95 flex items-center justify-center p-1"
@@ -159,7 +205,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                   {...enemyLongPress}
                   className="active:scale-95 drop-shadow-sm"
                 >
-                  {showAddedFeedback ? (
+                  {showAddedFeedback || isEnemy ? (
                     <img 
                       src="/btn-added.png" 
                       alt="Added" 
@@ -237,8 +283,7 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className={cn(
-              "flex items-center space-x-1 rounded-full px-1.5 py-0.5 transition-all duration-300 shadow-sm",
-              userVote === 1 ? "bg-green-600" : userVote === -1 ? "bg-[#DC143C]" : "bg-zinc-100 border border-zinc-200"
+              "flex items-center space-x-1 rounded-full px-1.5 py-0.5 transition-all duration-300 shadow-sm bg-zinc-100 border border-zinc-200"
             )}>
               {!gameMode && (
                 <button 
@@ -250,8 +295,8 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                 >
                   <ArrowBigUp 
                     size={22} 
-                    fill={userVote === 1 ? "white" : "transparent"} 
-                    stroke={userVote === 1 ? "white" : "black"}
+                    fill={userVote === 1 ? "#16a34a" : "transparent"} 
+                    stroke={userVote === 1 ? "#16a34a" : "black"}
                     strokeWidth={2}
                   />
                 </button>
@@ -265,8 +310,8 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
               >
                 <ArrowBigDown 
                   size={22} 
-                  fill={userVote === -1 ? "white" : "transparent"} 
-                  stroke={userVote === -1 ? "white" : "black"}
+                  fill={userVote === -1 ? "#DC143C" : "transparent"} 
+                  stroke={userVote === -1 ? "#DC143C" : "black"}
                   strokeWidth={2}
                 />
               </button>

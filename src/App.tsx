@@ -14,11 +14,12 @@ import Signup from "./pages/Signup";
 import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/SettingsPage";
 import Chat from "./pages/Chat";
+import EliminatedPage from "./pages/Eliminated";
 import { useChallenge } from "./contexts/ChallengeContext";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, authLoading } = useChallenge();
-  // Wait for Supabase to resolve the session before deciding to redirect
+  const { isAuthenticated, authLoading, isEliminated } = useChallenge();
+  
   if (authLoading) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-zinc-50">
@@ -27,7 +28,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
+  
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  
+  if (isEliminated) {
+    return <EliminatedPage />;
+  }
+  
   return <>{children}</>;
 };
 
