@@ -401,10 +401,15 @@ const Profile = () => {
           />
         </button>
         <button 
-          className="flex-1 flex items-center justify-center h-12 border-b-2 border-transparent text-zinc-400 opacity-20 cursor-not-allowed"
+          className="flex-1 flex items-center justify-center h-12 border-b-2 border-transparent opacity-20 cursor-not-allowed"
           title="Trophies coming soon"
         >
-          <Trophy size={20} />
+          <img 
+            src="/trophy-icon.png" 
+            alt="Trophies" 
+            className="w-6 h-6 object-contain" 
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
+          />
         </button>
       </div>
 
