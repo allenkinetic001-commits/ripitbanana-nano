@@ -149,7 +149,14 @@ const Profile = () => {
             )}
             title={viewMode === 'enemies' ? "Back to Posts" : "View Enemies"}
           >
-            <ShieldAlert size={24} />
+            <img 
+              src="/enemies-icon.png" 
+              alt="Enemies" 
+              className={cn(
+                "w-7 h-7 object-contain transition-all duration-300",
+                viewMode === 'enemies' ? "brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" : "opacity-40"
+              )}
+            />
           </button>
           <div className="relative">
             <button 
@@ -382,9 +389,16 @@ const Profile = () => {
         )}
         <button 
           onClick={() => setViewMode('enemies')}
-          className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'enemies' ? 'border-rose-600 text-rose-600' : 'border-transparent text-zinc-400'}`}
+          className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'enemies' ? 'border-rose-600' : 'border-transparent text-zinc-400'}`}
         >
-          <ShieldAlert size={24} />
+          <img 
+            src="/enemies-icon.png" 
+            alt="Enemies" 
+            className={cn(
+              "w-7 h-7 object-contain transition-all duration-300",
+              viewMode === 'enemies' ? "brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" : "opacity-40"
+            )}
+          />
         </button>
         <button 
           className="flex-1 flex items-center justify-center h-12 border-b-2 border-transparent text-zinc-400 opacity-20 cursor-not-allowed"
@@ -422,8 +436,12 @@ const Profile = () => {
               enemies.map((enemy) => (
                 <div key={enemy.id} className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-rose-600">
-                      <ShieldAlert size={20} />
+                    <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center">
+                      <img 
+                        src="/enemies-icon.png" 
+                        alt="Enemy" 
+                        className="w-6 h-6 object-contain brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" 
+                      />
                     </div>
                     <span className="font-bold text-sm">@{enemy.username}</span>
                   </div>
