@@ -277,7 +277,12 @@ const Profile = () => {
           <div className="flex-1 flex justify-around">
             <div className="flex flex-col items-center">
               <span className="font-bold">{userPosts.length}</span>
-              <span className="text-xs text-zinc-500">{t('profile_posts')}</span>
+              <img 
+                src="/posts-title.png" 
+                alt="Posts" 
+                className="h-3 w-auto object-contain opacity-40" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold">0</span>
