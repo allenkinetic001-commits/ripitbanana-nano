@@ -284,7 +284,7 @@ const Profile = () => {
               <img 
                 src="/followers-title.png" 
                 alt="Followers" 
-                className="h-3 w-auto object-contain brightness-90" 
+                className="h-3 w-auto object-contain opacity-40" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
