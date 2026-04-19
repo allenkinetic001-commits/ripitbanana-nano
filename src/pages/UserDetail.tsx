@@ -335,7 +335,7 @@ const UserDetail = () => {
           </div>
         ) : profileNotFound ? (
           <EmptyFeed
-            className="min-h-[40vh] pt-24"
+            className="min-h-[40vh] pt-36"
             title="User Not Found"
             subtitle="This profile doesn't exist"
           />
@@ -352,7 +352,7 @@ const UserDetail = () => {
             ))}
           </div>
         ) : (
-          <EmptyFeed className="min-h-[40vh] pt-24" subtitle="Nobody yet" />
+          <EmptyFeed className="min-h-[40vh] pt-36" subtitle="Nobody yet" />
         )
       ) : (
         <div className="flex-1 bg-zinc-50/50 p-4">

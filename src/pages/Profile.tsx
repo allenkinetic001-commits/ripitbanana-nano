@@ -383,7 +383,7 @@ const Profile = () => {
             ))}
           </div>
         ) : (
-          <EmptyFeed className="min-h-[40vh] pt-24" subtitle="Nobody yet" />
+            <EmptyFeed className="min-h-[40vh] pt-36" subtitle="Nobody yet" />
         )
       ) : viewMode === 'enemies' ? (
         <div className="flex-1 bg-zinc-50/50 p-4">
