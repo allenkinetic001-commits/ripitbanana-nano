@@ -211,7 +211,12 @@ const UserDetail = () => {
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold">0</span>
-              <span className="text-xs text-zinc-500">Followers</span>
+              <img 
+                src="/followers-title.png" 
+                alt="Followers" 
+                className="h-3 w-auto object-contain brightness-90" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold">{isMe ? followedUsers.length : 0}</span>
