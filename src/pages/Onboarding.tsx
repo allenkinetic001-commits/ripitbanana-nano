@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Check } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -8,10 +9,17 @@ export default function Onboarding() {
 
   const totalSteps = 7;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ has_onboarded: true })
+          .eq('id', user.id);
+      }
       navigate('/');
     }
   };
@@ -75,7 +83,14 @@ export default function Onboarding() {
     }
   ];
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from('profiles')
+        .update({ has_onboarded: true })
+        .eq('id', user.id);
+    }
     navigate('/');
   };
 

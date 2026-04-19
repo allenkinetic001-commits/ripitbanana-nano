@@ -39,7 +39,7 @@ export default function Login() {
         // If it doesn't, it means the user was eliminated (destroyed)
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, has_onboarded')
           .eq('id', data.user.id)
           .single();
           
@@ -50,7 +50,11 @@ export default function Login() {
           return;
         }
 
-        navigate('/');
+        if (profile.has_onboarded) {
+          navigate('/');
+        } else {
+          navigate('/onboarding');
+        }
       } catch (err: any) {
         setError(err.message || 'An error occurred during log in.');
       } finally {
