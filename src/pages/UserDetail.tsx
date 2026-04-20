@@ -65,7 +65,7 @@ const UserDetail = () => {
         setUserPostsFromDB(posts.map((p: any) => ({
           id: p.id,
           username: p.profiles?.username || username,
-          avatar: p.profiles?.avatar_url || profile.avatar_url || '',
+          avatar: p.profiles?.avatar_url || profile.avatar_url || '/custom-empty-profile.png',
           image: p.image_url || '',
           caption: p.caption || '',
           likes: p.likes_count || 0,

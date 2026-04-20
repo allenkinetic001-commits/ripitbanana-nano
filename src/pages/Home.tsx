@@ -99,7 +99,7 @@ const Home = () => {
   const navigate = useNavigate();
   const {
     timeLeft, isActive, clickCounts, eliminationCounts, madeItCounts,
-    userSelection, isChallengeEnded, survivors,
+    userSelection, isChallengeEnded, survivors, eliminated,
     isEliminationRoundActive, setIsEliminationRoundActive,
     showPills, setShowPills, activeTab, setActiveTab,
     majorityVariant,
@@ -283,22 +283,9 @@ const Home = () => {
   }, []);
 
   // End challenge if all posts are judged or timer runs out
-  useEffect(() => {
-    if ((isActive || isEliminationRoundActive) && !isChallengeEnded) {
-      // Only end automatically if there were posts to judge and they are all gone
-      if (visiblePosts.length === 0 && allPosts.length > 0) {
-        setIsActive(false);
-        setIsEliminationRoundActive(false);
-        setIsChallengeEnded(true);
-        setTimeLeft(0);
-        navigate('/search');
-      } else if (timeLeft === 0 && isActive) {
-        setIsActive(false);
-        setIsChallengeEnded(true);
-        navigate('/search');
-      }
-    }
-  }, [visiblePosts.length, isActive, isEliminationRoundActive, isChallengeEnded, timeLeft, setSurvivors, setIsActive, setIsEliminationRoundActive, setIsChallengeEnded, setTimeLeft, userSelection, majorityVariant, setMadeItCounts, navigate]);
+  // Navigate to results when challenge ends
+  // REMOVED auto-navigation to allow viewing end-screen on Home
+
 
   const handleTabClick = (tab: string) => {
     if (timeLeft > 0) {
@@ -870,35 +857,53 @@ const Home = () => {
             }
           />
         ) : (
-          /* ── Challenge ended / all posts judged ── */
-          <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20">
-            <div className="space-y-4 mb-8 mt-20">
-              <img src="/the-end.png" alt={t('home_the_end')} className="h-16 w-auto object-contain mx-auto" />
-              <div className="flex flex-col items-center gap-3">
-                <div className="h-[2px] w-24 bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
+          /* ── Universal Selection Ended / Victory Screen ── */
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20 relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-purple-100/30 blur-[100px] rounded-full -z-10" />
+            
+            <div className="space-y-6 mb-12 animate-in slide-in-from-top-12 duration-1000">
+              <div className="relative inline-block">
+                <img 
+                  src="/the-end.png" 
+                  alt={t('home_the_end')} 
+                  className="h-24 w-auto object-contain mx-auto relative z-10" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+                <div className="absolute -inset-4 bg-white/50 blur-xl rounded-full -z-10" />
+              </div>
+              
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-[3px] w-32 bg-gradient-to-r from-transparent via-zinc-900 to-transparent" />
+                <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-tighter italic">
+                  Selection Complete
+                </h2>
                 <p className="text-zinc-400 font-black uppercase tracking-[0.4em] text-[10px]">
-                  {isChallengeEnded 
-                    ? t('home_universal_complete') 
-                    : t('home_all_judged')}
+                  You Survived the Universal Rounds
                 </p>
               </div>
             </div>
 
-            {survivors.length > 0 && (
-              <div className="w-full max-w-sm mb-8 animate-in slide-in-from-bottom-4 duration-700 delay-300">
-                <div className="flex items-center gap-2 mb-3 px-2">
-                  <img 
-                    src="/guacamole-trophy.png" 
-                    alt="Survival" 
-                    className="h-5 w-auto object-contain" 
-                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
-                  />
-                  <span className="text-xs font-black uppercase tracking-widest text-zinc-500">{t('home_survivors')}</span>
-                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold">{survivors.length}</span>
+            {survivors.length > 0 ? (
+              <div className="w-full max-w-sm mb-12 animate-in slide-in-from-bottom-12 duration-1000 delay-300">
+                <div className="flex items-center justify-between mb-4 px-4">
+                  <div className="flex items-center gap-2">
+                    <img 
+                      src="/guacamole-trophy.png" 
+                      alt="Survival" 
+                      className="h-6 w-auto object-contain" 
+                      style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                    />
+                    <span className="text-[11px] font-black uppercase tracking-widest text-zinc-900">Hall of Fame</span>
+                  </div>
+                  <span className="bg-zinc-900 text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
+                    {survivors.length} SURVIVORS
+                  </span>
                 </div>
-                <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
-                  <div className="max-h-[200px] overflow-y-auto divide-y divide-zinc-50">
-                    {survivors.map((survivor, index) => (
+                
+                <div className="bg-white/80 backdrop-blur-md rounded-[2.5rem] border border-zinc-100 shadow-2xl overflow-hidden group">
+                  <div className="max-h-[280px] overflow-y-auto divide-y divide-zinc-50 p-2">
+                    {survivors.slice(0, 10).map((survivor, index) => (
                       <HomeUserItem 
                         key={survivor.id} 
                         user={survivor} 
@@ -906,34 +911,68 @@ const Home = () => {
                         navigate={navigate} 
                       />
                     ))}
+                    {survivors.length > 10 && (
+                      <div className="p-4 text-center">
+                        <button 
+                          onClick={() => navigate('/search')}
+                          className="text-[10px] font-black text-purple-600 uppercase tracking-widest hover:underline"
+                        >
+                          View All {survivors.length} in Public Gallery
+                        </button>
+                      </div>
+                    )}
                   </div>
+                </div>
+              </div>
+            ) : eliminated.length > 0 && (
+              /* ── TOTAL TERMINATION STATE ── */
+              <div className="w-full max-w-sm mb-12 animate-in slide-in-from-bottom-12 duration-1000 delay-300">
+                <div className="bg-rose-50/80 backdrop-blur-md rounded-[2.5rem] border border-rose-100 p-8 shadow-2xl overflow-hidden group text-center">
+                  <div className="relative mb-6">
+                    <Skull size={48} className="text-rose-500 mx-auto drop-shadow-lg" />
+                    <div className="absolute inset-0 bg-rose-200/20 blur-xl rounded-full -z-10" />
+                  </div>
+                  <h3 className="text-2xl font-black text-rose-600 uppercase tracking-tighter italic mb-2">
+                    {t('search_total_termination')}
+                  </h3>
+                  <p className="text-rose-400 font-black uppercase tracking-[0.3em] text-[9px]">
+                    No One Made It Out Alive
+                  </p>
                 </div>
               </div>
             )}
 
-            <div className="mt-8 flex items-center justify-center p-2">
-              <img 
-                src="/btn-get-started-mask.png" 
-                alt={t('home_start_new')} 
-                className="h-36 w-auto object-contain drop-shadow-xl" 
-              />
+            <div className="flex flex-col items-center gap-6 animate-in fade-in duration-1000 delay-700">
+              <button
+                onClick={() => navigate('/search')}
+                className="group relative transition-all active:scale-95"
+              >
+                <div className="absolute -inset-2 bg-purple-100 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                <img 
+                  src="/btn-get-started-mask.png" 
+                  alt="View Results" 
+                  className="h-16 w-auto object-contain relative z-10" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              </button>
+              
+              <button
+                onClick={() => {
+                  startNewChallenge();
+                  setVisiblePosts(allPosts);
+                  setActiveTab('pley');
+                  setShowPills(false);
+                }}
+                className="transition-all hover:scale-105 active:scale-95"
+              >
+                <img 
+                  src="/artisan-lobster.png" 
+                  alt="New Round" 
+                  className="h-28 w-auto object-contain drop-shadow-lg" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+              </button>
             </div>
-            <button
-              onClick={() => {
-                startNewChallenge();
-                setVisiblePosts(allPosts);
-                setActiveTab('pley');
-                setShowPills(false);
-              }}
-              className="mt-8 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center mx-auto"
-            >
-              <img 
-                src="/artisan-lobster.png" 
-                alt={t('search_try_again')} 
-                className="h-32 w-auto object-contain drop-shadow-sm" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
-              />
-            </button>
           </div>
         )}
       </main>

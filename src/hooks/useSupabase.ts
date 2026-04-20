@@ -245,7 +245,7 @@ export function formatPostForUI(post: SupabasePost & { profiles: { is_traitor?: 
   return {
     id: post.id,
     username: post.profiles?.username || 'unknown',
-    avatar: post.profiles?.avatar_url || '',
+    avatar: post.profiles?.avatar_url || '/custom-empty-profile.png',
     isTraitorGlobal: post.profiles?.is_traitor || false,
     image: post.image_url || '',
     type: isVideo ? 'video' : 'image',

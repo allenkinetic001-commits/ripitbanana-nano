@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { posts } from '../data/posts';
 import { formatDate } from '../lib/utils';
 import { supabase } from '../lib/supabase';
@@ -26,11 +26,11 @@ interface RoundRecord {
   id: string;
   date: string;
   time: string;
-  outcome: 'SURVIVAL' | 'TERMINATION';
-  survivorCount: number;
   survivors: Survivor[];
+  eliminated: Survivor[];
   durationLabel: string;
   variant: string | null;
+  timestamp?: number;
   rankingRule?: string | null;
 }
 
@@ -104,7 +104,6 @@ interface ChallengeContextType {
   isEliminationRoundActive: boolean;
   setIsEliminationRoundActive: (active: boolean) => void;
   setSurvivors: React.Dispatch<React.SetStateAction<Survivor[]>>;
-  setSurvivorHistory: React.Dispatch<React.SetStateAction<Survivor[]>>;
   setRoundHistory: React.Dispatch<React.SetStateAction<RoundRecord[]>>;
   updateHistoryVote: (survivorId: number, roundId: string | null, vote: 'up' | 'down' | null) => void;
   startNewChallenge: () => void;
@@ -3893,7 +3892,6 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s3_i2': 'Suara dapat memengaruhi perkembangan pengguna, reset profil, atau pembatasan sementara.',
     'terms_s3_i3': 'Timer, babak, dan hasil ditentukan oleh aplikasi dan pengguna yang berpartisipasi.',
     'terms_s3_i4': 'Pengguna berpartisipasi atas diskresi mereka sendiri.',
-    'terms_s4_title': '4. Reputasi, Status & Skor',
     'terms_s4_intro': 'Dengan menggunakan Rip It, Anda memahami bahwa:',
     'terms_s4_i1': 'Status, gelar, dan pengakuan mencerminkan performa dalam aplikasi dan riwayat bertahan hidup',
     'terms_s4_i2': 'Voting publik memengaruhi perkembangan dalam mode',
@@ -4986,7 +4984,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const [timeLeft, setTimeLeft] = useState(getSecondsUntilMidnight());
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date().toDateString());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('userProfile');
@@ -5001,7 +4999,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       username: '',
       fullName: '',
       bio: '',
-      avatar: '',
+      avatar: '/custom-empty-profile.png',
       website: ''
     };
   });
@@ -5036,8 +5034,25 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
-  const [survivorHistory, setSurvivorHistory] = useState<Survivor[]>([]);
   const [roundHistory, setRoundHistory] = useState<RoundRecord[]>([]);
+
+  // Hall of Fame is now derived from universal round history
+  const survivorHistory = useMemo(() => {
+    const allSurvivors: Survivor[] = [];
+    const seenUsernames = new Set<string>();
+    
+    roundHistory.forEach(round => {
+      (round.survivors || []).forEach((s: any) => {
+        // Deduplicate by username so each person appears once in Hall of Fame
+        if (s.username && !seenUsernames.has(s.username)) {
+          allSurvivors.push({ ...s, madeIt: true });
+          seenUsernames.add(s.username);
+        }
+      });
+    });
+    
+    return allSurvivors;
+  }, [roundHistory]);
 
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
 
@@ -5070,8 +5085,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setFollowedUsers([]);
       setWallPosts([]);
       setPostComments({});
-      setSurvivorHistory([]);
-      setRoundHistory([]);
       setUserVotes({});
       return;
     }
@@ -5087,8 +5100,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     load('followedUsers', setFollowedUsers, []);
     load('wallPosts', setWallPosts, []);
     load('postComments', setPostComments, {});
-    load('survivorHistory', setSurvivorHistory, []);
-    load('roundHistory', setRoundHistory, []);
   }, [userProfile.username]);
 
   // Persist private data to scoped local storage
@@ -5100,9 +5111,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     localStorage.setItem(`followedUsers_v7_${u}`, JSON.stringify(followedUsers));
     localStorage.setItem(`wallPosts_v7_${u}`, JSON.stringify(wallPosts));
     localStorage.setItem(`postComments_v7_${u}`, JSON.stringify(postComments));
-    localStorage.setItem(`survivorHistory_v7_${u}`, JSON.stringify(survivorHistory));
-    localStorage.setItem(`roundHistory_v7_${u}`, JSON.stringify(roundHistory));
-  }, [userProfile.username, userVotes, enemies, followedUsers, wallPosts, postComments, survivorHistory, roundHistory]);
+  }, [userProfile.username, userVotes, enemies, followedUsers, wallPosts, postComments]);
 
   // Global/Public caches (not account-specific)
   useEffect(() => {
@@ -5202,16 +5211,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           localStorage.removeItem('allPosts');
           localStorage.removeItem('visiblePosts');
           localStorage.removeItem('postComments');
-          localStorage.removeItem('survivorHistory');
-          localStorage.removeItem('roundHistory');
           setEnemies([]);
           setFollowedUsers([]);
           setWallPosts([]);
           setAllPosts([]);
           setVisiblePosts([]);
           setPostComments({});
-          setSurvivorHistory([]);
-          setRoundHistory([]);
           setIsChallengeEnded(false);
           localStorage.setItem('isChallengeEnded', 'false');
           localStorage.setItem('supabaseUserId', session.user.id);
@@ -5232,16 +5237,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           localStorage.removeItem('allPosts');
           localStorage.removeItem('visiblePosts');
           localStorage.removeItem('postComments');
-          localStorage.removeItem('survivorHistory');
-          localStorage.removeItem('roundHistory');
           setEnemies([]);
           setFollowedUsers([]);
           setWallPosts([]);
           setAllPosts([]);
           setVisiblePosts([]);
           setPostComments({});
-          setSurvivorHistory([]);
-          setRoundHistory([]);
           setIsChallengeEnded(false);
           localStorage.setItem('isChallengeEnded', 'false');
           localStorage.setItem('supabaseUserId', session.user.id);
@@ -5254,8 +5255,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setFollowedUsers([]);
         setWallPosts([]);
         setPostComments({});
-        setSurvivorHistory([]);
-        setRoundHistory([]);
         setUserVotes({});
         localStorage.removeItem('supabaseUserId');
       }
@@ -5412,6 +5411,53 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const [isDurationInitialized, setIsDurationInitialized] = useState(false);
 
+  // Universal History Fetching — fetch once on mount, re-fetch on new inserts
+  const fetchHistory = async () => {
+    const { data, error } = await supabase
+      .from('challenge_rounds')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ Failed to fetch round history:', error);
+      return;
+    }
+
+    if (data) {
+      const formatted: RoundRecord[] = data.map(r => ({
+        id: r.id,
+        date: r.date,
+        time: r.time,
+        variant: r.variant,
+        durationLabel: r.duration_label,
+        survivors: Array.isArray(r.survivors) ? r.survivors : [],
+        eliminated: Array.isArray(r.eliminated) ? r.eliminated : [],
+        timestamp: r.round_timestamp
+      }));
+      console.log('📥 Fetched', formatted.length, 'rounds from Supabase');
+      setRoundHistory(formatted);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+    
+    const channel = supabase
+      .channel('universal_history')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'challenge_rounds' }, () => {
+        fetchHistory();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  // Re-fetch history whenever auth state changes (login/logout) to keep UI in sync
+  useEffect(() => {
+    fetchHistory();
+  }, [isAuthenticated]);
+
+
   const startNewChallenge = () => {
     setIsActive(true);
     setIsEliminationRoundActive(true);
@@ -5424,88 +5470,24 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     setClickCounts({ pley: 0 });
     setEliminationCounts({ pley: 0 });
     setMadeItCounts({ pley: 0 });
-    setVariantDurations({ pley: 86400 }); // 24hr cycle
+    setVariantDurations({ pley: 120 }); // 2m cycle
     setVariantFirstClickTime({ pley: 0 });
     setSurvivors([]);
     setEliminated([]);
     setVisiblePosts(allPosts);
   };
 
-  // Archive challenge results when it ends
-  useEffect(() => {
-    if (isChallengeEnded) {
-      const now = new Date();
-      const today = formatDate(now);
-      const survivalTime = now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
+  // (Archive logic moved to timeLeft===0 effect to avoid stale state)
 
-      const activeVariant = userSelection || majorityVariant;
-
-      // Get current round duration
-      const durationSeconds = activeVariant ? (variantDurations[activeVariant] || 0) : 0;
-      const formatDuration = (seconds: number) => {
-        if (seconds < 60) return `${seconds}s`;
-        if (seconds < 3600) return `${Math.floor(seconds / 60)} min`;
-        return `${Math.floor(seconds / 3600)} hr`;
-      };
-
-      const durationLabel = formatDuration(durationSeconds);
-
-      // Create round record with participants (survivors + eliminated)
-      const allParticipants = [
-        ...survivors.map(s => ({ ...s, madeIt: true, variant: activeVariant, userVote: null })),
-        ...eliminated.map(e => ({ ...e, madeIt: false, variant: activeVariant, userVote: null }))
-      ];
-
-      const roundRecord: RoundRecord = {
-        id: Math.random().toString(36).substr(2, 9),
-        date: today,
-        time: survivalTime,
-        outcome: survivors.length > 0 ? 'SURVIVAL' : 'TERMINATION',
-        survivorCount: survivors.length,
-        survivors: allParticipants,
-        durationLabel,
-        variant: activeVariant
-      };
-
-      setRoundHistory(prev => [roundRecord, ...prev]);
-
-      // Archive individual survivors for the Hall of Fame
-      if (survivors.length > 0) {
-        const updatedSurvivors = survivors.map(s => ({
-          ...s,
-          madeIt: true,
-          survivalDate: today,
-          survivalTime: survivalTime,
-          roundDurationLabel: durationLabel,
-          roundDurationValue: durationSeconds,
-          variant: activeVariant,
-          userVote: null
-        }));
-        
-        setSurvivorHistory(prev => {
-          // Prevent duplicate entries for the same round
-          const existingIds = new Set(prev.map(p => `${p.id}-${p.survivalDate}-${p.survivalTime}`));
-          const filteredNew = updatedSurvivors.filter(s => !existingIds.has(`${s.id}-${today}-${survivalTime}`));
-          return [...filteredNew, ...prev];
-        });
-      }
+  const clearAllHistory = async () => {
+    const { error } = await supabase.from('challenge_rounds').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (!error) {
+      setRoundHistory([]);
     }
-  }, [isChallengeEnded, survivors, eliminated, majorityVariant, userSelection, variantDurations]);
-
-  const clearAllHistory = () => {
-    setSurvivorHistory([]);
-    setRoundHistory([]);
-    localStorage.removeItem('survivorHistory');
-    localStorage.removeItem('roundHistory');
   };
 
   const updateHistoryVote = (survivorId: number, roundId: string | null, vote: 'up' | 'down' | null) => {
     if (roundId) {
-      // Update in specific round history
       setRoundHistory(prev => prev.map(round => {
         if (round.id === roundId) {
           return {
@@ -5515,57 +5497,131 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         }
         return round;
       }));
-    } else {
-      // Update in Hall of Fame (survivorHistory)
-      setSurvivorHistory(prev => prev.map(s => s.id === survivorId ? { ...s, userVote: vote } : s));
     }
   };
 
-  // Day-change detection and automated reset (Changed to 1 minute end logic for testing)
+  // Day-change detection and automated reset (Universal Loop)
   useEffect(() => {
     if (isActive && timeLeft === 0) {
         // Round ends: Archive results
-        setIsActive(false);
-        setIsChallengeEnded(true);
+        const activeMode = userSelection || majorityVariant || 'pley';
         
-        // Settle current round logic
-        if (visiblePosts.length > 0) {
-          const remainingSurvivors = visiblePosts.map(p => ({ 
-            id: p.id,
-            username: p.username, 
-            avatar: p.avatar,
-            image: p.image,
-            caption: p.caption,
-            time: p.time,
-            comments: p.comments
-          }));
-          
+        // Build the survivor list from visiblePosts NOW (before state becomes stale)
+        const remainingSurvivors = visiblePosts.map(p => ({ 
+          id: p.id,
+          username: p.username, 
+          avatar: p.avatar,
+          image: p.image,
+          caption: p.caption,
+          time: p.time,
+          comments: p.comments,
+          madeIt: true,
+          variant: activeMode
+        }));
+
+        if (remainingSurvivors.length > 0) {
           setSurvivors(prevSurvivors => {
-            const existingIds = new Set(prevSurvivors.map(s => s.id));
+            const existingIds = new Set(prevSurvivors.map((s: any) => s.id));
             const uniqueNew = remainingSurvivors.filter(s => !existingIds.has(s.id));
             return [...prevSurvivors, ...uniqueNew];
           });
 
-          const activeMode = userSelection || majorityVariant || 'pley';
           setMadeItCounts(prevCounts => ({
             ...prevCounts,
             [activeMode]: (prevCounts[activeMode] || 0) + remainingSurvivors.length
           }));
         }
 
+        // ── PUSH TO SUPABASE HERE (with data we already have in closure) ──
+        // Only push if there is meaningful data to record
+        const hasData = remainingSurvivors.length > 0 || eliminated.length > 0;
+
+        if (hasData && isAuthenticated) {
+          const currentCycleSeconds = 120;
+          const roundTimestamp = Math.floor(Date.now() / 1000 / currentCycleSeconds) * currentCycleSeconds;
+          const lastPushed = localStorage.getItem('last_pushed_round');
+
+          if (lastPushed !== String(roundTimestamp)) {
+            localStorage.setItem('last_pushed_round', String(roundTimestamp));
+
+            const now = new Date();
+            const today = formatDate(now);
+            const survivalTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const durationLabel = '2 min';
+            const currentSurvivors = remainingSurvivors.map(s => ({ ...s, madeIt: true, userVote: null }));
+            const currentEliminated = eliminated.map(e => ({ ...e, madeIt: false, userVote: null }));
+
+            supabase.from('challenge_rounds').insert({
+              date: today,
+              time: survivalTime,
+              variant: activeMode === 'pley' ? 'Pley' : activeMode,
+              duration_label: durationLabel,
+              survivors: currentSurvivors,
+              eliminated: currentEliminated,
+              round_timestamp: roundTimestamp
+            }).then(({ error }) => {
+              if (error && error.code !== '23505') {
+                console.error('Error saving round:', error);
+              } else if (!error) {
+                console.log('✅ Round saved to Supabase!', { survivors: currentSurvivors.length, eliminated: currentEliminated.length });
+              }
+            });
+          }
+        }
+
+        setIsChallengeEnded(true);
     }
-  }, [timeLeft, isActive, visiblePosts, allPosts, majorityVariant, userSelection, isEliminationRoundActive]);
+  }, [timeLeft, isActive, visiblePosts, allPosts, majorityVariant, userSelection, isEliminationRoundActive, eliminated]);
+
+  useEffect(() => {
+    if (isChallengeEnded) {
+      const timeout = setTimeout(() => {
+        setIsChallengeEnded(false);
+        setSurvivors([]);
+        setEliminated([]);
+        setClickCounts({ pley: 0 });
+        setEliminationCounts({ pley: 0 });
+        setMadeItCounts({ pley: 0 });
+        setUserSelection(null);
+        setVariantFirstClickTime({ pley: 0 });
+        try {
+          const historyIds = new Set([
+            ...survivorHistory.map(s => s.id),
+            ...roundHistory.flatMap(r => r.survivors?.map(s => s.id) || []),
+            ...roundHistory.flatMap(r => r.eliminated?.map(e => e.id) || [])
+          ]);
+
+          setVisiblePosts(allPosts.filter(p => !historyIds.has(p.id)));
+        } catch (e) {
+          setVisiblePosts([]); // Start clean if history fails
+        }
+      }, 20000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isChallengeEnded, allPosts]);
+
+  // Universal Timer Calculation (Set to 2 minutes)
+  const calculateUniversalTimeLeft = () => {
+    const now = Math.floor(Date.now() / 1000);
+    const cycleSeconds = 120; // 2 minutes
+    const remaining = cycleSeconds - (now % cycleSeconds);
+    // Return 0 at the exact moment of reset
+    const finalTime = remaining === cycleSeconds ? 0 : remaining;
+    return finalTime;
+  };
 
   // Timer countdown
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
-      }, 1000);
-    }
+    const updateTimer = () => {
+      if (isActive) {
+        setTimeLeft(calculateUniversalTimeLeft());
+      }
+    };
+
+    updateTimer(); // Initial call
+    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [isActive, timeLeft]);
+  }, [isActive]);
 
 
 
@@ -5591,10 +5647,10 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           return prevTimes;
         });
 
-        // 3. Update variant durations (fixed for 24h cycle)
+        // 3. Update variant durations (fixed for 2m cycle)
         setVariantDurations(prevDurations => ({
           ...prevDurations,
-          [randomVariant]: 86400
+          [randomVariant]: 120
         }));
 
         // 4. Removed random elimination simulation - now depends on user actions
@@ -5615,7 +5671,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
       setUserSelection, setIsChallengeEnded, startNewChallenge,
-      setSurvivors, setSurvivorHistory, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
+      setSurvivors, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
       addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, authLoading, login, logout, language, setLanguage, theme, setTheme, t,
       userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser,
       isEliminated
