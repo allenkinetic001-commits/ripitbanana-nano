@@ -29,24 +29,34 @@ const Profile = () => {
   const [wallInput, setWallInput] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditEditForm] = useState(userProfile);
-  const [userPosts, setUserPosts] = useState<any[]>([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Supabase data with caching
+  const [profileData, setProfileData] = useState<any>(() => {
+    // Priority: Context > Cache > Null
+    if (userProfile.username) return { 
+      username: userProfile.username,
+      avatar_url: userProfile.avatar,
+      bio: userProfile.bio || 'Surviving the round ⚡',
+      lives: 3 // Default
+    };
+    return null;
+  });
 
-  const [profileData, setProfileData] = useState<any>(null);
+  const [userPosts, setUserPosts] = useState<any[]>(() => {
+    if (!userProfile?.username) return [];
+    const cached = localStorage.getItem(`user_posts_cache_${userProfile.username}`);
+    return cached ? JSON.parse(cached) : [];
+  });
+  
+  const [loadingPosts, setLoadingPosts] = useState(!userProfile?.username || userPosts.length === 0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchProfileAndPosts = async () => {
-      // If username isn't available yet, wait. If we're authenticated, it will come.
-      if (!userProfile?.username) {
-        setLoadingPosts(false);
-        return;
-      }
+      if (!userProfile?.username) return;
       
-      setLoadingPosts(true);
-      
-      // Reset state for new profile
-      setProfileData(null);
+      // If we have posts cached, we don't need to show a blocking loader
+      const cachedPosts = localStorage.getItem(`user_posts_cache_${userProfile.username}`);
+      if (!cachedPosts) setLoadingPosts(true);
       
       // Fetch profile for latest lives count
       const { data: profile } = await supabase
@@ -55,11 +65,16 @@ const Profile = () => {
         .eq('username', userProfile.username)
         .single();
       
-      if (profile) setProfileData(profile);
+      if (profile) {
+        setProfileData(profile);
+        localStorage.setItem(`user_profile_cache_${userProfile.username}`, JSON.stringify(profile));
+      }
 
       const { data, error } = await fetchPostsByUsername(userProfile.username);
       if (data) {
-        setUserPosts(data.map(formatPostForUI));
+        const formatted = data.map(formatPostForUI);
+        setUserPosts(formatted);
+        localStorage.setItem(`user_posts_cache_${userProfile.username}`, JSON.stringify(formatted));
       }
       setLoadingPosts(false);
     };

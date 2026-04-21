@@ -25,21 +25,45 @@ const UserDetail = () => {
   const [viewMode, setViewMode] = useState<'posts' | 'wall'>('posts');
   const [isTraitor, setIsTraitor] = useState(false);
 
-  // Supabase data
-  const [profileData, setProfileData] = useState<any>(null);
-  const [userPostsFromDB, setUserPostsFromDB] = useState<any[]>([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
+  const isMe = username === userProfile.username;
+
+  // Supabase data with caching
+  const [profileData, setProfileData] = useState<any>(() => {
+    // Priority: Context (if Me) > Cache > Null
+    if (isMe && userProfile.username) return { 
+      id: userProfile.id,
+      username: userProfile.username,
+      avatar_url: userProfile.avatar,
+      bio: userProfile.bio || 'Surviving the round ⚡',
+      lives: userLives[userProfile.username] || 3
+    };
+    const cached = localStorage.getItem(`user_profile_cache_${username}`);
+    return cached ? JSON.parse(cached) : null;
+  });
+  
+  const [userPostsFromDB, setUserPostsFromDB] = useState<any[]>(() => {
+    const cached = localStorage.getItem(`user_posts_cache_${username}`);
+    return cached ? JSON.parse(cached) : [];
+  });
+  
+  const [loadingPosts, setLoadingPosts] = useState(!profileData || userPostsFromDB.length === 0);
   const [profileNotFound, setProfileNotFound] = useState(false);
 
   useEffect(() => {
     if (!username) return;
-    setLoadingPosts(true);
+    
+    // If it's me, we can skip the initial loading state since we have profile data
+    if (isMe) {
+      setLoadingPosts(userPostsFromDB.length === 0);
+    } else {
+      // For others, only show loading if we have NO cached data
+      const hasCache = localStorage.getItem(`user_profile_cache_${username}`);
+      if (!hasCache) setLoadingPosts(true);
+    }
+    
     setProfileNotFound(false);
 
     const fetchUserData = async () => {
-      // Reset state for new profile to prevent flicker
-      setProfileData(null);
-      
       // Fetch profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -48,12 +72,18 @@ const UserDetail = () => {
         .single();
       
       if (!profile || profileError) {
+        // If not found in DB, check if it's in our local context (Guest mode or recent signup)
+        if (isMe) {
+          setLoadingPosts(false);
+          return;
+        }
         setProfileNotFound(true);
         setLoadingPosts(false);
         return;
       }
 
       setProfileData(profile);
+      localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(profile));
       
       // Fetch their posts
       const { data: posts } = await supabase
@@ -63,7 +93,7 @@ const UserDetail = () => {
         .order('created_at', { ascending: false });
       
       if (posts) {
-        setUserPostsFromDB(posts.map((p: any) => ({
+        const formatted = posts.map((p: any) => ({
           id: p.id,
           username: p.profiles?.username || username,
           avatar: p.profiles?.avatar_url || profile.avatar_url || '/custom-empty-profile.png',
@@ -72,7 +102,9 @@ const UserDetail = () => {
           likes: p.likes_count || 0,
           time: 'Recently',
           comments: [],
-        })));
+        }));
+        setUserPostsFromDB(formatted);
+        localStorage.setItem(`user_posts_cache_${username}`, JSON.stringify(formatted));
       }
       setLoadingPosts(false);
     };
@@ -88,6 +120,7 @@ const UserDetail = () => {
         filter: `username=eq.${username}`
       }, (payload) => {
         setProfileData(payload.new);
+        localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(payload.new));
       })
       .on('postgres_changes', { 
         event: 'DELETE', 
@@ -102,7 +135,7 @@ const UserDetail = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [username]);
+  }, [username, isMe]);
 
   // Merge context posts with DB posts (context might have locally created posts)
   const contextPosts = allPosts.filter((p: any) => p.username === username);
@@ -113,7 +146,6 @@ const UserDetail = () => {
   const userWallPosts = wallPosts.filter(p => p.targetUser === username);
   const userIsLegend = username ? isLegend(username) : false;
   const isFollowing = username ? followedUsers.includes(username) : false;
-  const isMe = username === userProfile.username;
 
   const toggleTraitor = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -252,9 +284,10 @@ const UserDetail = () => {
                 title="Trigger Traitor Action"
               >
                 <img 
+                  key="traitor-mustache"
                   src="/traitor.png" 
                   alt="Traitor" 
-                  className="h-8 w-auto object-contain" 
+                  className="h-8 w-auto object-contain animate-pop-in" 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               </button>
@@ -268,21 +301,24 @@ const UserDetail = () => {
                   >
                     {showAddedFeedback || isEnemy ? (
                       <img 
+                        key="added"
                         src="/btn-added.png" 
                         alt="Added" 
-                        className="h-[32px] w-auto object-contain" 
+                        className="h-[32px] w-auto object-contain animate-pop-in" 
                       />
                     ) : isSwornLocal ? (
                       <img 
+                        key="sworn"
                         src="/btn-sworn.png" 
                         alt="Sworn Enemy" 
-                        className="h-[32px] w-auto object-contain" 
+                        className="h-[32px] w-auto object-contain animate-pop-in" 
                       />
                     ) : (
                       <img 
+                        key="add"
                         src="/add-enemy.png" 
                         alt="Add Enemy" 
-                        className="h-[43px] w-auto object-contain rounded-xl" 
+                        className="h-[43px] w-auto object-contain rounded-xl animate-pop-in" 
                       />
                     )}
                   </button>
@@ -294,16 +330,18 @@ const UserDetail = () => {
                   >
                     {isFollowing ? (
                       <img 
+                        key="following"
                         src="/btn-following.png" 
                         alt="Following" 
-                        className="h-[32px] w-auto object-contain" 
+                        className="h-[32px] w-auto object-contain animate-pop-in" 
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
                       />
                     ) : (
                       <img 
+                        key="follow"
                         src="/btn-follow.png" 
                         alt="Follow" 
-                        className="h-[32px] w-auto object-contain" 
+                        className="h-[32px] w-auto object-contain animate-pop-in" 
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
                       />
                     )}
