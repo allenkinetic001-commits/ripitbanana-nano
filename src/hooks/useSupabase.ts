@@ -19,8 +19,11 @@ export interface SupabasePost {
 
 // Fetch all posts with profile data joined
 export function useSupabasePosts() {
-  const [posts, setPosts] = useState<SupabasePost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<SupabasePost[]>(() => {
+    const saved = localStorage.getItem('supabase_posts_cache');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [loading, setLoading] = useState(() => !localStorage.getItem('supabase_posts_cache'));
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = async () => {
@@ -40,12 +43,14 @@ export function useSupabasePosts() {
           lives
         )
       `)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(15);
 
     if (fetchError) {
       setError(fetchError.message);
     } else {
       setPosts(data as any[]);
+      localStorage.setItem('supabase_posts_cache', JSON.stringify(data));
     }
     setLoading(false);
   };
@@ -64,7 +69,11 @@ export function useSupabasePosts() {
           .single();
           
         if (newPostWithProfile) {
-          setPosts(prev => [newPostWithProfile as SupabasePost, ...prev]);
+          setPosts(prev => {
+            const next = [newPostWithProfile as SupabasePost, ...prev];
+            localStorage.setItem('supabase_posts_cache', JSON.stringify(next));
+            return next;
+          });
         }
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'posts' }, (payload) => {

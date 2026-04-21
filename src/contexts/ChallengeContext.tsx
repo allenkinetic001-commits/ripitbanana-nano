@@ -92,6 +92,7 @@ interface ChallengeContextType {
   setShowPills: (show: boolean) => void;
   activeTab: string | null;
   setActiveTab: (tab: string | null) => void;
+  historyLoading: boolean;
   setTimeLeft: (time: number) => void;
   setIsActive: (active: boolean) => void;
   setClickCounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
@@ -3962,7 +3963,6 @@ const translations: Record<string, Record<string, string>> = {
     'home_survived': 'بچ گیا',
     'home_the_end': 'اختتام',
     'home_all_judged': 'تمام پروفائلز کا فیصلہ ہو چکا ہے',
-    'home_universal_complete': 'عالمگیر انتخاب مکمل',
     'home_winner_complete': 'فاتح کا انتخاب مکمل',
     'home_upload_modal_title': 'نئی پوسٹ',
     'home_upload_caption_placeholder': 'کیپشن لکھیں...',
@@ -4221,8 +4221,6 @@ const translations: Record<string, Record<string, string>> = {
     'home_survived': 'زنده ماند',
     'home_the_end': 'پایان',
     'home_all_judged': 'همه پروفایل‌ها داوری شدند',
-    'home_universal_complete': 'انتخاب جهانی کامل شد',
-    'home_winner_complete': 'انتخاب برنده کامل شد',
     'home_upload_modal_title': 'پست جدید',
     'home_upload_caption_placeholder': 'کپشن بنویسید...',
     'home_upload_cancel': 'لغو',
@@ -5026,15 +5024,28 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   });
   const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(false);
   const [enemies, setEnemies] = useState<Survivor[]>([]);
-  const [allPosts, setAllPosts] = useState<any[]>([]);
-  const [visiblePosts, setVisiblePosts] = useState<any[]>([]);
+  const [allPosts, setAllPosts] = useState<any[]>(() => {
+    const saved = localStorage.getItem('allPosts_v2');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [visiblePosts, setVisiblePosts] = useState<any[]>(() => {
+    const saved = localStorage.getItem('visiblePosts_v2');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [wallPosts, setWallPosts] = useState<WallPost[]>([]);
   const [followedUsers, setFollowedUsers] = useState<string[]>([]);
   const [postComments, setPostComments] = useState<Record<number, Comment[]>>({});
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
-  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>([]);
+  const [roundHistory, setRoundHistory] = useState<RoundRecord[]>(() => {
+    const saved = localStorage.getItem('roundHistory');
+    return saved ? JSON.parse(saved) : [];
+  });
+  // Only show loading if there is no cached data to show immediately
+  const [historyLoading, setHistoryLoading] = useState(() => {
+    return !localStorage.getItem('roundHistory');
+  });
 
   // Hall of Fame is now derived from universal round history
   const survivorHistory = useMemo(() => {
@@ -5126,13 +5137,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     localStorage.setItem('madeItCounts', JSON.stringify(madeItCounts));
   }, [madeItCounts]);
 
-  useEffect(() => {
-    localStorage.setItem('allPosts', JSON.stringify(allPosts));
-  }, [allPosts]);
+  // Sync only metadata to local storage, but avoid syncing heavy post lists which cause UI lag
+  // Supabase is the source of truth for posts now.
 
-  useEffect(() => {
-    localStorage.setItem('visiblePosts', JSON.stringify(visiblePosts));
-  }, [visiblePosts]);
 
   useEffect(() => {
     localStorage.setItem('userProfile', JSON.stringify(userProfile));
@@ -5149,6 +5156,18 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('isChallengeEnded', String(isChallengeEnded));
   }, [isChallengeEnded]);
+
+  useEffect(() => {
+    localStorage.setItem('allPosts_v2', JSON.stringify(allPosts));
+  }, [allPosts]);
+
+  useEffect(() => {
+    localStorage.setItem('visiblePosts_v2', JSON.stringify(visiblePosts));
+  }, [visiblePosts]);
+
+  useEffect(() => {
+    localStorage.setItem('roundHistory', JSON.stringify(roundHistory));
+  }, [roundHistory]);
 
 
 
@@ -5380,11 +5399,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (isFollowing) {
         return prev.filter(u => u !== username);
       }
-      // Survivor-only follow logic enforcement
-      if (!isSurvivor(username)) {
-        console.warn(`Follow action blocked: ${username} is not a survivor.`);
-        return prev;
-      }
       return [...prev, username];
     });
   };
@@ -5413,6 +5427,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   // Universal History Fetching — fetch once on mount, re-fetch on new inserts
   const fetchHistory = async () => {
+    setHistoryLoading(true);
     const { data, error } = await supabase
       .from('challenge_rounds')
       .select('*')
@@ -5420,6 +5435,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     if (error) {
       console.error('❌ Failed to fetch round history:', error);
+      setHistoryLoading(false);
       return;
     }
 
@@ -5437,11 +5453,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       console.log('📥 Fetched', formatted.length, 'rounds from Supabase');
       setRoundHistory(formatted);
     }
+    setHistoryLoading(false);
   };
 
   useEffect(() => {
-    fetchHistory();
-    
+    // Set up realtime subscription for new rounds
     const channel = supabase
       .channel('universal_history')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'challenge_rounds' }, () => {
@@ -5452,9 +5468,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Re-fetch history whenever auth state changes (login/logout) to keep UI in sync
+  // Fetch history once when the user is confirmed authenticated
   useEffect(() => {
-    fetchHistory();
+    if (isAuthenticated) {
+      fetchHistory();
+    }
   }, [isAuthenticated]);
 
 
@@ -5550,6 +5568,20 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             const durationLabel = '2 min';
             const currentSurvivors = remainingSurvivors.map(s => ({ ...s, madeIt: true, userVote: null }));
             const currentEliminated = eliminated.map(e => ({ ...e, madeIt: false, userVote: null }));
+
+            const newRoundRecord: RoundRecord = {
+              id: 'temp-' + Date.now(), // Temporary ID until refresh
+              date: today,
+              time: survivalTime,
+              variant: activeMode === 'pley' ? 'Pley' : activeMode,
+              durationLabel: durationLabel,
+              survivors: currentSurvivors,
+              eliminated: currentEliminated,
+              timestamp: roundTimestamp
+            };
+            
+            // Optimistically update history immediately
+            setRoundHistory(prev => [newRoundRecord, ...prev]);
 
             supabase.from('challenge_rounds').insert({
               date: today,
@@ -5674,7 +5706,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setSurvivors, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
       addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, authLoading, login, logout, language, setLanguage, theme, setTheme, t,
       userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser,
-      isEliminated
+      isEliminated, historyLoading
     }}>
       {children}
     </ChallengeContext.Provider>

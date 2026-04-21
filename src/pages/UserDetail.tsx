@@ -19,7 +19,8 @@ const UserDetail = () => {
   } = useChallenge();
   const [wallInput, setWallInput] = useState('');
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
-  const [hasActed, setHasActed] = useState(false);
+  // Derived state from context
+  const hasActed = enemies.some(e => e.username === username);
   const [isSwornLocal, setIsSwornLocal] = useState(false);
   const [viewMode, setViewMode] = useState<'posts' | 'wall'>('posts');
   const [isTraitor, setIsTraitor] = useState(false);
@@ -145,7 +146,6 @@ const UserDetail = () => {
         removeEnemy(enemyToRemove.id);
       }
       setShowAddedFeedback(false);
-      setHasActed(false);
     } else {
       const survivorData = userPosts[0] || {
         id: profileData?.id || Date.now(),
@@ -163,7 +163,6 @@ const UserDetail = () => {
         addEnemy(survivorData);
       }
       setShowAddedFeedback(true);
-      setHasActed(true);
     }
   };
 
@@ -288,13 +287,35 @@ const UserDetail = () => {
                     )}
                   </button>
                 )}
+                {!isMe && (
+                  <button 
+                    onClick={() => toggleFollow(username || '')}
+                    className="transition-all active:scale-95 hover:scale-105"
+                  >
+                    {isFollowing ? (
+                      <img 
+                        src="/btn-following.png" 
+                        alt="Following" 
+                        className="h-[32px] w-auto object-contain" 
+                        style={{ imageRendering: '-webkit-optimize-contrast' }}
+                      />
+                    ) : (
+                      <img 
+                        src="/btn-follow.png" 
+                        alt="Follow" 
+                        className="h-[32px] w-auto object-contain" 
+                        style={{ imageRendering: '-webkit-optimize-contrast' }}
+                      />
+                    )}
+                  </button>
+                )}
               </>
             )}
           </div>
         </div>
 
         <div className="flex flex-col gap-3 mt-2">
-          {!isTraitor && !isMe && isSurvivor(username) && (
+          {!isTraitor && !isMe && (
             <button 
               onClick={() => navigate(`/chat/${username}`)}
               className="w-full bg-zinc-100 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-zinc-200 transition-colors"

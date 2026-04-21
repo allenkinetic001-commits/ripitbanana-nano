@@ -26,15 +26,16 @@ interface PostProps {
   globalLives?: number;
 }
 
-const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments, isTraitorGlobal, globalLives = 3 }: PostProps) => {
+const PostCard = React.memo(({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments, isTraitorGlobal, globalLives = 3 }: PostProps) => {
+  const { addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t, userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser } = useChallenge();
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
-  const [hasActed, setHasActed] = useState(false);
+  // Derived state from context
   const [isSwornLocal, setIsSwornLocal] = useState(false);
   const [quickComment, setQuickComment] = useState('');
   const [showHearts, setShowHearts] = useState(false);
   const [isTraitor, setIsTraitor] = useState(false);
   const navigate = useNavigate();
-  const { addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t, userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser } = useChallenge();
+  const hasActed = enemies.some(e => e.username === username);
 
   // Track downvote per TARGET USERNAME (not per post) — 1 click per voter per person
   const userVote = userVotes[`user_${username}`] !== undefined ? userVotes[`user_${username}`] : 0;
@@ -91,7 +92,6 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         removeEnemy(enemyToRemove.id);
       }
       setShowAddedFeedback(false);
-      setHasActed(false);
     } else {
       if (isSwornLocal) {
         addSwornEnemy(survivorData);
@@ -99,7 +99,6 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
         addEnemy(survivorData);
       }
       setShowAddedFeedback(true);
-      setHasActed(true);
     }
   };
 
@@ -190,9 +189,10 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                 title="Trigger Traitor Action"
               >
                 <img 
+                  key="traitor-mustache"
                   src="/traitor.png" 
                   alt="Traitor" 
-                  className="h-8 w-auto object-contain" 
+                  className="h-8 w-auto object-contain animate-pop-in" 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               </button>
@@ -207,43 +207,48 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
                 >
                   {showAddedFeedback || isEnemy ? (
                     <img 
+                      key="added"
                       src="/btn-added.png" 
                       alt="Added" 
-                      className="h-[28px] w-auto object-contain"
+                      className="h-[28px] w-auto object-contain animate-pop-in"
                     />
                   ) : isSwornLocal ? (
                     <img 
+                      key="sworn"
                       src="/btn-sworn.png" 
                       alt="Sworn Enemy" 
-                      className="h-[28px] w-auto object-contain"
+                      className="h-[28px] w-auto object-contain animate-pop-in"
                     />
                   ) : (
                     <img 
+                      key="add"
                       src="/add-enemy.png" 
                       alt={t('home_add_enemy')} 
-                      className="h-[44px] w-auto object-contain rounded-xl"
+                      className="h-[44px] w-auto object-contain rounded-xl animate-pop-in"
                     />
                   )}
                 </button>
               </div>
                 )}
-                {!isMe && isSurvivor(username) && (
+                {!isMe && (
                   <button 
                     onClick={() => toggleFollow(username)}
                     className="transition-all active:scale-95 hover:scale-105"
                   >
                     {followedUsers.includes(username) ? (
                       <img 
+                        key="following"
                         src="/btn-following.png" 
                         alt="Following" 
-                        className="h-8 w-auto object-contain" 
+                        className="h-8 w-auto object-contain animate-pop-in" 
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
                       />
                     ) : (
                       <img 
+                        key="follow"
                         src="/btn-follow.png" 
                         alt="Follow" 
-                        className="h-8 w-auto object-contain" 
+                        className="h-8 w-auto object-contain animate-pop-in" 
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
                       />
                     )}
@@ -403,6 +408,6 @@ const PostCard = ({ id, username, avatar, image, caption, time, type = 'image', 
       </div>
     </div>
   );
-};
+});
 
 export default PostCard;

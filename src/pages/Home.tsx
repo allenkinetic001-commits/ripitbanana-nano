@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar, ChevronRight } from 'lucide-react';
@@ -10,10 +10,10 @@ import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
 import EmptyFeed from '../components/Empty';
 
-const HomeUserItem = ({ user, index, navigate, isSearch = false }: any) => {
+const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: any) => {
   const [showHearts, setShowHearts] = useState(false);
   const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
-  const { followedUsers, toggleFollow, isSurvivor, addEnemy, enemies } = useChallenge();
+  const { followedUsers, toggleFollow, isSurvivor, addEnemy, enemies, userProfile } = useChallenge();
   const isFollowing = followedUsers.includes(user.username);
   const [isTraitor, setIsTraitor] = useState(false);
   const hasActed = enemies.some((e: any) => e.username === user.username);
@@ -24,9 +24,9 @@ const HomeUserItem = ({ user, index, navigate, isSearch = false }: any) => {
   };
 
   return (
-    <button 
+    <div 
       onClick={() => navigate(`/user/${user.username}`)}
-      className="flex items-center p-3 hover:bg-zinc-50 transition-colors w-full text-left"
+      className="flex items-center p-3 hover:bg-zinc-50 transition-colors w-full text-left cursor-pointer"
     >
       <div className="relative shrink-0">
         <div className="w-12 h-12 rounded-full border border-zinc-200 overflow-hidden bg-zinc-50">
@@ -53,47 +53,84 @@ const HomeUserItem = ({ user, index, navigate, isSearch = false }: any) => {
             }}
             className="animate-pop-in transition-all active:scale-95 flex items-center justify-center p-1"
           >
-            <img src="/traitor.png" alt="Traitor" className="h-6 w-auto object-contain" />
+            <img 
+              key="traitor-icon"
+              src="/traitor.png" 
+              alt="Traitor" 
+              className="h-6 w-auto object-contain animate-pop-in" 
+            />
           </button>
         ) : (
-          isSurvivor(user.username) && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFollow(user.username);
-              }}
-              className="transition-all active:scale-95 hover:scale-105"
-            >
-              {isFollowing ? (
-                <img
-                  src="/btn-following.png"
-                  alt="Following"
-                  className="h-8 w-auto object-contain"
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
-              ) : (
-                <img
-                  src="/btn-follow.png"
-                  alt="Follow"
-                  className="h-8 w-auto object-contain"
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
-              )}
-            </button>
-          )
+          <div className="flex items-center space-x-2">
+            {user.username !== userProfile?.username && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addEnemy(user);
+                }}
+                className="active:scale-95 drop-shadow-sm"
+              >
+                {hasActed ? (
+                  <img 
+                    key="added"
+                    src="/btn-added.png" 
+                    alt="Added" 
+                    className="h-7 w-auto object-contain animate-pop-in"
+                  />
+                ) : (
+                  <img 
+                    key="add"
+                    src="/add-enemy.png" 
+                    alt="Add Enemy" 
+                    className="h-8 w-auto object-contain animate-pop-in"
+                  />
+                )}
+              </button>
+            )}
+            {user.username !== userProfile?.username && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFollow(user.username);
+                }}
+                className="transition-all active:scale-95 hover:scale-105"
+              >
+                {isFollowing ? (
+                  <img
+                    key="following"
+                    src="/btn-following.png"
+                    alt="Following"
+                    className="h-8 w-auto object-contain animate-pop-in"
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                ) : (
+                  <img
+                    key="follow"
+                    src="/btn-follow.png"
+                    alt="Follow"
+                    className="h-8 w-auto object-contain animate-pop-in"
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                )}
+              </button>
+            )}
+          </div>
         )}
         {!hasActed && (
           <div 
-            onClick={toggleTraitor}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleTraitor(e);
+            }}
             className="w-20 h-12 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-xl hover:bg-zinc-100/50 active:scale-95 touch-none"
           >
             <div className="w-2 h-2 rounded-full bg-zinc-200/40" />
           </div>
         )}
       </div>
-    </button>
+    </div>
   );
-};
+});
 
 const Home = () => {
   const navigate = useNavigate();
@@ -118,14 +155,15 @@ const Home = () => {
   // Fetch posts from Supabase
   const { posts: supabasePosts, loading: postsLoading, refetch: refetchPosts } = useSupabasePosts();
 
+  // Memoize formatted posts
+  const formattedPosts = useMemo(() => supabasePosts.map(formatPostForUI), [supabasePosts]);
+
   // Sync Supabase posts into context on load
   useEffect(() => {
     if (!postsLoading) {
-      const formatted = supabasePosts.map(formatPostForUI);
-      
       setAllPosts(prevAll => {
         const existingIds = new Set(prevAll.map(p => p.id));
-        const newPosts = formatted.filter(p => !existingIds.has(p.id));
+        const newPosts = formattedPosts.filter(p => !existingIds.has(p.id));
         
         // If there are brand new posts from the DB, inject them into the feed
         if (newPosts.length > 0 && prevAll.length > 0) {
@@ -138,14 +176,14 @@ const Home = () => {
         }
         
         // Initial load or not active or feed empty: full sync
-        if (prevAll.length === 0 || !isActive || (!isChallengeEnded && formatted.length > 0)) {
-          setVisiblePosts(formatted);
+        if (prevAll.length === 0 || !isActive || (!isChallengeEnded && formattedPosts.length > 0)) {
+          setVisiblePosts(formattedPosts);
+          return formattedPosts;
         }
-        
-        return formatted;
+        return prevAll;
       });
     }
-  }, [supabasePosts, postsLoading, isActive]);
+  }, [postsLoading, formattedPosts, setAllPosts, setVisiblePosts, isActive, isChallengeEnded, setIsChallengeEnded]);
 
   // New state for upload modal
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -163,8 +201,12 @@ const Home = () => {
       const isVideo = file.type.startsWith('video/');
       setFileType(isVideo ? 'video' : 'image');
       setUploadModalOpen(true);
-      // Instant preview
-      setSelectedFile(URL.createObjectURL(file));
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedFile(reader.result as string);
+      };
+      reader.readAsDataURL(file);
       setRawFile(file);
     }
     if (fileInputRef.current) {
@@ -174,7 +216,6 @@ const Home = () => {
 
   const handleCloseModal = () => {
     setUploadModalOpen(false);
-    if (selectedFile) URL.revokeObjectURL(selectedFile);
     setSelectedFile(null);
     setRawFile(null);
     setCaptionText('');
@@ -204,8 +245,7 @@ const Home = () => {
         console.error('Failed to create post:', error);
         createLocalPostFallback(caption, base64Data);
       } else if (newPost) {
-        // Re-fetch posts to get the new one with proper data
-        refetchPosts();
+        // Post added successfully, real-time listener will pick it up
       }
     } else {
       console.warn('No active session, creating local post fallback');
@@ -224,8 +264,8 @@ const Home = () => {
   const createLocalPostFallback = (caption: string, imageUrl: string) => {
     const localPost = {
       id: Date.now(),
-      username: userProfile.username,
-      avatar: userProfile.avatar,
+      username: userProfile?.username || 'Guest',
+      avatar: userProfile?.avatar || '/custom-empty-profile.png',
       image: imageUrl,
       type: fileType,
       caption,
@@ -388,7 +428,7 @@ const Home = () => {
     <div className="flex flex-col relative h-full">
       {/* Upload Post Modal */}
       {uploadModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center px-4">
           <div 
             className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm"
             onClick={handleCloseModal}
@@ -565,9 +605,10 @@ const Home = () => {
               className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
             >
               <img 
+                key={showPills ? 'mustache-active' : 'mustache-inactive'}
                 src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"}
                 alt="Create" 
-                className="h-[44px] w-[44px] object-contain transition-all duration-200"
+                className="h-[44px] w-[44px] object-contain transition-all duration-200 animate-pop-in"
                 style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
               />
             </button>
@@ -821,7 +862,7 @@ const Home = () => {
 
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
-        {postsLoading ? (
+        {postsLoading && visiblePosts.length === 0 ? (
           /* ── Loading state ── */
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />

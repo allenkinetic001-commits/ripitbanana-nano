@@ -22,7 +22,7 @@ const VariantPill = ({ variant }: { variant: string | null | undefined }) => {
   );
 };
 
-const SurvivorRow = ({ survivor, isSurvivor, toggleFollow, followedUsers, navigate, handleVote, selectedRoundId, isHistoryView, isChallengeEnded }: any) => {
+const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUsers, navigate, handleVote, selectedRoundId, isHistoryView, isChallengeEnded }: any) => {
   const [showHearts, setShowHearts] = useState(false);
   const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
 
@@ -166,51 +166,58 @@ const SurvivorRow = ({ survivor, isSurvivor, toggleFollow, followedUsers, naviga
       </div>
     </div>
   );
-};
+});
 
 const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
   return (
     <div 
       onClick={onClick}
-      className="mx-6 mb-4 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 p-5 shadow-lg cursor-pointer hover:shadow-2xl transition-all active:scale-[0.98] group relative overflow-hidden"
+      className="mx-6 mb-6 relative group cursor-pointer transition-all active:scale-[0.98]"
     >
-      <div className="absolute top-0 right-0 p-4">
-        <div className="bg-zinc-900 text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest shadow-lg">
-           {round.survivors.length} SURVIVORS
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Clock size={12} className="text-zinc-400" />
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{round.date} at {round.time}</span>
-          </div>
-          <h3 className="text-lg font-black text-zinc-900 uppercase italic tracking-tighter leading-none">{round.variant} Selection Round</h3>
-          <div className="mt-1 flex items-center gap-2">
-            <span className="text-[8px] font-black bg-zinc-100 text-zinc-500 px-2 py-0.5 rounded uppercase tracking-wider">
-               Duration: {round.durationLabel}
-            </span>
+      {/* Decorative Stacks */}
+      <div className="absolute inset-0 bg-zinc-200/40 rounded-[2.5rem] translate-y-3 scale-[0.96] blur-[2px] -z-20" />
+      <div className="absolute inset-0 bg-zinc-100/60 rounded-[2.5rem] translate-y-1.5 scale-[0.98] -z-10" />
+      
+      <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 p-6 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-5">
+          <div className="bg-zinc-900 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
+             <Trophy size={10} className="text-yellow-400" />
+             {round.survivors.length} SURVIVORS
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex -space-x-3">
-            {round.survivors.slice(0, 6).map((s: any, i: number) => (
-              <div key={s.id} className="w-12 h-12 rounded-full border-2 border-white overflow-hidden shadow-xl transform transition-transform group-hover:scale-110 group-hover:-translate-y-1" style={{ zIndex: 10 - i }}>
-                <img src={s.avatar} alt={s.username} className="w-full h-full object-cover" />
-              </div>
-            ))}
-            {round.survivors.length > 6 && (
-              <div className="w-12 h-12 rounded-full border-2 border-white bg-zinc-50 flex items-center justify-center shadow-xl relative z-0">
-                 <span className="text-[10px] font-black text-zinc-400">+{round.survivors.length - 6}</span>
-              </div>
-            )}
+        <div className="flex flex-col gap-5">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Clock size={12} className="text-zinc-400" />
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{round.date} at {round.time}</span>
+            </div>
+            <h3 className="text-xl font-black text-zinc-900 uppercase italic tracking-tighter leading-none mb-2">{round.variant} Selection Round</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black bg-zinc-100 text-zinc-600 px-3 py-1 rounded-full uppercase tracking-wider border border-zinc-200/50">
+                 Duration: {round.durationLabel}
+              </span>
+            </div>
           </div>
-          
-          <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-2xl group-hover:bg-zinc-900 group-hover:text-white transition-colors">
-            <span className="text-[10px] font-black uppercase tracking-widest">View Results</span>
-            <ChevronLeft size={16} className="rotate-180" />
+
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex -space-x-4">
+              {round.survivors.slice(0, 6).map((s: any, i: number) => (
+                <div key={s.id} className="w-14 h-14 rounded-full border-4 border-white overflow-hidden shadow-xl transform transition-transform group-hover:scale-110 group-hover:-translate-y-1" style={{ zIndex: 10 - i }}>
+                  <img src={s.avatar} alt={s.username} className="w-full h-full object-cover" />
+                </div>
+              ))}
+              {round.survivors.length > 6 && (
+                <div className="w-14 h-14 rounded-full border-4 border-white bg-zinc-50 flex items-center justify-center shadow-xl relative z-0">
+                   <span className="text-[10px] font-black text-zinc-400">+{round.survivors.length - 6}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-3 bg-zinc-50 px-5 py-3 rounded-[1.5rem] group-hover:bg-zinc-900 group-hover:text-white transition-all shadow-sm">
+              <span className="text-[10px] font-black uppercase tracking-widest">View Results</span>
+              <ChevronLeft size={18} className="rotate-180" />
+            </div>
           </div>
         </div>
       </div>
@@ -224,55 +231,16 @@ const Search = () => {
     isChallengeEnded, survivors, eliminated, survivorHistory, roundHistory, isActive, 
     startNewChallenge, clearAllHistory, updateHistoryVote, getVariantDisplayName,
     toggleFollow, followedUsers, isLegend, setShowPills, activeTab, setActiveTab, isSurvivor, t,
-    setRoundHistory, isAuthenticated
+    setRoundHistory, isAuthenticated, historyLoading
   } = useChallenge();
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
   const [selectedRoundId, setSelectedRoundId] = useState<string | null>(null);
-  const [localRounds, setLocalRounds] = useState<any[]>([]);
-  const [loadingHistory, setLoadingHistory] = useState(true);
+  
+  // Set historyLoading to false is now handled by context status
 
-  // Direct fetch from Supabase — always loads fresh data on page visit
-  useEffect(() => {
-    const load = async () => {
-      setLoadingHistory(true);
-      const { data, error } = await supabase
-        .from('challenge_rounds')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (data && !error) {
-        const filtered = data
-          .map((r: any) => ({
-            id: r.id,
-            date: r.date,
-            time: r.time,
-            variant: r.variant,
-            durationLabel: r.duration_label,
-            survivors: Array.isArray(r.survivors) ? r.survivors : [],
-            eliminated: Array.isArray(r.eliminated) ? r.eliminated : [],
-            timestamp: r.round_timestamp
-          }))
-          // Only show rounds that actually have data
-          .filter((r: any) => r.survivors.length > 0 || r.eliminated.length > 0);
-        setLocalRounds(filtered);
-        // Also sync to context
-        setRoundHistory(filtered);
-      }
-      setLoadingHistory(false);
-    };
-    load();
-
-    // Real-time: refresh when new round is inserted
-    const channel = supabase
-      .channel('search_history')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'challenge_rounds' }, () => load())
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [isChallengeEnded]);
-
-  // Merge local fetch with context data (local takes priority since it's always fresh)
-  const mergedRounds = localRounds.length > 0 ? localRounds : roundHistory;
+  // Use context data directly since it is now optimistically updated
+  const mergedRounds = roundHistory;
 
   // Auto-navigate to home when the 10-second results display ends
   const previousIsChallengeEnded = React.useRef(isChallengeEnded);
@@ -362,8 +330,13 @@ const Search = () => {
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-24 bg-[#FAFAFA]">
       {/* Header */}
-      <div className="sticky top-0 px-4 py-6 bg-white/70 backdrop-blur-xl z-30 flex items-center border-b border-zinc-100 justify-center shadow-sm">
-        <h1 className="text-xl font-black text-zinc-900 uppercase tracking-tighter italic">
+      <div className="px-4 py-6 bg-white flex items-center border-b border-zinc-100 justify-between shadow-sm">
+        <img 
+          src="/globe_head.png" 
+          alt="Globe Head" 
+          className="h-14 w-auto object-contain flex-shrink-0" 
+        />
+        <h1 className="text-xl font-black text-zinc-900 uppercase tracking-tighter italic flex-1 flex justify-center">
           {viewMode === 'hall_of_fame' ? (
             <img 
               src="/hall_of_fame_title.png" 
@@ -378,6 +351,8 @@ const Search = () => {
             />
           )}
         </h1>
+        {/* Spacer to keep title perfectly centered */}
+        <div className="w-10"></div>
       </div>
 
       {/* View Switcher Tabs */}
@@ -386,20 +361,28 @@ const Search = () => {
           <button 
             onClick={() => setViewMode('hall_of_fame')}
             className={cn(
-              "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
+              "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center",
               viewMode === 'hall_of_fame' ? "bg-white text-zinc-900 shadow-md scale-[1.02]" : "text-zinc-400 hover:text-zinc-600"
             )}
           >
-            Public
+            <img 
+              src="/variant-public-text.png" 
+              alt="Public" 
+              className={cn("h-4 w-auto object-contain transition-opacity", viewMode === 'hall_of_fame' ? "opacity-100" : "opacity-40")} 
+            />
           </button>
           <button 
             onClick={() => setViewMode('round_logs')}
             className={cn(
-              "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
+              "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center",
               viewMode === 'round_logs' ? "bg-white text-zinc-900 shadow-md scale-[1.02]" : "text-zinc-400 hover:text-zinc-600"
             )}
           >
-            History
+            <img 
+              src="/round-history.png" 
+              alt="History" 
+              className={cn("h-4 w-auto object-contain transition-opacity", viewMode === 'round_logs' ? "opacity-100" : "opacity-40")} 
+            />
           </button>
         </div>
       </div>
