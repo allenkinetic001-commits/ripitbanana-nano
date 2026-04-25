@@ -165,7 +165,7 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
                 <img 
                   src="/pley-badge.png" 
                   alt="Survivor" 
-                  className="w-11 h-11 object-contain" 
+                  className="w-6 h-6 object-contain" 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               </div>

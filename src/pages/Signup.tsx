@@ -156,8 +156,13 @@ export default function Signup() {
                 <div className="absolute -inset-4 bg-purple-100/50 blur-xl rounded-full -z-10" />
               </div>
             </div>
-            <div className="space-y-2">
-              <h2 className="text-3xl font-black text-zinc-900 tracking-tight italic uppercase">Check Your Email</h2>
+            <div className="space-y-4 flex flex-col items-center">
+              <img 
+                src="/check-your-mail.png" 
+                alt="Check Your Mail" 
+                className="h-16 w-auto object-contain" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }} 
+              />
               <p className="text-zinc-500 font-medium leading-relaxed">
                 We've sent a confirmation link to <span className="text-zinc-900 font-bold">{email}</span>. 
                 Please click it to activate your citizen profile.
@@ -166,12 +171,12 @@ export default function Signup() {
             <div className="pt-8 flex justify-center w-full">
               <button 
                 onClick={() => navigate('/login')}
-                className="w-full transition-all duration-300 active:scale-95 hover:scale-105"
+                className="w-48 transition-all duration-300 active:scale-95 hover:scale-105"
               >
                 <img
                   src="/back-to-login.png"
                   alt="back to login"
-                  className="w-full h-auto object-contain"
+                  className="w-full h-auto object-contain drop-shadow-md"
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               </button>
