@@ -156,12 +156,10 @@ export default function Signup() {
                 <div className="absolute -inset-4 bg-purple-100/50 blur-xl rounded-full -z-10" />
               </div>
             </div>
-            <div className="space-y-4 flex flex-col items-center mt-6">
-              <h2 className="text-5xl md:text-6xl font-black text-black tracking-tight italic uppercase drop-shadow-sm text-center">
-                Check Your Email
-              </h2>
-              <p className="text-xl md:text-2xl text-zinc-800 font-semibold leading-relaxed text-center px-4 mt-4">
-                We've sent a confirmation link to <br/><span className="text-black font-black text-2xl md:text-3xl bg-yellow-200 px-2 rounded-lg">{email}</span><br/> 
+            <div className="space-y-2">
+              <h2 className="text-3xl font-black text-zinc-900 tracking-tight italic uppercase">Check Your Email</h2>
+              <p className="text-zinc-500 font-medium leading-relaxed">
+                We've sent a confirmation link to <span className="text-zinc-900 font-bold">{email}</span>. 
                 Please click it to activate your citizen profile.
               </p>
             </div>
