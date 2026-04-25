@@ -189,7 +189,16 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
               <Clock size={12} className="text-zinc-400" />
               <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{round.date} at {round.time}</span>
             </div>
-            <h3 className="text-xl font-black text-zinc-900 uppercase italic tracking-tighter leading-none mb-3">{round.variant} Selection Round</h3>
+            {round.variant?.toLowerCase() === 'pley' ? (
+              <img 
+                src="/pley_selection_round.png" 
+                alt="Pley Selection Round" 
+                className="h-10 w-auto object-contain mb-3"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
+            ) : (
+              <h3 className="text-xl font-black text-zinc-900 uppercase italic tracking-tighter leading-none mb-3">{round.variant} Selection Round</h3>
+            )}
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-rose-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
                 <img 
