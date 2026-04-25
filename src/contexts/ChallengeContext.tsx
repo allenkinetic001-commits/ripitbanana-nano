@@ -5712,7 +5712,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             });
           }
         }
-
+        setIsEliminationRoundActive(false);
         setIsChallengeEnded(true);
     }
   }, [timeLeft, isActive, visiblePosts, allPosts, majorityVariant, userSelection, isEliminationRoundActive, eliminated]);
@@ -5727,7 +5727,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setEliminationCounts({ pley: 0 });
         setMadeItCounts({ pley: 0 });
         setUserSelection(null);
-        setIsEliminationRoundActive(false);
         setVariantFirstClickTime({ pley: 0 });
         try {
           const historyIds = new Set([
