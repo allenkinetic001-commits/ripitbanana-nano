@@ -4981,7 +4981,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     return Math.floor((midnight.getTime() - now.getTime()) / 1000);
   };
 
-  const [timeLeft, setTimeLeft] = useState(getSecondsUntilMidnight());
+  const calculateUniversalTimeLeft = () => {
+    const now = Math.floor(Date.now() / 1000);
+    const cycleSeconds = 120; // 2 minutes
+    const remaining = cycleSeconds - (now % cycleSeconds);
+    // Return 0 at the exact moment of reset
+    const finalTime = remaining === cycleSeconds ? 0 : remaining;
+    return finalTime;
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateUniversalTimeLeft());
   const [isActive, setIsActive] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date().toDateString());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
@@ -5697,15 +5706,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   }, [isChallengeEnded, allPosts]);
 
-  // Universal Timer Calculation (Set to 2 minutes)
-  const calculateUniversalTimeLeft = () => {
-    const now = Math.floor(Date.now() / 1000);
-    const cycleSeconds = 120; // 2 minutes
-    const remaining = cycleSeconds - (now % cycleSeconds);
-    // Return 0 at the exact moment of reset
-    const finalTime = remaining === cycleSeconds ? 0 : remaining;
-    return finalTime;
-  };
+
 
   // Timer countdown
   useEffect(() => {
