@@ -7,11 +7,13 @@ type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 
 export default function Signup() {
   const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle');
   const usernameTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
@@ -68,6 +70,10 @@ export default function Signup() {
       setError('That username is already taken. Please choose another.');
       return;
     }
+    if (!fullName.trim()) {
+      setError('Please enter a display name.');
+      return;
+    }
     if (!validateEmail(email)) {
       setError('Please enter a valid email address.');
       return;
@@ -85,6 +91,7 @@ export default function Signup() {
         options: {
           data: {
             username: username.trim().toLowerCase(),
+            full_name: fullName.trim(),
           }
         }
       });
@@ -93,8 +100,8 @@ export default function Signup() {
 
       // If email confirmation is required, data.user exists but session may be null
       if (data?.user && !data?.session) {
-        // Email confirmation required — show friendly message
-        // We still navigate to onboarding so user can see it
+        setShowConfirmation(true);
+        return;
       }
 
       navigate('/onboarding');
@@ -130,7 +137,7 @@ export default function Signup() {
   };
 
   const hint = usernameHint();
-  const canSubmit = !loading && usernameStatus !== 'taken' && usernameStatus !== 'invalid' && usernameStatus !== 'checking' && username && email && password;
+  const canSubmit = !loading && usernameStatus !== 'taken' && usernameStatus !== 'invalid' && usernameStatus !== 'checking' && username && fullName && email && password;
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -141,6 +148,32 @@ export default function Signup() {
       </div>
 
       <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-500">
+        {showConfirmation ? (
+          <div className="text-center space-y-6 py-12 px-8 bg-white/50 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-2xl">
+            <div className="flex justify-center">
+              <div className="relative">
+                <img src="/signup-welcome-hydrant.png" alt="Email" className="w-32 h-auto object-contain animate-bounce" />
+                <div className="absolute -inset-4 bg-purple-100/50 blur-xl rounded-full -z-10" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-black text-zinc-900 tracking-tight italic uppercase">Check Your Email</h2>
+              <p className="text-zinc-500 font-medium leading-relaxed">
+                We've sent a confirmation link to <span className="text-zinc-900 font-bold">{email}</span>. 
+                Please click it to activate your citizen profile.
+              </p>
+            </div>
+            <div className="pt-4">
+              <button 
+                onClick={() => navigate('/login')}
+                className="w-full bg-zinc-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-zinc-800 transition-all active:scale-95 shadow-lg"
+              >
+                Back to Login
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
         {/* Header */}
         <div className="text-center mb-4">
           <div className="flex items-center justify-center mb-2">
@@ -210,6 +243,26 @@ export default function Signup() {
                 {hint.text}
               </p>
             )}
+          </div>
+
+          {/* Full Name */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Display Name</label>
+            <div className="relative group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-600 transition-colors">
+                <img src="/signup-user-icon.png" alt="" className="w-6 h-6 object-contain opacity-40 group-focus-within:opacity-100 transition-opacity" />
+              </div>
+              <input
+                type="text"
+                name="signup_fullname_field"
+                value={fullName}
+                onChange={(e) => { setFullName(e.target.value); setError(''); }}
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl py-4 pl-12 pr-4 font-medium outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all placeholder:text-zinc-400"
+                placeholder="Your display name"
+                autoComplete="off"
+                required
+              />
+            </div>
           </div>
 
           {/* Email */}
@@ -307,6 +360,8 @@ export default function Signup() {
             </Link>
           </p>
         </div>
+          </>
+        )}
       </div>
     </div>
   );

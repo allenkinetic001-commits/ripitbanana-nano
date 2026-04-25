@@ -120,7 +120,7 @@ const PostDetail = () => {
           {post.type === 'video' ? (
             <video
               src={post.image}
-              className="w-full h-full object-contain bg-black"
+              className="w-full h-full object-contain bg-zinc-50"
               controls autoPlay muted loop playsInline
             />
           ) : (

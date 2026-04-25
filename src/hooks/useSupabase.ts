@@ -21,7 +21,13 @@ export interface SupabasePost {
 export function useSupabasePosts() {
   const [posts, setPosts] = useState<SupabasePost[]>(() => {
     const saved = localStorage.getItem('supabase_posts_cache');
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error('Failed to parse supabase_posts_cache', e);
+      return [];
+    }
   });
   const [loading, setLoading] = useState(() => !localStorage.getItem('supabase_posts_cache'));
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +50,7 @@ export function useSupabasePosts() {
         )
       `)
       .order('created_at', { ascending: false })
-      .limit(15);
+      .limit(50);
 
     if (fetchError) {
       setError(fetchError.message);
@@ -62,11 +68,22 @@ export function useSupabasePosts() {
       .channel('public:posts')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, async (payload) => {
         // Fetch the profile for the new post to maintain JOIN consistency
-        const { data: newPostWithProfile } = await supabase
-          .from('posts')
-          .select('*, profiles(username, full_name, avatar_url, is_traitor, lives)')
-          .eq('id', payload.new.id)
-          .single();
+        // Add a small retry loop to handle replication latency
+        let newPostWithProfile = null;
+        for (let i = 0; i < 3; i++) {
+          const { data } = await supabase
+            .from('posts')
+            .select('*, profiles(username, full_name, avatar_url, is_traitor, lives)')
+            .eq('id', payload.new.id)
+            .single();
+            
+          if (data) {
+            newPostWithProfile = data;
+            break;
+          }
+          // wait 500ms before retrying
+          await new Promise(r => setTimeout(r, 500));
+        }
           
         if (newPostWithProfile) {
           setPosts(prev => {
@@ -159,7 +176,29 @@ export async function fetchProfileByUsername(username: string) {
   return { data, error };
 }
 
-// Create a new post
+// Upload media file to Supabase Storage, return the public URL
+export async function uploadPostMedia(userId: string, file: File): Promise<{ url: string | null; error: any }> {
+  const ext = file.name.split('.').pop() || (file.type.includes('video') ? 'mp4' : 'jpg');
+  const fileName = `${userId}/${Date.now()}.${ext}`;
+
+  const { data, error } = await supabase.storage
+    .from('posts')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type,
+    });
+
+  if (error) return { url: null, error };
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('posts')
+    .getPublicUrl(data.path);
+
+  return { url: publicUrl, error: null };
+}
+
+// Create a new post — imageUrl should be a public storage URL (not base64)
 export async function createPost(userId: string, caption: string, imageUrl: string) {
   const { data, error } = await supabase
     .from('posts')
@@ -247,21 +286,24 @@ export async function decrementUserLives(username: string) {
 }
 
 // Helper: format a SupabasePost into the shape the existing UI components expect
-export function formatPostForUI(post: SupabasePost & { profiles: { is_traitor?: boolean } }) {
+export function formatPostForUI(post: any) {
   const timeAgo = getTimeAgo(post.created_at);
-  const isVideo = post.image_url?.startsWith('data:video/') || post.image_url?.endsWith('.mp4');
+  const url = post.image_url || '';
+  const isVideo =
+    url.startsWith('data:video/') ||
+    /\.(mp4|mov|webm|ogg)(\?|$)/i.test(url);
   
   return {
     id: post.id,
     username: post.profiles?.username || 'unknown',
     avatar: post.profiles?.avatar_url || '/custom-empty-profile.png',
     isTraitorGlobal: post.profiles?.is_traitor || false,
-    image: post.image_url || '',
+    image: url,
     type: isVideo ? 'video' : 'image',
     caption: post.caption || '',
-    likes: post.likes_count || 0,
     globalLives: post.profiles?.lives ?? 3,
     time: timeAgo,
+    createdAt: post.created_at,
     comments: [],
   };
 }

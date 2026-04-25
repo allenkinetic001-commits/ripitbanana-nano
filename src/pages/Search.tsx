@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Skull, Trophy, Sparkles, MessageCircle, Bookmark, MoreHorizontal, ArrowBigUp, ArrowBigDown, Zap, Filter, Clock, History, ChevronLeft, Trash2, Send } from 'lucide-react';
+import { Skull, Trophy, Sparkles, MessageCircle, Bookmark, MoreHorizontal, ArrowBigUp, ArrowBigDown, Zap, Filter, Clock, History, ChevronLeft, ChevronRight, Trash2, Send, Search as SearchIcon, X } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn, formatDate } from '../lib/utils';
@@ -53,7 +53,9 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
               <ProfileHeartsToggle isVisible={showHearts} heartClassName="w-3.5 h-3.5" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">{survivor.time}</span>
+              <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">
+                {survivor.roundDate ? `${survivor.roundDate} at ${survivor.roundTime}` : survivor.time}
+              </span>
               {survivor.roundDurationLabel && (
                 <div className="flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
                   <img src="/duration-alarm.png" alt="" className="h-3 w-auto object-contain" />
@@ -180,8 +182,8 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
       
       <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 p-6 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden">
         <div className="absolute top-0 right-0 p-5">
-          <div className="bg-zinc-900 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
-             <Trophy size={10} className="text-yellow-400" />
+          <div className="bg-rose-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
+             <Trophy size={10} className="text-white" />
              {round.survivors.length} SURVIVORS
           </div>
         </div>
@@ -214,9 +216,9 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
               )}
             </div>
             
-            <div className="flex items-center gap-3 bg-zinc-50 px-5 py-3 rounded-[1.5rem] group-hover:bg-zinc-900 group-hover:text-white transition-all shadow-sm">
-              <span className="text-[10px] font-black uppercase tracking-widest">View Results</span>
-              <ChevronLeft size={18} className="rotate-180" />
+            <div className="flex items-center gap-2 bg-white border border-zinc-100 px-5 py-2.5 rounded-full transition-all shadow-sm hover:bg-zinc-50 hover:border-zinc-200 active:scale-95 cursor-pointer group/btn">
+              <span className="text-[10px] font-black text-zinc-900 uppercase tracking-[0.2em]">View Results</span>
+              <ChevronRight size={14} className="text-zinc-300 group-hover/btn:translate-x-1 transition-transform" />
             </div>
           </div>
         </div>
@@ -225,7 +227,7 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
   );
 };
 
-const Search = () => {
+const SearchPage = () => {
   const navigate = useNavigate();
   const { 
     isChallengeEnded, survivors, eliminated, survivorHistory, roundHistory, isActive, 
@@ -236,6 +238,7 @@ const Search = () => {
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
   const [selectedRoundId, setSelectedRoundId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Set historyLoading to false is now handled by context status
 
@@ -293,20 +296,44 @@ const Search = () => {
     });
   }, [mergedRounds]);
 
-  // Build Hall of Fame from mergedRounds — deduplicated by username
+  // Build Hall of Fame from mergedRounds — show ALL winning content
   const localSurvivorHistory = useMemo(() => {
-    const seen = new Set<string>();
     const result: any[] = [];
+    const seenUsernames = new Set<string>();
+
     mergedRounds.forEach((round: any) => {
       (round.survivors || []).forEach((s: any) => {
-        if (s.username && !seen.has(s.username)) {
-          result.push({ ...s, madeIt: true });
-          seen.add(s.username);
+        if (s.username) {
+          if (viewMode === 'hall_of_fame') {
+            if (!seenUsernames.has(s.username)) {
+              result.push({ 
+                ...s, 
+                madeIt: true,
+                roundId: round.id,
+                roundDate: round.date,
+                roundTime: round.time
+              });
+              seenUsernames.add(s.username);
+            }
+          } else {
+            result.push({ 
+              ...s, 
+              madeIt: true,
+              roundId: round.id,
+              roundDate: round.date,
+              roundTime: round.time
+            });
+          }
         }
       });
     });
-    return result;
-  }, [mergedRounds]);
+    // Sort by most recent rounds first
+    return result.sort((a, b) => {
+      const dateA = new Date(`${a.roundDate} ${a.roundTime}`).getTime();
+      const dateB = new Date(`${b.roundDate} ${b.roundTime}`).getTime();
+      return dateB - dateA;
+    });
+  }, [mergedRounds, viewMode]);
 
   const allAvailableSurvivors = useMemo(() => {
     return isChallengeEnded ? survivors : localSurvivorHistory;
@@ -316,14 +343,27 @@ const Search = () => {
     const base = selectedDuration === 'all' 
       ? allAvailableSurvivors 
       : allAvailableSurvivors.filter(s => s.roundDurationLabel === selectedDuration);
+    
+    const filtered = searchQuery 
+      ? base.filter(s => s.username.toLowerCase().includes(searchQuery.toLowerCase()))
+      : base;
+
     // Only show winners/survivors, remove terminated players
-    return base.filter(s => s.madeIt !== false);
-  }, [allAvailableSurvivors, selectedDuration]);
+    return filtered.filter(s => s.madeIt !== false);
+  }, [allAvailableSurvivors, selectedDuration, searchQuery]);
 
   const displayLogs = useMemo(() => {
     const base = selectedDuration === 'all' ? mergedRounds : mergedRounds.filter((r: any) => r.durationLabel === selectedDuration);
-    return base.filter((r: any) => (r.survivors?.length || 0) > 0 || (r.eliminated?.length || 0) > 0);
-  }, [mergedRounds, selectedDuration]);
+    
+    const filtered = searchQuery
+      ? base.filter((r: any) => 
+          (r.survivors || []).some((s: any) => s.username?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (r.eliminated || []).some((e: any) => e.username?.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+      : base;
+
+    return filtered.filter((r: any) => (r.survivors?.length || 0) > 0 || (r.eliminated?.length || 0) > 0);
+  }, [mergedRounds, selectedDuration, searchQuery]);
 
   const isHistoryView = !isChallengeEnded;
 
@@ -353,6 +393,30 @@ const Search = () => {
         </h1>
         {/* Spacer to keep title perfectly centered */}
         <div className="w-10"></div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="px-6 pt-6 pb-2">
+        <div className="relative group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors">
+            <SearchIcon size={18} />
+          </div>
+          <input 
+            type="text"
+            placeholder="Search citizens..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-zinc-100 border-none rounded-2xl py-3.5 pl-12 pr-10 text-sm font-bold outline-none ring-0 focus:ring-2 focus:ring-zinc-200 transition-all placeholder:text-zinc-400 placeholder:font-medium"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* View Switcher Tabs */}
@@ -520,4 +584,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default SearchPage;

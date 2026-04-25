@@ -18,7 +18,7 @@ const Profile = () => {
   const { 
     enemies, removeEnemy, userProfile, setUserProfile, 
     followedUsers, toggleFollow, isLegend, survivorHistory,
-    wallPosts, addWallPost,
+    wallPosts, addWallPost, allPosts,
     t
   } = useChallenge();
 
@@ -138,6 +138,16 @@ const Profile = () => {
   };
 
   const userWallPosts = wallPosts.filter(p => p.targetUser === userProfile.username);
+
+  // Merge context posts with DB posts to ensure local optimistic posts are shown instantly
+  const contextPosts = allPosts.filter((p: any) => p.username === userProfile.username);
+  const mergedPosts = [...contextPosts];
+  userPosts.forEach(dbPost => {
+    if (!mergedPosts.some(p => p.id === dbPost.id)) {
+      mergedPosts.push(dbPost);
+    }
+  });
+  mergedPosts.sort((a, b) => b.id - a.id);
 
   const hasActed = false; // Mock for own profile
   const toggleTraitor = () => {}; // Mock for own profile
@@ -298,7 +308,7 @@ const Profile = () => {
           </div>
           <div className="flex-1 flex justify-around">
             <div className="flex flex-col items-center">
-              <span className="font-bold">{userPosts.length}</span>
+              <span className="font-bold">{mergedPosts.length}</span>
               <img 
                 src="/posts-title.png" 
                 alt="Posts" 
@@ -430,13 +440,13 @@ const Profile = () => {
 
       {/* Content */}
       {viewMode === 'posts' ? (
-        loadingPosts ? (
+        loadingPosts && mergedPosts.length === 0 ? (
           <div className="flex items-center justify-center p-12">
             <div className="w-8 h-8 border-4 border-zinc-200 border-t-zinc-900 rounded-full animate-spin" />
           </div>
-        ) : userPosts.length > 0 ? (
+        ) : mergedPosts.length > 0 ? (
           <div className="grid grid-cols-3 gap-0.5 pb-4">
-            {userPosts.map((post, index) => (
+            {mergedPosts.map((post, index) => (
               <div 
                 key={index} 
                 onClick={() => navigate(`/post/${post.id}`)}

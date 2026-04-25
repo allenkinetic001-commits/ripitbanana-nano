@@ -16,6 +16,12 @@ const SettingsPage = () => {
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
 
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const handleImageError = (id: string) => {
+    setImageErrors(prev => ({ ...prev, [id]: true }));
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -59,24 +65,26 @@ const SettingsPage = () => {
         <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-zinc-100 text-zinc-900 transition-colors">
           <ChevronLeft size={24} />
         </button>
-        <img src="/settings-header.png" alt="Settings" className="h-10 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+        <div className="flex items-center gap-2">
+          <span className="font-black text-zinc-900 text-lg uppercase tracking-tight">{t('settings')}</span>
+        </div>
         <div className="w-10" /> {/* Spacer */}
       </header>
       
       <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-32">
         {/* APP Section */}
         <div className="space-y-2">
-          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider ml-1">{t('app')}</h3>
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest ml-1">{t('app')}</h3>
           <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 shadow-sm">
             <div 
               onClick={() => setShowLanguageModal(true)}
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/language-icon.png" alt="" className="w-full h-full object-contain" />
+                <div className="w-10 h-10 flex items-center justify-center bg-zinc-100 rounded-xl group-hover:bg-zinc-200 transition-colors">
+                  <Globe size={24} className="text-zinc-600" />
                 </div>
-                <img src="/language-header.png" alt={t('language')} className="h-8 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                <span className="font-black text-zinc-900 uppercase tracking-tight">{t('language')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-zinc-400 font-medium">{getLanguageName(language)}</span>
@@ -89,10 +97,10 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/theme-icon.png" alt="" className="w-full h-full object-contain" />
+                <div className="w-10 h-10 flex items-center justify-center bg-zinc-100 rounded-xl group-hover:bg-zinc-200 transition-colors">
+                  <Sun size={24} className="text-zinc-600" />
                 </div>
-                <img src="/theme-header.png" alt={t('theme')} className="h-6 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                <span className="font-black text-zinc-900 uppercase tracking-tight">{t('theme')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-zinc-400 font-medium">{getThemeName(theme)}</span>
@@ -105,10 +113,10 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/personalization-icon.png" alt="" className="w-full h-full object-contain" />
+                <div className="w-10 h-10 flex items-center justify-center bg-zinc-100 rounded-xl group-hover:bg-zinc-200 transition-colors">
+                  <Palette size={24} className="text-zinc-600" />
                 </div>
-                <img src="/personalization-header.png" alt={t('personalization')} className="h-6 w-auto object-contain ml-3" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                <span className="font-black text-zinc-900 uppercase tracking-tight">{t('personalization')}</span>
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -117,7 +125,7 @@ const SettingsPage = () => {
 
         {/* ABOUT Section */}
         <div className="space-y-2">
-          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider ml-1">{t('about')}</h3>
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest ml-1">{t('about')}</h3>
           <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 shadow-sm">
             <div 
               onClick={() => setShowModelModal(true)}
@@ -125,9 +133,28 @@ const SettingsPage = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/model-icon.png" alt="" className="w-full h-full object-contain" />
+                  {!imageErrors['model_icon'] ? (
+                    <img 
+                      src="/model-icon.png" 
+                      alt="" 
+                      onError={() => handleImageError('model_icon')}
+                      className="w-full h-full object-contain" 
+                    />
+                  ) : (
+                    <Layers size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <img src="/model-header.png" alt={t('model')} className="h-6 w-auto object-contain -ml-2" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                {!imageErrors['model_header'] ? (
+                  <img 
+                    src="/model-header.png" 
+                    alt={t('model')} 
+                    onError={() => handleImageError('model_header')}
+                    className="h-6 w-auto object-contain -ml-2" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
+                ) : (
+                  <span className="font-bold text-zinc-900 -ml-2">{t('model')}</span>
+                )}
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -138,9 +165,28 @@ const SettingsPage = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/terms-icon.png" alt="" className="w-full h-full object-contain" />
+                  {!imageErrors['terms_icon'] ? (
+                    <img 
+                      src="/terms-icon.png" 
+                      alt="" 
+                      onError={() => handleImageError('terms_icon')}
+                      className="w-full h-full object-contain" 
+                    />
+                  ) : (
+                    <FileText size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <img src="/terms-header.png" alt={t('terms')} className="h-11 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                {!imageErrors['terms_header'] ? (
+                  <img 
+                    src="/terms-header.png" 
+                    alt={t('terms')} 
+                    onError={() => handleImageError('terms_header')}
+                    className="h-11 w-auto object-contain" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
+                ) : (
+                  <span className="font-bold text-zinc-900">{t('terms')}</span>
+                )}
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -151,9 +197,28 @@ const SettingsPage = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/privacy-icon.png" alt="" className="w-full h-full object-contain" />
+                  {!imageErrors['privacy_icon'] ? (
+                    <img 
+                      src="/privacy-icon.png" 
+                      alt="" 
+                      onError={() => handleImageError('privacy_icon')}
+                      className="w-full h-full object-contain" 
+                    />
+                  ) : (
+                    <Lock size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <img src="/privacy-header.png" alt={t('privacy')} className="h-9 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                {!imageErrors['privacy_header'] ? (
+                  <img 
+                    src="/privacy-header.png" 
+                    alt={t('privacy')} 
+                    onError={() => handleImageError('privacy_header')}
+                    className="h-9 w-auto object-contain" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
+                ) : (
+                  <span className="font-bold text-zinc-900">{t('privacy')}</span>
+                )}
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -164,9 +229,28 @@ const SettingsPage = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/about-icon.png" alt="" className="w-full h-full object-contain" />
+                  {!imageErrors['about_icon'] ? (
+                    <img 
+                      src="/about-icon.png" 
+                      alt="" 
+                      onError={() => handleImageError('about_icon')}
+                      className="w-full h-full object-contain" 
+                    />
+                  ) : (
+                    <Info size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <img src="/about-header.png" alt={t('about')} className="h-7 w-auto object-contain -ml-4" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                {!imageErrors['about_header'] ? (
+                  <img 
+                    src="/about-header.png" 
+                    alt={t('about')} 
+                    onError={() => handleImageError('about_header')}
+                    className="h-7 w-auto object-contain -ml-4" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
+                ) : (
+                  <span className="font-bold text-zinc-900 -ml-4">{t('about')}</span>
+                )}
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -182,9 +266,28 @@ const SettingsPage = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 flex items-center justify-center">
-                  <img src="/contact-icon.png" alt="" className="w-full h-full object-contain" />
+                  {!imageErrors['contact_icon'] ? (
+                    <img 
+                      src="/contact-icon.png" 
+                      alt="" 
+                      onError={() => handleImageError('contact_icon')}
+                      className="w-full h-full object-contain" 
+                    />
+                  ) : (
+                    <MessageCircle size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <img src="/contact-header.png" alt={t('contact')} className="h-8 w-auto object-contain -ml-2" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                {!imageErrors['contact_header'] ? (
+                  <img 
+                    src="/contact-header.png" 
+                    alt={t('contact')} 
+                    onError={() => handleImageError('contact_header')}
+                    className="h-8 w-auto object-contain -ml-2" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
+                ) : (
+                  <span className="font-bold text-zinc-900 -ml-2">{t('contact')}</span>
+                )}
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
@@ -196,9 +299,28 @@ const SettingsPage = () => {
               className="w-full flex items-center gap-3 p-4 hover:bg-red-50 transition-colors text-left group"
             >
               <div className="w-10 h-10 flex items-center justify-center">
-                <img src="/logout-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['logout_icon'] ? (
+                  <img 
+                    src="/logout-icon.png" 
+                    alt="" 
+                    onError={() => handleImageError('logout_icon')}
+                    className="w-full h-full object-contain" 
+                  />
+                ) : (
+                  <LogOut size={24} className="text-red-500" />
+                )}
               </div>
-              <img src="/logout-header.png" alt={t('logout')} className="h-6 w-auto object-contain ml-4" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+              {!imageErrors['logout_header'] ? (
+                <img 
+                  src="/logout-header.png" 
+                  alt={t('logout')} 
+                  onError={() => handleImageError('logout_header')}
+                  className="h-6 w-auto object-contain ml-4" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-red-600 ml-4 uppercase tracking-tighter">{t('logout')}</span>
+              )}
             </button>
           </div>
         </div>
@@ -210,14 +332,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/about-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_about_icon'] ? (
+                  <img src="/about-icon.png" alt="" onError={() => handleImageError('modal_about_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <Info size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/about-header.png" 
-                alt="About" 
-                className="h-16 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_about_header'] ? (
+                <img 
+                  src="/about-header.png" 
+                  alt={t('about')} 
+                  onError={() => handleImageError('modal_about_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('about')}</span>
+              )}
             </div>
             
             <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -232,6 +363,14 @@ const SettingsPage = () => {
                         <span className="font-bold text-zinc-900 block mb-1">{t('about_pley_title')}</span>
                         <p>{t('about_pley_desc')}</p>
                     </div>
+                    
+                    {/* Second Mode info if it exists in translations */}
+                    {t('about_Pley_title') !== 'about_Pley_title' && (
+                        <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                            <span className="font-bold text-zinc-900 block mb-1">{t('about_Pley_title')}</span>
+                            <p>{t('about_Pley_desc')}</p>
+                        </div>
+                    )}
                 </div>
 
                 <p>{t('about_desc2')}</p>
@@ -243,12 +382,17 @@ const SettingsPage = () => {
               onClick={() => setShowAboutModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              <img 
-                src="/btn-close.png" 
-                alt="Close" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_close_about'] ? (
+                <img 
+                  src="/btn-close.png" 
+                  alt={t('close')} 
+                  onError={() => handleImageError('btn_close_about')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-zinc-900 text-white px-8 py-2 rounded-full font-bold">{t('close')}</div>
+              )}
             </button>
           </div>
         </div>
@@ -260,14 +404,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/contact-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_contact_icon'] ? (
+                  <img src="/contact-icon.png" alt="" onError={() => handleImageError('modal_contact_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <MessageCircle size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/contact-header.png" 
-                alt="Contact Us" 
-                className="h-16 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_contact_header'] ? (
+                <img 
+                  src="/contact-header.png" 
+                  alt={t('contact')} 
+                  onError={() => handleImageError('modal_contact_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('contact')}</span>
+              )}
             </div>
             
             <div className="space-y-4 text-xs text-zinc-600">
@@ -290,12 +443,17 @@ const SettingsPage = () => {
               onClick={() => setShowContactModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-4"
             >
-              <img 
-                src="/btn-close.png" 
-                alt="Close" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_close_contact'] ? (
+                <img 
+                  src="/btn-close.png" 
+                  alt={t('close')} 
+                  onError={() => handleImageError('btn_close_contact')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-zinc-900 text-white px-8 py-2 rounded-full font-bold">{t('close')}</div>
+              )}
             </button>
           </div>
         </div>
@@ -307,14 +465,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/language-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_lang_icon'] ? (
+                  <img src="/language-icon.png" alt="" onError={() => handleImageError('modal_lang_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <Globe size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/language-header.png" 
-                alt="Language" 
-                className="h-19 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_lang_header'] ? (
+                <img 
+                  src="/language-header.png" 
+                  alt={t('language')} 
+                  onError={() => handleImageError('modal_lang_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('language')}</span>
+              )}
             </div>
             
             <div className="space-y-2 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -361,12 +528,17 @@ const SettingsPage = () => {
               onClick={() => setShowLanguageModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 shrink-0"
             >
-              <img 
-                src="/btn-cancel.png" 
-                alt="Cancel" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_cancel_lang'] ? (
+                <img 
+                  src="/btn-cancel.png" 
+                  alt={t('cancel')} 
+                  onError={() => handleImageError('btn_cancel_lang')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-zinc-100 text-zinc-900 px-8 py-2 rounded-full font-bold">{t('cancel')}</div>
+              )}
             </button>
           </div>
         </div>
@@ -378,14 +550,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/theme-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_theme_icon'] ? (
+                  <img src="/theme-icon.png" alt="" onError={() => handleImageError('modal_theme_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <Sun size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/theme-header.png" 
-                alt="Theme" 
-                className="h-16 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_theme_header'] ? (
+                <img 
+                  src="/theme-header.png" 
+                  alt={t('theme')} 
+                  onError={() => handleImageError('modal_theme_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('theme')}</span>
+              )}
             </div>
             
             <div className="space-y-2">
@@ -416,12 +597,17 @@ const SettingsPage = () => {
               onClick={() => setShowThemeModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105"
             >
-              <img 
-                src="/btn-cancel-red.png" 
-                alt="Cancel" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_cancel_theme'] ? (
+                <img 
+                  src="/btn-cancel-red.png" 
+                  alt={t('cancel')} 
+                  onError={() => handleImageError('btn_cancel_theme')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-red-50 text-red-600 px-8 py-2 rounded-full font-bold border border-red-100">{t('cancel')}</div>
+              )}
             </button>
           </div>
         </div>
@@ -433,14 +619,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/personalization-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_pers_icon'] ? (
+                  <img src="/personalization-icon.png" alt="" onError={() => handleImageError('modal_pers_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <Palette size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/personalization-header.png" 
-                alt="Personalization" 
-                className="h-20 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_pers_header'] ? (
+                <img 
+                  src="/personalization-header.png" 
+                  alt={t('personalization')} 
+                  onError={() => handleImageError('modal_pers_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('personalization')}</span>
+              )}
             </div>
             
             <div className="space-y-4 text-xs text-zinc-600">
@@ -462,12 +657,17 @@ const SettingsPage = () => {
               onClick={() => setShowPersonalizationModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-4"
             >
-              <img 
-                src="/btn-got-it.png" 
-                alt="Got it" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_got_it'] ? (
+                <img 
+                  src="/btn-got-it.png" 
+                  alt={t('got_it')} 
+                  onError={() => handleImageError('btn_got_it')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-zinc-900 text-white px-8 py-2 rounded-full font-bold">{t('got_it')}</div>
+              )}
             </button>
           </div>
         </div>
@@ -479,14 +679,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/privacy-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_privacy_icon'] ? (
+                  <img src="/privacy-icon.png" alt="" onError={() => handleImageError('modal_privacy_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <Lock size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/privacy-header.png" 
-                alt="Privacy Policy" 
-                className="h-16 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_privacy_header'] ? (
+                <img 
+                  src="/privacy-header.png" 
+                  alt={t('privacy')} 
+                  onError={() => handleImageError('modal_privacy_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('privacy')}</span>
+              )}
             </div>
             
             <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -555,12 +764,17 @@ const SettingsPage = () => {
               onClick={() => setShowPrivacyModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              <img 
-                src="/btn-close.png" 
-                alt="Close" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_close_privacy'] ? (
+                <img 
+                  src="/btn-close.png" 
+                  alt={t('close')} 
+                  onError={() => handleImageError('btn_close_privacy')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-zinc-900 text-white px-8 py-2 rounded-full font-bold">{t('close')}</div>
+              )}
             </button>
           </div>
         </div>
@@ -572,14 +786,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/terms-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_terms_icon'] ? (
+                  <img src="/terms-icon.png" alt="" onError={() => handleImageError('modal_terms_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <FileText size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/terms-header.png" 
-                alt="Terms of Service" 
-                className="h-19 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_terms_header'] ? (
+                <img 
+                  src="/terms-header.png" 
+                  alt={t('terms')} 
+                  onError={() => handleImageError('modal_terms_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('terms')}</span>
+              )}
             </div>
             
             <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -689,12 +912,17 @@ const SettingsPage = () => {
               onClick={() => setShowTermsModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              <img 
-                src="/btn-cancel-red-solid.png" 
-                alt="Cancel" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_cancel_terms'] ? (
+                <img 
+                  src="/btn-cancel-red-solid.png" 
+                  alt={t('cancel')} 
+                  onError={() => handleImageError('btn_cancel_terms')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-red-600 text-white px-8 py-2 rounded-full font-bold">{t('cancel')}</div>
+              )}
             </button>
           </div>
         </div>
@@ -706,14 +934,23 @@ const SettingsPage = () => {
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                <img src="/model-icon.png" alt="" className="w-full h-full object-contain" />
+                {!imageErrors['modal_model_icon'] ? (
+                  <img src="/model-icon.png" alt="" onError={() => handleImageError('modal_model_icon')} className="w-full h-full object-contain" />
+                ) : (
+                  <Layers size={32} className="text-zinc-500" />
+                )}
               </div>
-              <img 
-                src="/model-header.png" 
-                alt="Model" 
-                className="h-16 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['modal_model_header'] ? (
+                <img 
+                  src="/model-header.png" 
+                  alt={t('model')} 
+                  onError={() => handleImageError('modal_model_header')}
+                  className="h-16 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('model')}</span>
+              )}
             </div>
             
             <div className="space-y-6 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
@@ -738,6 +975,19 @@ const SettingsPage = () => {
                     <li>{t('model_pley_item4')}</li>
                   </ul>
                 </div>
+
+                {/* Second Mode info if it exists in translations */}
+                {t('model_Pley_title') !== 'model_Pley_title' && (
+                    <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                        <span className="font-bold text-zinc-900 block mb-1">{t('model_Pley_title')}</span>
+                        <ul className="space-y-1 list-disc list-inside marker:text-red-500">
+                            <li>{t('model_Pley_item1')}</li>
+                            <li>{t('model_Pley_item2')}</li>
+                            <li>{t('model_Pley_item3')}</li>
+                            <li>{t('model_Pley_item4')}</li>
+                        </ul>
+                    </div>
+                )}
               </div>
 
               {/* Personalization */}
@@ -756,12 +1006,17 @@ const SettingsPage = () => {
               onClick={() => setShowModelModal(false)}
               className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-2 sticky bottom-0 shrink-0"
             >
-              <img 
-                src="/btn-close.png" 
-                alt="Close" 
-                className="h-10 w-auto object-contain" 
-                style={{ imageRendering: '-webkit-optimize-contrast' }} 
-              />
+              {!imageErrors['btn_close_model'] ? (
+                <img 
+                  src="/btn-close.png" 
+                  alt={t('close')} 
+                  onError={() => handleImageError('btn_close_model')}
+                  className="h-10 w-auto object-contain" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              ) : (
+                <div className="bg-zinc-900 text-white px-8 py-2 rounded-full font-bold">{t('close')}</div>
+              )}
             </button>
           </div>
         </div>

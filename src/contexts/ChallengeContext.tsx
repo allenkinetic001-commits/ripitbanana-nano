@@ -5052,10 +5052,13 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const allSurvivors: Survivor[] = [];
     const seenUsernames = new Set<string>();
     
-    roundHistory.forEach(round => {
+    (roundHistory || []).forEach(round => {
+      if (!round) return;
       (round.survivors || []).forEach((s: any) => {
+        // Guard against null/undefined elements inside the JSONB array
+        if (!s || !s.username) return;
         // Deduplicate by username so each person appears once in Hall of Fame
-        if (s.username && !seenUsernames.has(s.username)) {
+        if (!seenUsernames.has(s.username)) {
           allSurvivors.push({ ...s, madeIt: true });
           seenUsernames.add(s.username);
         }
@@ -5158,15 +5161,27 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [isChallengeEnded]);
 
   useEffect(() => {
-    localStorage.setItem('allPosts_v2', JSON.stringify(allPosts));
+    try {
+      localStorage.setItem('allPosts_v2', JSON.stringify(allPosts));
+    } catch(e) {
+      console.warn('Storage quota exceeded for allPosts_v2');
+    }
   }, [allPosts]);
 
   useEffect(() => {
-    localStorage.setItem('visiblePosts_v2', JSON.stringify(visiblePosts));
+    try {
+      localStorage.setItem('visiblePosts_v2', JSON.stringify(visiblePosts));
+    } catch(e) {
+      console.warn('Storage quota exceeded for visiblePosts_v2');
+    }
   }, [visiblePosts]);
 
   useEffect(() => {
-    localStorage.setItem('roundHistory', JSON.stringify(roundHistory));
+    try {
+      localStorage.setItem('roundHistory', JSON.stringify(roundHistory));
+    } catch(e) {
+      console.warn('Storage quota exceeded for roundHistory');
+    }
   }, [roundHistory]);
 
 
@@ -5446,8 +5461,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         time: r.time,
         variant: r.variant,
         durationLabel: r.duration_label,
-        survivors: Array.isArray(r.survivors) ? r.survivors : [],
-        eliminated: Array.isArray(r.eliminated) ? r.eliminated : [],
+        survivors: Array.isArray(r.survivors) ? r.survivors.filter(Boolean) : [],
+        eliminated: Array.isArray(r.eliminated) ? r.eliminated.filter(Boolean) : [],
         timestamp: r.round_timestamp
       }));
       console.log('📥 Fetched', formatted.length, 'rounds from Supabase');
@@ -5618,9 +5633,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setVariantFirstClickTime({ pley: 0 });
         try {
           const historyIds = new Set([
-            ...survivorHistory.map(s => s.id),
-            ...roundHistory.flatMap(r => r.survivors?.map(s => s.id) || []),
-            ...roundHistory.flatMap(r => r.eliminated?.map(e => e.id) || [])
+            ...survivorHistory.map(s => s?.id).filter(Boolean),
+            ...roundHistory.flatMap(r => r?.survivors?.map(s => s?.id).filter(Boolean) || []),
+            ...roundHistory.flatMap(r => r?.eliminated?.map(e => e?.id).filter(Boolean) || [])
           ]);
 
           setVisiblePosts(allPosts.filter(p => !historyIds.has(p.id)));

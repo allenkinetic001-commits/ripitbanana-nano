@@ -267,7 +267,7 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
         {type === 'video' ? (
           <video 
             src={image} 
-            className="w-full h-full object-contain bg-black group-hover:scale-105 transition-transform duration-500" 
+            className="w-full h-full object-contain bg-zinc-50 group-hover:scale-105 transition-transform duration-500" 
             controls 
             loop 
             muted 

@@ -30,8 +30,8 @@ const UserDetail = () => {
   // Supabase data with caching
   const [profileData, setProfileData] = useState<any>(() => {
     // Priority: Context (if Me) > Cache > Null
-    if (isMe && userProfile.username) return { 
-      id: userProfile.id,
+    if (isMe && userProfile?.username) return { 
+      id: (userProfile as any)?.id || userProfile?.username || 'me',
       username: userProfile.username,
       avatar_url: userProfile.avatar,
       bio: userProfile.bio || 'Surviving the round ⚡',
@@ -137,9 +137,20 @@ const UserDetail = () => {
     };
   }, [username, isMe]);
 
-  // Merge context posts with DB posts (context might have locally created posts)
+  // Merge context posts with DB posts to ensure local optimistic posts are shown instantly
   const contextPosts = allPosts.filter((p: any) => p.username === username);
-  const userPosts = userPostsFromDB.length > 0 ? userPostsFromDB : contextPosts;
+  const userPosts = [...contextPosts];
+  userPostsFromDB.forEach(dbPost => {
+    if (!userPosts.some(p => p.id === dbPost.id)) {
+      userPosts.push(dbPost);
+    }
+  });
+  userPosts.sort((a, b) => {
+    // Try to sort by id descending
+    const aId = typeof a.id === 'number' ? a.id : 0;
+    const bId = typeof b.id === 'number' ? b.id : 0;
+    return bId - aId;
+  });
 
   const isEnemy = enemies.some(e => e.username === username);
   const isSwornEnemy = enemies.find(e => e.username === username)?.isSworn || false;

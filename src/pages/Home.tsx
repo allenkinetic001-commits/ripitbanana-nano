@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
-import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar, ChevronRight } from 'lucide-react';
+import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar, ChevronRight, Trophy } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
-import { useSupabasePosts, createPost, formatPostForUI } from '../hooks/useSupabase';
+import { useSupabasePosts, createPost, uploadPostMedia, formatPostForUI } from '../hooks/useSupabase';
 import { supabase } from '../lib/supabase';
 import { cn } from '../utils';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
@@ -38,9 +38,11 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
         </div>
       </div>
       <div className="flex-1 ml-3 overflow-hidden">
-        <p className="text-sm font-bold text-zinc-900 truncate">@{user.username}</p>
+        <p className="text-sm font-bold text-zinc-900 truncate">
+          {user.fullName || `@${user.username}`}
+        </p>
         <p className="text-xs text-zinc-500 truncate">
-          {isSearch ? 'Survivor' : user.caption}
+          {user.fullName ? `@${user.username}` : (isSearch ? 'Survivor' : user.caption)}
         </p>
       </div>
       <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -132,6 +134,93 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
   );
 });
 
+const SearchContent = ({ searchQuery, allPosts, navigate }: { searchQuery: string, allPosts: any[], navigate: any }) => {
+  const [remoteUsers, setRemoteUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchQuery.length < 1) return;
+    
+    const searchRemote = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, full_name, avatar_url')
+        .ilike('username', `%${searchQuery}%`)
+        .limit(10);
+      
+      if (!error && data) {
+        setRemoteUsers(data.map(u => ({
+          id: u.id,
+          username: u.username,
+          fullName: u.full_name,
+          avatar: u.avatar_url,
+          caption: 'New Citizen', // Fallback for people without posts
+          isRemote: true
+        })));
+      }
+      setLoading(false);
+    };
+
+    const timer = setTimeout(searchRemote, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const localResults = useMemo(() => {
+    return allPosts
+      .filter(post => post.username.toLowerCase().includes(searchQuery.toLowerCase()))
+      .reduce((acc: any[], current) => {
+        if (!acc.find(item => item.username === current.username)) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+  }, [allPosts, searchQuery]);
+
+  // Merge results, prioritizing local ones (they have more data)
+  const mergedResults = useMemo(() => {
+    const results = [...localResults];
+    const seenUsernames = new Set(results.map(r => r.username.toLowerCase()));
+    
+    remoteUsers.forEach(ru => {
+      if (!seenUsernames.has(ru.username.toLowerCase())) {
+        results.push(ru);
+      }
+    });
+    return results;
+  }, [localResults, remoteUsers]);
+
+  return (
+    <div className="p-2 space-y-1">
+      {mergedResults.map((user) => (
+        <HomeUserItem 
+          key={user.id} 
+          user={user} 
+          navigate={navigate} 
+          isSearch={true} 
+        />
+      ))}
+      
+      {loading && mergedResults.length === 0 && (
+        <div className="py-12 text-center">
+          <div className="w-8 h-8 rounded-full border-2 border-zinc-200 border-t-zinc-800 animate-spin mx-auto mb-2" />
+          <p className="text-xs text-zinc-400">Searching records...</p>
+        </div>
+      )}
+
+      {!loading && mergedResults.length === 0 && (
+        <div className="pt-8 pb-16 text-center space-y-4">
+          <div className="flex items-center justify-center mx-auto mb-2">
+            <img src="/search-input-icon.png" alt="Not found" className="w-12 h-12 object-contain opacity-30" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+          </div>
+          <p className="text-sm font-bold text-zinc-400 italic px-6">no people found on that place "@{searchQuery}"</p>
+          <p className="text-xs text-zinc-400 px-10">Make sure you spelled the username correctly.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const {
@@ -160,30 +249,50 @@ const Home = () => {
 
   // Sync Supabase posts into context on load
   useEffect(() => {
-    if (!postsLoading) {
-      setAllPosts(prevAll => {
-        const existingIds = new Set(prevAll.map(p => p.id));
-        const newPosts = formattedPosts.filter(p => !existingIds.has(p.id));
-        
-        // If there are brand new posts from the DB, inject them into the feed
-        if (newPosts.length > 0 && prevAll.length > 0) {
-          setIsChallengeEnded(false);
-          setVisiblePosts(prevVisible => {
-            const visibleIds = new Set(prevVisible.map(p => p.id));
-            const uniqueNew = newPosts.filter(p => !visibleIds.has(p.id));
-            return [...uniqueNew, ...prevVisible];
-          });
+    if (postsLoading || formattedPosts.length === 0) return;
+
+    setAllPosts(prevAll => {
+      const merged = [...prevAll];
+      let changed = false;
+
+      formattedPosts.forEach(dbPost => {
+        const index = merged.findIndex(p => String(p.id) === String(dbPost.id));
+        if (index === -1) {
+          merged.unshift(dbPost);
+          changed = true;
+        } else {
+          // Check if key properties changed
+          const existing = merged[index];
+          if (
+            existing.image !== dbPost.image || 
+            existing.caption !== dbPost.caption ||
+            existing.globalLives !== dbPost.globalLives ||
+            existing.isTraitorGlobal !== dbPost.isTraitorGlobal
+          ) {
+            merged[index] = { ...existing, ...dbPost };
+            changed = true;
+          }
         }
-        
-        // Initial load or not active or feed empty: full sync
-        if (prevAll.length === 0 || !isActive || (!isChallengeEnded && formattedPosts.length > 0)) {
-          setVisiblePosts(formattedPosts);
-          return formattedPosts;
-        }
-        return prevAll;
       });
+
+      if (!changed) return prevAll;
+
+      return merged.sort((a, b) => {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return timeB - timeA;
+      });
+    });
+  }, [postsLoading, formattedPosts]);
+
+  // Handle visible posts sync separately to avoid nested state updates
+  useEffect(() => {
+    if (allPosts.length > 0) {
+      if (visiblePosts.length === 0 || !isActive || (!isChallengeEnded && allPosts.length > visiblePosts.length)) {
+        setVisiblePosts(allPosts);
+      }
     }
-  }, [postsLoading, formattedPosts, setAllPosts, setVisiblePosts, isActive, isChallengeEnded, setIsChallengeEnded]);
+  }, [allPosts, isActive, isChallengeEnded]);
 
   // New state for upload modal
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -200,14 +309,15 @@ const Home = () => {
     if (file) {
       const isVideo = file.type.startsWith('video/');
       setFileType(isVideo ? 'video' : 'image');
-      setUploadModalOpen(true);
-      
+      setRawFile(file);
+
+      // Read file FIRST, open modal only once preview is ready
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedFile(reader.result as string);
+        setUploadModalOpen(true);
       };
       reader.readAsDataURL(file);
-      setRawFile(file);
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -222,43 +332,54 @@ const Home = () => {
     setIsUploading(false);
   };
 
-  const handleCreatePost = async () => {
+  const handleCreatePost = () => {
     if (!selectedFile || !rawFile) return;
     setIsUploading(true);
 
     const caption = captionText || (fileType === 'video' ? 'Just uploaded a video! 🎥' : 'Just uploaded a photo! 📸');
 
-    // Convert file to base64 just in time for upload
-    const base64Data = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target?.result as string);
-      reader.readAsDataURL(rawFile);
-    });
+    // Save the raw File and local preview before clearing modal state
+    const currentRawFile = rawFile;
+    const currentSelectedFile = selectedFile;
 
-    // Get current user session
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (session?.user) {
-      const { data: newPost, error } = await createPost(session.user.id, caption, base64Data);
-      
-      if (error) {
-        console.error('Failed to create post:', error);
-        createLocalPostFallback(caption, base64Data);
-      } else if (newPost) {
-        // Post added successfully, real-time listener will pick it up
-      }
-    } else {
-      console.warn('No active session, creating local post fallback');
-      createLocalPostFallback(caption, base64Data);
-    }
-    
-    // Reset and close
+    // Close modal instantly for snappy UX
     setUploadModalOpen(false);
-    if (selectedFile) URL.revokeObjectURL(selectedFile);
     setSelectedFile(null);
     setRawFile(null);
     setCaptionText('');
     setIsUploading(false);
+
+    // Optimistically show in local feed using blob preview
+    createLocalPostFallback(caption, currentSelectedFile);
+
+    // Upload to Storage then insert DB row in background
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        alert('You must be logged in to upload content.');
+        return;
+      }
+
+      // Step 1: Upload file to Supabase Storage
+      const { url: storageUrl, error: uploadError } = await uploadPostMedia(session.user.id, currentRawFile);
+
+      if (uploadError || !storageUrl) {
+        console.error('Storage upload failed:', uploadError);
+        alert('Upload failed: ' + (uploadError?.message || 'Could not upload file'));
+        return;
+      }
+
+      // Step 2: Insert post row with public storage URL
+      const { error: postError } = await createPost(session.user.id, caption, storageUrl);
+
+      if (postError) {
+        console.error('Failed to create post:', postError);
+        alert('Post failed: ' + postError.message);
+      }
+      // Realtime subscription in useSupabasePosts will pick up the INSERT
+      // and push it to all connected users automatically
+    })();
   };
 
   const createLocalPostFallback = (caption: string, imageUrl: string) => {
@@ -271,6 +392,7 @@ const Home = () => {
       caption,
       likes: 0,
       time: 'Just now',
+      createdAt: new Date().toISOString(),
       comments: []
     };
     setAllPosts(prev => [localPost, ...prev]);
@@ -451,7 +573,7 @@ const Home = () => {
             
             <div className="p-4 space-y-4 overflow-y-auto flex-1">
               {/* Media Preview */}
-              <div id="preview-container" className="aspect-square w-full bg-zinc-900 rounded-2xl flex items-center justify-center overflow-hidden relative min-h-[300px]">
+              <div id="preview-container" className="aspect-square w-full bg-zinc-50 rounded-2xl flex items-center justify-center overflow-hidden relative min-h-[300px]">
                 {!selectedFile ? (
                   <div className="flex flex-col items-center gap-3">
                     <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
@@ -699,37 +821,7 @@ const Home = () => {
 
               <div className="max-h-[60vh] overflow-y-auto">
                 {searchQuery ? (
-                  <div className="p-2 space-y-1">
-                    {allPosts
-                      .filter(post => 
-                        post.username.toLowerCase().includes(searchQuery.toLowerCase())
-                      )
-                      .reduce((acc: any[], current) => {
-                        const x = acc.find(item => item.username === current.username);
-                        if (!x) {
-                          return acc.concat([current]);
-                        } else {
-                          return acc;
-                        }
-                      }, [])
-                      .map((user) => (
-                        <HomeUserItem 
-                          key={user.id} 
-                          user={user} 
-                          navigate={navigate} 
-                          isSearch={true} 
-                        />
-                      ))
-                    }
-                    {allPosts.filter(post => post.username.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
-                      <div className="pt-1 pb-16 text-center space-y-2">
-                        <div className="flex items-center justify-center mx-auto mb-2">
-                          <img src="/search-input-icon.png" alt="Not found" className="w-12 h-12 object-contain opacity-30" style={{ imageRendering: '-webkit-optimize-contrast' }} />
-                        </div>
-                        <p className="text-sm font-medium text-zinc-400 italic">no people found on that place "@{searchQuery}"</p>
-                      </div>
-                    )}
-                  </div>
+                  <SearchContent searchQuery={searchQuery} allPosts={allPosts} navigate={navigate} />
                 ) : (
                   <div className="p-8 text-center space-y-4">
                     <img src="/search-chair-final.png" alt="Empty Chair" className="w-32 h-auto mx-auto object-contain mb-4" style={{ imageRendering: '-webkit-optimize-contrast' }} />
@@ -986,15 +1078,11 @@ const Home = () => {
             <div className="flex flex-col items-center gap-6 animate-in fade-in duration-1000 delay-700">
               <button
                 onClick={() => navigate('/search')}
-                className="group relative transition-all active:scale-95"
+                className="group relative transition-all active:scale-95 px-5 py-2.5 bg-white border border-zinc-100 rounded-full flex items-center gap-2 shadow-sm hover:bg-zinc-50 hover:border-zinc-200"
               >
-                <div className="absolute -inset-2 bg-purple-100 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-                <img 
-                  src="/btn-get-started-mask.png" 
-                  alt="View Results" 
-                  className="h-16 w-auto object-contain relative z-10" 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
+                <Trophy size={14} className="text-zinc-400 group-hover:text-yellow-500 transition-colors" />
+                <span className="text-[10px] font-black text-zinc-900 uppercase tracking-[0.2em]">View Results</span>
+                <ChevronRight size={14} className="text-zinc-300 group-hover:translate-x-1 transition-transform" />
               </button>
               
               <button
