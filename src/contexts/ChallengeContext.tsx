@@ -4991,7 +4991,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const [timeLeft, setTimeLeft] = useState(calculateUniversalTimeLeft());
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date().toDateString());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('userProfile');
@@ -5553,7 +5553,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const startNewChallenge = () => {
     setIsActive(true);
     setIsEliminationRoundActive(true);
-    setTimeLeft(getSecondsUntilMidnight());
+    setTimeLeft(calculateUniversalTimeLeft());
     setIsChallengeEnded(false);
     setIsDurationInitialized(false);
     setUserSelection(null);
