@@ -5027,11 +5027,15 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     pley: 0
   });
   const [isEliminated, setIsEliminated] = useState(false);
-  const [userSelection, setUserSelection] = useState<string | null>(null);
+  const [userSelection, setUserSelection] = useState<string | null>(() => {
+    return localStorage.getItem('userSelection');
+  });
   const [isChallengeEnded, setIsChallengeEnded] = useState<boolean>(() => {
     return localStorage.getItem('isChallengeEnded') === 'true' || false;
   });
-  const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(false);
+  const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(() => {
+    return localStorage.getItem('isEliminationRoundActive') === 'true' || false;
+  });
   const [enemies, setEnemies] = useState<Survivor[]>([]);
   const [allPosts, setAllPosts] = useState<any[]>(() => {
     const saved = localStorage.getItem('allPosts_v2');
@@ -5055,6 +5059,15 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [historyLoading, setHistoryLoading] = useState(() => {
     return !localStorage.getItem('roundHistory');
   });
+
+  useEffect(() => {
+    if (userSelection) localStorage.setItem('userSelection', userSelection);
+    else localStorage.removeItem('userSelection');
+  }, [userSelection]);
+
+  useEffect(() => {
+    localStorage.setItem('isEliminationRoundActive', String(isEliminationRoundActive));
+  }, [isEliminationRoundActive]);
 
   // Hall of Fame is now derived from universal round history
   const survivorHistory = useMemo(() => {
@@ -5265,12 +5278,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           localStorage.removeItem('allPosts');
           localStorage.removeItem('visiblePosts');
           localStorage.removeItem('postComments');
+          localStorage.removeItem('userSelection');
+          localStorage.removeItem('isEliminationRoundActive');
           setEnemies([]);
           setFollowedUsers([]);
           setWallPosts([]);
           setAllPosts([]);
           setVisiblePosts([]);
           setPostComments({});
+          setUserSelection(null);
+          setIsEliminationRoundActive(false);
 
           // Set initial profile from auth metadata immediately for instant UI
           setUserProfile({
@@ -5320,12 +5337,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           localStorage.removeItem('allPosts');
           localStorage.removeItem('visiblePosts');
           localStorage.removeItem('postComments');
+          localStorage.removeItem('userSelection');
+          localStorage.removeItem('isEliminationRoundActive');
           setEnemies([]);
           setFollowedUsers([]);
           setWallPosts([]);
           setAllPosts([]);
           setVisiblePosts([]);
           setPostComments({});
+          setUserSelection(null);
+          setIsEliminationRoundActive(false);
 
           // Set initial profile from auth metadata immediately for instant UI
           setUserProfile({
@@ -5349,7 +5370,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setWallPosts([]);
         setPostComments({});
         setUserVotes({});
+        setUserSelection(null);
+        setIsEliminationRoundActive(false);
         localStorage.removeItem('supabaseUserId');
+        localStorage.removeItem('userSelection');
+        localStorage.removeItem('isEliminationRoundActive');
       }
     });
 
