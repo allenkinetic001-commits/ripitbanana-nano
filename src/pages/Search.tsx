@@ -183,7 +183,11 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
       <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 p-6 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden">
         <div className="absolute top-0 right-0 p-5">
           <div className="bg-rose-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
-             <Trophy size={10} className="text-white" />
+             <img 
+               src="/round-trophy.png" 
+               alt="" 
+               className="h-3 w-auto object-contain brightness-0 invert" 
+             />
              {round.survivors.length} SURVIVORS
           </div>
         </div>
