@@ -156,14 +156,14 @@ export default function Signup() {
                 <div className="absolute -inset-4 bg-purple-100/50 blur-xl rounded-full -z-10" />
               </div>
             </div>
-            <div className="space-y-4 flex flex-col items-center">
+            <div className="space-y-6 flex flex-col items-center">
               <img 
                 src="/check-your-mail.png" 
                 alt="Check Your Mail" 
-                className="h-16 w-auto object-contain" 
+                className="h-28 w-auto object-contain" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }} 
               />
-              <p className="text-zinc-500 font-medium leading-relaxed">
+              <p className="text-zinc-500 font-medium leading-relaxed text-center px-4">
                 We've sent a confirmation link to <span className="text-zinc-900 font-bold">{email}</span>. 
                 Please click it to activate your citizen profile.
               </p>
