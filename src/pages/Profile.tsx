@@ -67,14 +67,22 @@ const Profile = () => {
       
       if (profile) {
         setProfileData(profile);
-        localStorage.setItem(`user_profile_cache_${userProfile.username}`, JSON.stringify(profile));
+        try {
+          localStorage.setItem(`user_profile_cache_${userProfile.username}`, JSON.stringify(profile));
+        } catch(e) {
+          console.warn('Profile cache quota exceeded');
+        }
       }
 
       const { data, error } = await fetchPostsByUsername(userProfile.username);
       if (data) {
         const formatted = data.map(formatPostForUI);
         setUserPosts(formatted);
-        localStorage.setItem(`user_posts_cache_${userProfile.username}`, JSON.stringify(formatted));
+        try {
+          localStorage.setItem(`user_posts_cache_${userProfile.username}`, JSON.stringify(formatted));
+        } catch(e) {
+          console.warn('Posts cache quota exceeded');
+        }
       }
       setLoadingPosts(false);
     };

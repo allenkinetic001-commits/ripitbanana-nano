@@ -285,14 +285,7 @@ const Home = () => {
     });
   }, [postsLoading, formattedPosts]);
 
-  // Handle visible posts sync separately to avoid nested state updates
-  useEffect(() => {
-    if (allPosts.length > 0) {
-      if (visiblePosts.length === 0 || !isActive || (!isChallengeEnded && allPosts.length > visiblePosts.length)) {
-        setVisiblePosts(allPosts);
-      }
-    }
-  }, [allPosts, isActive, isChallengeEnded]);
+
 
   // New state for upload modal
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -399,12 +392,31 @@ const Home = () => {
     setVisiblePosts(prev => [localPost, ...prev]);
   };
 
-  // Sync visible posts with master list when starting a round or on mount
+  // Calculate exact unswiped posts during render
+  const swipedIds = useMemo(() => new Set([
+    ...survivors.map((s: any) => s.id),
+    ...eliminated.map((e: any) => e.id)
+  ]), [survivors, eliminated]);
+
+  const unswipedPosts = useMemo(() => 
+    allPosts.filter(p => !swipedIds.has(p.id)),
+  [allPosts, swipedIds]);
+
+  // Deterministic feed synchronization: Ensures the feed always matches new posts minus swiped ones
   useEffect(() => {
-    if (!isActive && !isChallengeEnded) {
-      setVisiblePosts(allPosts);
+    if (allPosts.length > 0) {
+      // If challenge ended, feed stays empty
+      if (isChallengeEnded) {
+        if (visiblePosts.length > 0) setVisiblePosts([]);
+        return;
+      }
+      
+      // Only reset if they are wildly out of sync (prevents infinite render loops)
+      if (visiblePosts.length !== unswipedPosts.length) {
+        setVisiblePosts(unswipedPosts);
+      }
     }
-  }, [allPosts, isActive, isChallengeEnded]);
+  }, [allPosts.length, unswipedPosts, visiblePosts.length, isChallengeEnded]);
 
 
   const [showInfo, setShowPillsInfo] = useState(false);
@@ -954,15 +966,15 @@ const Home = () => {
 
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
-        {postsLoading && visiblePosts.length === 0 ? (
+        {postsLoading ? (
           /* ── Loading state ── */
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
             <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Loading...</p>
           </div>
-        ) : visiblePosts.length > 0 ? (
+        ) : (visiblePosts.length > 0 || unswipedPosts.length > 0) ? (
           /* ── Posts feed ── */
-          visiblePosts.map((post) => (
+          (visiblePosts.length > 0 ? visiblePosts : unswipedPosts).map((post) => (
             <PostCard 
               key={post.id} 
               {...post} 

@@ -20,7 +20,6 @@ import { useChallenge } from "./contexts/ChallengeContext";
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, authLoading, isEliminated } = useChallenge();
   
-  /*
   if (authLoading && !isAuthenticated) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-zinc-50">
@@ -29,15 +28,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  */
   
   // For local preview, we can bypass the redirect if a special flag is set or if we just want to allow viewing
   if (!isAuthenticated && !window.location.search.includes('preview')) {
-    // return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace />;
   }
-  
-  // Actually, let's just make it public for now to fix the "cannot see" issue
-  // if (!isAuthenticated) return <Navigate to="/login" replace />;
   
   if (isEliminated) {
     return <EliminatedPage />;

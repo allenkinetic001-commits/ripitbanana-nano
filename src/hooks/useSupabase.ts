@@ -29,14 +29,11 @@ export function useSupabasePosts() {
       return [];
     }
   });
-  const [loading, setLoading] = useState(() => !localStorage.getItem('supabase_posts_cache'));
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = async () => {
-    // Only set loading to true if we have no posts (to avoid flickering on background refresh)
-    if (posts.length === 0) {
-      setLoading(true);
-    }
+    // We start with loading=true on mount. We don't need to conditionally set it here.
     const { data, error: fetchError } = await supabase
       .from('posts')
       .select(`

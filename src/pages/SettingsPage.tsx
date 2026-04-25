@@ -81,10 +81,18 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center bg-zinc-100 rounded-xl group-hover:bg-zinc-200 transition-colors">
-                  <Globe size={24} className="text-zinc-600" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  {!imageErrors['lang_icon'] ? (
+                    <img src="/language-icon.png" alt="" onError={() => handleImageError('lang_icon')} className="w-full h-full object-contain" />
+                  ) : (
+                    <Globe size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <span className="font-black text-zinc-900 uppercase tracking-tight">{t('language')}</span>
+                {!imageErrors['lang_header'] ? (
+                  <img src="/language-header.png" alt={t('language')} onError={() => handleImageError('lang_header')} className="h-6 w-auto object-contain -ml-2" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                ) : (
+                  <span className="font-bold text-zinc-900 -ml-2">{t('language')}</span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-zinc-400 font-medium">{getLanguageName(language)}</span>
@@ -97,10 +105,18 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center bg-zinc-100 rounded-xl group-hover:bg-zinc-200 transition-colors">
-                  <Sun size={24} className="text-zinc-600" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  {!imageErrors['theme_icon'] ? (
+                    <img src="/theme-icon.png" alt="" onError={() => handleImageError('theme_icon')} className="w-full h-full object-contain" />
+                  ) : (
+                    <Sun size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <span className="font-black text-zinc-900 uppercase tracking-tight">{t('theme')}</span>
+                {!imageErrors['theme_header'] ? (
+                  <img src="/theme-header.png" alt={t('theme')} onError={() => handleImageError('theme_header')} className="h-6 w-auto object-contain -ml-2" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                ) : (
+                  <span className="font-bold text-zinc-900 -ml-2">{t('theme')}</span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-zinc-400 font-medium">{getThemeName(theme)}</span>
@@ -113,10 +129,18 @@ const SettingsPage = () => {
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center bg-zinc-100 rounded-xl group-hover:bg-zinc-200 transition-colors">
-                  <Palette size={24} className="text-zinc-600" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  {!imageErrors['pers_icon'] ? (
+                    <img src="/personalization-icon.png" alt="" onError={() => handleImageError('pers_icon')} className="w-full h-full object-contain" />
+                  ) : (
+                    <Palette size={24} className="text-zinc-500" />
+                  )}
                 </div>
-                <span className="font-black text-zinc-900 uppercase tracking-tight">{t('personalization')}</span>
+                {!imageErrors['pers_header'] ? (
+                  <img src="/personalization-header.png" alt={t('personalization')} onError={() => handleImageError('pers_header')} className="h-6 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                ) : (
+                  <span className="font-bold text-zinc-900">{t('personalization')}</span>
+                )}
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>

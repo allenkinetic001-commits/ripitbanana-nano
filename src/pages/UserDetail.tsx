@@ -83,7 +83,11 @@ const UserDetail = () => {
       }
 
       setProfileData(profile);
-      localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(profile));
+      try {
+        localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(profile));
+      } catch(e) {
+        console.warn('Profile cache quota exceeded');
+      }
       
       // Fetch their posts
       const { data: posts } = await supabase
@@ -104,7 +108,11 @@ const UserDetail = () => {
           comments: [],
         }));
         setUserPostsFromDB(formatted);
-        localStorage.setItem(`user_posts_cache_${username}`, JSON.stringify(formatted));
+        try {
+          localStorage.setItem(`user_posts_cache_${username}`, JSON.stringify(formatted));
+        } catch(e) {
+          console.warn('Posts cache quota exceeded');
+        }
       }
       setLoadingPosts(false);
     };
@@ -120,7 +128,11 @@ const UserDetail = () => {
         filter: `username=eq.${username}`
       }, (payload) => {
         setProfileData(payload.new);
-        localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(payload.new));
+        try {
+          localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(payload.new));
+        } catch(e) {
+          console.warn('Profile cache quota exceeded');
+        }
       })
       .on('postgres_changes', { 
         event: 'DELETE', 

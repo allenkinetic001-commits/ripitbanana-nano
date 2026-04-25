@@ -5219,9 +5219,20 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       }));
       setIsEliminated(false);
     } else if (error && authUser) {
-      // PGRST116 means no rows found -> Eliminated
+      // PGRST116 means no rows found -> POTENTIALLY Eliminated
       if (error.code === 'PGRST116') {
-        setIsEliminated(true);
+        // Check if user is very new (race condition with trigger)
+        const createdAt = authUser?.created_at ? new Date(authUser.created_at).getTime() : 0;
+        const now = new Date().getTime();
+        const ageInSeconds = (now - createdAt) / 1000;
+        
+        if (createdAt > 0 && ageInSeconds < 30) {
+          console.log('User is new, retrying profile fetch in 2s...');
+          setTimeout(() => fetchUserProfile(userId, authUser), 2000);
+          setIsEliminated(false); // Stay alive for now
+        } else {
+          setIsEliminated(true);
+        }
       }
       // If profile row is missing (Eliminated), at least keep the username from auth
       setUserProfile((prev: any) => ({
@@ -5251,9 +5262,38 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           setAllPosts([]);
           setVisiblePosts([]);
           setPostComments({});
+
+          // Set initial profile from auth metadata immediately for instant UI
+          setUserProfile({
+            username: session.user.user_metadata?.username || '',
+            fullName: session.user.user_metadata?.full_name || '',
+            bio: 'Surviving the round ⚡',
+            avatar: session.user.user_metadata?.avatar_url || '/custom-empty-profile.png',
+            website: ''
+          });
+          localStorage.setItem('userProfile', JSON.stringify({
+            username: session.user.user_metadata?.username || '',
+            fullName: session.user.user_metadata?.full_name || '',
+            bio: 'Surviving the round ⚡',
+            avatar: session.user.user_metadata?.avatar_url || '/custom-empty-profile.png',
+            website: ''
+          }));
+
           setIsChallengeEnded(false);
           localStorage.setItem('isChallengeEnded', 'false');
           localStorage.setItem('supabaseUserId', session.user.id);
+        } else {
+          // Even if user ID hasn't changed, ensure profile is synced if it's currently empty
+          setUserProfile((prev: any) => {
+            if (!prev.username && session.user.user_metadata?.username) {
+              return {
+                ...prev,
+                username: session.user.user_metadata.username,
+                fullName: session.user.user_metadata.full_name || prev.fullName,
+              };
+            }
+            return prev;
+          });
         }
       }
       setAuthLoading(false);
@@ -5277,6 +5317,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           setAllPosts([]);
           setVisiblePosts([]);
           setPostComments({});
+
+          // Set initial profile from auth metadata immediately for instant UI
+          setUserProfile({
+            username: session.user.user_metadata?.username || '',
+            fullName: session.user.user_metadata?.full_name || '',
+            bio: 'Surviving the round ⚡',
+            avatar: session.user.user_metadata?.avatar_url || '/custom-empty-profile.png',
+            website: ''
+          });
+
           setIsChallengeEnded(false);
           localStorage.setItem('isChallengeEnded', 'false');
           localStorage.setItem('supabaseUserId', session.user.id);
