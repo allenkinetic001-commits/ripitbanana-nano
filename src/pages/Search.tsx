@@ -181,17 +181,7 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
       <div className="absolute inset-0 bg-zinc-100/60 rounded-[2.5rem] translate-y-1.5 scale-[0.98] -z-10" />
       
       <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 p-6 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-5">
-          <div className="bg-rose-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
-             <img 
-               src="/trophy-icon.png" 
-               alt="" 
-               className="h-5 w-auto object-contain brightness-0 invert" 
-               style={{ imageRendering: '-webkit-optimize-contrast' }}
-             />
-             {round.survivors.length} SURVIVORS
-          </div>
-        </div>
+
 
         <div className="flex flex-col gap-5">
           <div>
@@ -199,7 +189,18 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
               <Clock size={12} className="text-zinc-400" />
               <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{round.date} at {round.time}</span>
             </div>
-            <h3 className="text-xl font-black text-zinc-900 uppercase italic tracking-tighter leading-none mb-2">{round.variant} Selection Round</h3>
+            <h3 className="text-xl font-black text-zinc-900 uppercase italic tracking-tighter leading-none mb-3">{round.variant} Selection Round</h3>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-rose-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
+                <img 
+                  src="/trophy-icon.png" 
+                  alt="" 
+                  className="h-4 w-auto object-contain brightness-0 invert" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+                {round.survivors.length} SURVIVORS
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <span className="text-[9px] font-black bg-zinc-100 text-zinc-600 px-3 py-1 rounded-full uppercase tracking-wider border border-zinc-200/50">
                  Duration: {round.durationLabel}
