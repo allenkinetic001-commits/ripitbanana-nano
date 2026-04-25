@@ -5750,15 +5750,13 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   // Timer countdown
   useEffect(() => {
     const updateTimer = () => {
-      if (isActive) {
-        setTimeLeft(calculateUniversalTimeLeft());
-      }
+      setTimeLeft(calculateUniversalTimeLeft());
     };
 
     updateTimer(); // Initial call
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [isActive]);
+  }, []);
 
 
 
