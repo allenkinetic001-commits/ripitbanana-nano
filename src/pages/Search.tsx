@@ -202,7 +202,7 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex flex-col items-center gap-6 mt-2 w-full">
             <div className="flex -space-x-4">
               {round.survivors.slice(0, 6).map((s: any, i: number) => (
                 <div key={s.id} className="w-14 h-14 rounded-full border-4 border-white overflow-hidden shadow-xl transform transition-transform group-hover:scale-110 group-hover:-translate-y-1" style={{ zIndex: 10 - i }}>
@@ -216,9 +216,9 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
               )}
             </div>
             
-            <div className="flex items-center gap-2 bg-white border border-zinc-100 px-5 py-2.5 rounded-full transition-all shadow-sm hover:bg-zinc-50 hover:border-zinc-200 active:scale-95 cursor-pointer group/btn">
-              <span className="text-[10px] font-black text-zinc-900 uppercase tracking-[0.2em]">View Results</span>
-              <ChevronRight size={14} className="text-zinc-300 group-hover/btn:translate-x-1 transition-transform" />
+            <div className="flex items-center gap-2 bg-zinc-900 px-8 py-3 rounded-full transition-all shadow-xl hover:bg-black active:scale-95 cursor-pointer group/btn">
+              <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">View Round Results</span>
+              <ChevronRight size={14} className="text-white/50 group-hover/btn:translate-x-1 transition-transform" />
             </div>
           </div>
         </div>
