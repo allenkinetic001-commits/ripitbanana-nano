@@ -472,21 +472,56 @@ const SearchPage = () => {
               )}
             </div>
             
-            <div className="space-y-4">
-              {selectedRound?.survivors.map((survivor: any) => (
-                <SurvivorRow 
-                  key={survivor.id} 
-                  survivor={survivor} 
-                  isSurvivor={isSurvivor}
-                  toggleFollow={toggleFollow}
-                  followedUsers={followedUsers}
-                  navigate={navigate}
-                  handleVote={handleVote}
-                  selectedRoundId={selectedRoundId}
-                  isHistoryView={true}
-                  isChallengeEnded={false}
-                />
-              ))}
+            <div className="space-y-8">
+              {/* Survivors Section */}
+              {selectedRound?.survivors && selectedRound.survivors.length > 0 && (
+                <div className="space-y-4">
+                  <div className="px-6 flex items-center gap-3">
+                    <div className="h-[1px] flex-1 bg-zinc-200" />
+                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">Survivors ({selectedRound.survivors.length})</span>
+                    <div className="h-[1px] flex-1 bg-zinc-200" />
+                  </div>
+                  {selectedRound.survivors.map((survivor: any) => (
+                    <SurvivorRow 
+                      key={`survivor-${survivor.id}`} 
+                      survivor={{ ...survivor, madeIt: true }} 
+                      isSurvivor={isSurvivor}
+                      toggleFollow={toggleFollow}
+                      followedUsers={followedUsers}
+                      navigate={navigate}
+                      handleVote={handleVote}
+                      selectedRoundId={selectedRoundId}
+                      isHistoryView={true}
+                      isChallengeEnded={false}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Eliminated Section */}
+              {selectedRound?.eliminated && selectedRound.eliminated.length > 0 && (
+                <div className="space-y-4">
+                  <div className="px-6 flex items-center gap-3">
+                    <div className="h-[1px] flex-1 bg-rose-200" />
+                    <span className="text-[10px] font-black text-rose-400 uppercase tracking-[0.3em]">Terminated ({selectedRound.eliminated.length})</span>
+                    <div className="h-[1px] flex-1 bg-rose-200" />
+                  </div>
+                  {selectedRound.eliminated.map((eliminatedUser: any) => (
+                    <SurvivorRow 
+                      key={`eliminated-${eliminatedUser.id}`} 
+                      survivor={{ ...eliminatedUser, madeIt: false }} 
+                      isSurvivor={isSurvivor}
+                      toggleFollow={toggleFollow}
+                      followedUsers={followedUsers}
+                      navigate={navigate}
+                      handleVote={handleVote}
+                      selectedRoundId={selectedRoundId}
+                      isHistoryView={true}
+                      isChallengeEnded={false}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ) : viewMode === 'hall_of_fame' ? (
