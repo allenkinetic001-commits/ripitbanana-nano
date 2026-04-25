@@ -5749,8 +5749,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   // Timer countdown
   useEffect(() => {
-    // Timer halted
-    /*
     const updateTimer = () => {
       if (isActive) {
         setTimeLeft(calculateUniversalTimeLeft());
@@ -5760,7 +5758,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     updateTimer(); // Initial call
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-    */
   }, [isActive]);
 
 
