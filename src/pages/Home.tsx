@@ -236,75 +236,16 @@ const Home = () => {
     allPosts, setAllPosts, wallPosts, addWallPost,
     visiblePosts, setVisiblePosts,
     language,
-    t
+    t, postsLoading
   } = useChallenge();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Fetch posts from Supabase
-  const { posts: supabasePosts, loading: postsLoading, refetch: refetchPosts } = useSupabasePosts();
-
-  // Memoize formatted posts
-  const formattedPosts = useMemo(() => supabasePosts.map(formatPostForUI), [supabasePosts]);
-
-  // Sync Supabase posts into context on load
+  // Supabase posts are now managed globally in ChallengeContext
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
-
   useEffect(() => {
-    if (postsLoading) return;
-    
-    if (formattedPosts.length === 0) {
-      setIsInitialSyncDone(true);
-      return;
-    }
-
-    setAllPosts(prevAll => {
-      const merged = [...prevAll];
-      let changed = false;
-
-      formattedPosts.forEach(dbPost => {
-        const index = merged.findIndex(p => String(p.id) === String(dbPost.id));
-        if (index === -1) {
-          // Check if this dbPost matches an optimistic local post
-          const optimisticIndex = merged.findIndex(p => 
-            p.username === dbPost.username && 
-            p.caption === dbPost.caption && 
-            typeof p.id === 'number' && p.id > 1000000000000
-          );
-          
-          if (optimisticIndex !== -1) {
-            // Replace the optimistic post with the real DB post
-            merged[optimisticIndex] = dbPost;
-            changed = true;
-          } else {
-            merged.unshift(dbPost);
-            changed = true;
-          }
-        } else {
-          // Check if key properties changed
-          const existing = merged[index];
-          if (
-            existing.image !== dbPost.image || 
-            existing.caption !== dbPost.caption ||
-            existing.globalLives !== dbPost.globalLives ||
-            existing.isTraitorGlobal !== dbPost.isTraitorGlobal
-          ) {
-            merged[index] = { ...existing, ...dbPost };
-            changed = true;
-          }
-        }
-      });
-
-      setIsInitialSyncDone(true);
-      if (!changed) return prevAll;
-
-      return merged.sort((a, b) => {
-        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return timeB - timeA;
-      });
-    });
-  }, [postsLoading, formattedPosts]);
+    if (allPosts.length > 0) setIsInitialSyncDone(true);
+  }, [allPosts.length]);
 
 
 
@@ -425,15 +366,16 @@ const Home = () => {
 
   // Deterministic feed synchronization: Ensures the feed always matches new posts minus swiped ones
   useEffect(() => {
+    // If challenge ended, feed stays empty
+    if (isChallengeEnded) {
+      if (visiblePosts.length > 0) setVisiblePosts([]);
+      return;
+    }
+    
     if (allPosts.length > 0) {
-      // If challenge ended, feed stays empty
-      if (isChallengeEnded) {
-        if (visiblePosts.length > 0) setVisiblePosts([]);
-        return;
-      }
-      
-      // Only reset if they are wildly out of sync (prevents infinite render loops)
-      if (visiblePosts.length !== unswipedPosts.length) {
+      // Always populate on first load (visiblePosts empty but posts available)
+      // or when the set of unswiped posts changes
+      if (visiblePosts.length === 0 || visiblePosts.length !== unswipedPosts.length) {
         setVisiblePosts(unswipedPosts);
       }
     }
