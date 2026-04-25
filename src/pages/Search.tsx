@@ -184,7 +184,7 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
         <div className="absolute top-0 right-0 p-5">
           <div className="bg-rose-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg flex items-center gap-2">
              <img 
-               src="/round-trophy.png" 
+               src="/trophy-icon.png" 
                alt="" 
                className="h-3 w-auto object-contain brightness-0 invert" 
              />
