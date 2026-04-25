@@ -248,8 +248,15 @@ const Home = () => {
   const formattedPosts = useMemo(() => supabasePosts.map(formatPostForUI), [supabasePosts]);
 
   // Sync Supabase posts into context on load
+  const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
+
   useEffect(() => {
-    if (postsLoading || formattedPosts.length === 0) return;
+    if (postsLoading) return;
+    
+    if (formattedPosts.length === 0) {
+      setIsInitialSyncDone(true);
+      return;
+    }
 
     setAllPosts(prevAll => {
       const merged = [...prevAll];
@@ -275,6 +282,7 @@ const Home = () => {
         }
       });
 
+      setIsInitialSyncDone(true);
       if (!changed) return prevAll;
 
       return merged.sort((a, b) => {
@@ -966,7 +974,7 @@ const Home = () => {
 
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
-        {postsLoading ? (
+        {(postsLoading || !isInitialSyncDone) ? (
           /* ── Loading state ── */
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
