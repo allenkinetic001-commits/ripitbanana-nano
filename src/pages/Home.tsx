@@ -265,8 +265,21 @@ const Home = () => {
       formattedPosts.forEach(dbPost => {
         const index = merged.findIndex(p => String(p.id) === String(dbPost.id));
         if (index === -1) {
-          merged.unshift(dbPost);
-          changed = true;
+          // Check if this dbPost matches an optimistic local post
+          const optimisticIndex = merged.findIndex(p => 
+            p.username === dbPost.username && 
+            p.caption === dbPost.caption && 
+            typeof p.id === 'number' && p.id > 1000000000000
+          );
+          
+          if (optimisticIndex !== -1) {
+            // Replace the optimistic post with the real DB post
+            merged[optimisticIndex] = dbPost;
+            changed = true;
+          } else {
+            merged.unshift(dbPost);
+            changed = true;
+          }
         } else {
           // Check if key properties changed
           const existing = merged[index];

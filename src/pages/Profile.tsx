@@ -149,9 +149,18 @@ const Profile = () => {
 
   // Merge context posts with DB posts to ensure local optimistic posts are shown instantly
   const contextPosts = allPosts.filter((p: any) => p.username === userProfile.username);
-  const mergedPosts = [...contextPosts];
+  
+  // Dedup contextPosts to ensure we don't carry over optimistic duplicates if a DB post exists
+  const uniqueContextPosts = contextPosts.filter(cp => {
+    const isOptimistic = typeof cp.id === 'number' && cp.id > 1000000000000;
+    if (!isOptimistic) return true;
+    const hasDbPost = contextPosts.some(other => other.id !== cp.id && other.caption === cp.caption && (typeof other.id !== 'number' || other.id < 1000000000000));
+    return !hasDbPost;
+  });
+
+  const mergedPosts = [...uniqueContextPosts];
   userPosts.forEach(dbPost => {
-    if (!mergedPosts.some(p => p.id === dbPost.id)) {
+    if (!mergedPosts.some(p => String(p.id) === String(dbPost.id) || p.caption === dbPost.caption)) {
       mergedPosts.push(dbPost);
     }
   });
