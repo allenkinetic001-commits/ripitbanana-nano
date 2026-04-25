@@ -974,7 +974,7 @@ const Home = () => {
 
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
-        {(postsLoading || !isInitialSyncDone) ? (
+        {(postsLoading || !isInitialSyncDone) && (visiblePosts.length === 0 && unswipedPosts.length === 0) ? (
           /* ── Loading state ── */
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
