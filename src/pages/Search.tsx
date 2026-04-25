@@ -191,7 +191,7 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
             </div>
             {round.variant?.toLowerCase() === 'pley' ? (
               <img 
-                src="/pley_selection_round.png" 
+                src="/header-round-results-custom.png" 
                 alt="Pley Selection Round" 
                 className="h-10 w-auto object-contain mb-3"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
