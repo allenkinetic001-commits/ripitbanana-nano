@@ -5028,13 +5028,19 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   });
   const [isEliminated, setIsEliminated] = useState(false);
   const [userSelection, setUserSelection] = useState<string | null>(() => {
-    return localStorage.getItem('userSelection');
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return null;
+    return localStorage.getItem(`userSelection_${userId}`);
   });
   const [isChallengeEnded, setIsChallengeEnded] = useState<boolean>(() => {
-    return localStorage.getItem('isChallengeEnded') === 'true' || false;
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return false;
+    return localStorage.getItem(`isChallengeEnded_${userId}`) === 'true' || false;
   });
   const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(() => {
-    return localStorage.getItem('isEliminationRoundActive') === 'true' || false;
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return false;
+    return localStorage.getItem(`isEliminationRoundActive_${userId}`) === 'true' || false;
   });
   const [enemies, setEnemies] = useState<Survivor[]>([]);
   const [allPosts, setAllPosts] = useState<any[]>(() => {
@@ -5061,13 +5067,23 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   });
 
   useEffect(() => {
-    if (userSelection) localStorage.setItem('userSelection', userSelection);
-    else localStorage.removeItem('userSelection');
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    if (userSelection) localStorage.setItem(`userSelection_${userId}`, userSelection);
+    else localStorage.removeItem(`userSelection_${userId}`);
   }, [userSelection]);
 
   useEffect(() => {
-    localStorage.setItem('isEliminationRoundActive', String(isEliminationRoundActive));
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`isEliminationRoundActive_${userId}`, String(isEliminationRoundActive));
   }, [isEliminationRoundActive]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`isChallengeEnded_${userId}`, String(isChallengeEnded));
+  }, [isChallengeEnded]);
 
   // Hall of Fame is now derived from universal round history
   const survivorHistory = useMemo(() => {
@@ -5306,7 +5322,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           }));
 
           setIsChallengeEnded(false);
-          localStorage.setItem('isChallengeEnded', 'false');
+          localStorage.setItem('isChallengeEnded_false', 'false'); // Legacy cleanup
           localStorage.setItem('supabaseUserId', session.user.id);
         } else {
           // Even if user ID hasn't changed, ensure profile is synced if it's currently empty
@@ -5358,7 +5374,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           });
 
           setIsChallengeEnded(false);
-          localStorage.setItem('isChallengeEnded', 'false');
           localStorage.setItem('supabaseUserId', session.user.id);
         }
       } else {
@@ -5373,8 +5388,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setUserSelection(null);
         setIsEliminationRoundActive(false);
         localStorage.removeItem('supabaseUserId');
-        localStorage.removeItem('userSelection');
-        localStorage.removeItem('isEliminationRoundActive');
       }
     });
 
