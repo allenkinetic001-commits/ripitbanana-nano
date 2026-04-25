@@ -166,9 +166,14 @@ export default function Signup() {
             <div className="pt-8 flex justify-center w-full">
               <button 
                 onClick={() => navigate('/login')}
-                className="w-full bg-[#b30000] hover:bg-[#cc0000] text-white py-6 px-10 rounded-[1.8rem] text-2xl font-black lowercase tracking-normal shadow-[0_15px_50px_rgba(179,0,0,0.4)] transition-all duration-300 active:scale-90 hover:scale-[1.05]"
+                className="w-full transition-all duration-300 active:scale-95 hover:scale-105"
               >
-                back to login
+                <img
+                  src="/back-to-login.png"
+                  alt="back to login"
+                  className="w-full h-auto object-contain"
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
               </button>
             </div>
           </div>
