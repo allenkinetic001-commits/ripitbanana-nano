@@ -216,9 +216,9 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
               )}
             </div>
             
-            <div className="flex items-center gap-2 bg-zinc-900 px-8 py-3 rounded-full transition-all shadow-xl hover:bg-black active:scale-95 cursor-pointer group/btn">
-              <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">View Round Results</span>
-              <ChevronRight size={14} className="text-white/50 group-hover/btn:translate-x-1 transition-transform" />
+            <div className="flex items-center gap-2 bg-white border border-zinc-200 px-8 py-3 rounded-full transition-all shadow-lg hover:shadow-xl hover:bg-zinc-50 active:scale-95 cursor-pointer group/btn">
+              <span className="text-[10px] font-black text-zinc-900 uppercase tracking-[0.3em]">View Round Results</span>
+              <ChevronRight size={14} className="text-zinc-300 group-hover/btn:translate-x-1 transition-transform" />
             </div>
           </div>
         </div>
