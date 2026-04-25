@@ -186,7 +186,8 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
              <img 
                src="/trophy-icon.png" 
                alt="" 
-               className="h-3 w-auto object-contain brightness-0 invert" 
+               className="h-5 w-auto object-contain brightness-0 invert" 
+               style={{ imageRendering: '-webkit-optimize-contrast' }}
              />
              {round.survivors.length} SURVIVORS
           </div>
