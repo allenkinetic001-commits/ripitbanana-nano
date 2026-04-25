@@ -163,17 +163,12 @@ export default function Signup() {
                 Please click it to activate your citizen profile.
               </p>
             </div>
-            <div className="pt-6 flex justify-center">
+            <div className="pt-8 flex justify-center w-full">
               <button 
                 onClick={() => navigate('/login')}
-                className="transition-all active:scale-95 hover:scale-110 group"
+                className="w-full bg-[#b30000] hover:bg-[#cc0000] text-white py-6 px-10 rounded-[1.8rem] text-2xl font-black lowercase tracking-normal shadow-[0_15px_50px_rgba(179,0,0,0.4)] transition-all duration-300 active:scale-90 hover:scale-[1.05]"
               >
-                <img 
-                  src="/back-to-login.png" 
-                  alt="back to login" 
-                  className="h-[75px] w-auto object-contain drop-shadow-2xl"
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
+                back to login
               </button>
             </div>
           </div>
