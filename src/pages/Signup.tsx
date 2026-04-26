@@ -152,12 +152,18 @@ export default function Signup() {
           <div className="text-center space-y-6 py-12 px-8 bg-white/50 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-2xl">
             <div className="flex justify-center">
               <div className="relative">
-                <img src="/signup-welcome-hydrant.png" alt="Email" className="w-32 h-auto object-contain animate-bounce" />
+                <img src="/signup-welcome-hydrant.png" alt="Email" className="w-44 h-auto object-contain animate-bounce" />
                 <div className="absolute -inset-4 bg-purple-100/50 blur-xl rounded-full -z-10" />
               </div>
             </div>
             <div className="space-y-2">
-              <h2 className="text-3xl font-black text-zinc-900 tracking-tight italic uppercase">Check Your Email</h2>
+              <div className="flex justify-center">
+                <img 
+                  src="/check-your-mail.png" 
+                  alt="Check Your Email" 
+                  className="h-12 w-auto mix-blend-multiply" 
+                />
+              </div>
               <p className="text-zinc-500 font-medium leading-relaxed">
                 We've sent a confirmation link to <span className="text-zinc-900 font-bold">{email}</span>. 
                 Please click it to activate your citizen profile.
@@ -185,7 +191,7 @@ export default function Signup() {
             <img
               src="/signup-welcome-hydrant.png"
               alt="Welcome"
-              className="w-28 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
+              className="w-40 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </div>
