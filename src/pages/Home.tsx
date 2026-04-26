@@ -434,6 +434,13 @@ const Home = () => {
         return JSON.stringify(vp) !== JSON.stringify(up);
       });
 
+      // If all posts were swiped in a previous session but new posts exist in DB,
+      // reset the feed so users aren't permanently stuck on "The End" screen.
+      if (unswipedPosts.length === 0 && visiblePosts.length === 0 && allPosts.length > 0) {
+        setVisiblePosts(allPosts);
+        return;
+      }
+
       if (visiblePosts.length === 0 || hasNew || hasRemoved || hasContentChanged) {
         setVisiblePosts(unswipedPosts);
       }

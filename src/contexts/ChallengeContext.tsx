@@ -5221,7 +5221,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [isChallengeEnded]);
 
   // Sync Supabase posts into context globally
-  const { posts: supabasePosts, loading: postsLoading } = useSupabasePosts();
+  const { posts: supabasePosts, loading: postsLoading, refetch: refetchPosts } = useSupabasePosts();
   const formattedPosts = useMemo(() => supabasePosts.map(formatPostForUI), [supabasePosts]);
 
   useEffect(() => {
@@ -5414,6 +5414,13 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setIsAuthenticated(!!session);
       if (session?.user) {
         fetchUserProfile(session.user.id, session.user);
+
+        // Always reset round state on login so old swiped posts never block the feed
+        setSurvivors([]);
+        setEliminated([]);
+        setUserSelection(null);
+        setIsChallengeEnded(false);
+
         const prevUserId = localStorage.getItem('supabaseUserId');
         if (prevUserId !== session.user.id) {
           localStorage.removeItem('enemies');
@@ -5427,10 +5434,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           setEnemies([]);
           setFollowedUsers([]);
           setWallPosts([]);
-          setAllPosts([]);
-          setVisiblePosts([]);
           setPostComments({});
-          setUserSelection(null);
           setIsEliminationRoundActive(false);
 
           // Set initial profile from auth metadata immediately for instant UI
@@ -5442,9 +5446,25 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             website: ''
           });
 
-          setIsChallengeEnded(false);
           localStorage.setItem('supabaseUserId', session.user.id);
         }
+
+        // Immediately seed visiblePosts from cache for instant display (feed is universal)
+        const cachedPosts = localStorage.getItem('allPosts_v2');
+        if (cachedPosts) {
+          try {
+            const parsed = JSON.parse(cachedPosts);
+            if (parsed.length > 0) {
+              setAllPosts(parsed);
+              setVisiblePosts(parsed);
+            }
+          } catch (_) {}
+        }
+
+        // Trigger a fresh fetch from Supabase in the background
+        refetchPosts();
+
+
       } else {
         setUserProfile({
           username: '', fullName: '', bio: '', avatar: '', website: ''

@@ -33,7 +33,7 @@ export function useSupabasePosts() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = async () => {
-    // We start with loading=true on mount. We don't need to conditionally set it here.
+    setLoading(true);
     const { data, error: fetchError } = await supabase
       .from('posts')
       .select(`
