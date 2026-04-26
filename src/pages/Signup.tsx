@@ -152,7 +152,7 @@ export default function Signup() {
           <div className="text-center space-y-6 py-12 px-8 bg-white/50 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-2xl">
             <div className="flex justify-center">
               <div className="relative">
-                <img src="/signup-welcome-hydrant.png" alt="Email" className="w-44 h-auto object-contain animate-bounce" />
+                <img src="/signup-welcome-hydrant.png" alt="Email" className="w-64 h-auto object-contain animate-bounce" />
                 <div className="absolute -inset-4 bg-purple-100/50 blur-xl rounded-full -z-10" />
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function Signup() {
             <img
               src="/signup-welcome-hydrant.png"
               alt="Welcome"
-              className="w-40 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
+              className="w-64 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </div>
