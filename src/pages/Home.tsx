@@ -266,13 +266,10 @@ const Home = () => {
       setFileType(isVideo ? 'video' : 'image');
       setRawFile(file);
 
-      // Read file FIRST, open modal only once preview is ready
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedFile(reader.result as string);
-        setUploadModalOpen(true);
-      };
-      reader.readAsDataURL(file);
+      // Instantly preview using an object URL instead of freezing the UI with a huge base64 string
+      const objectUrl = URL.createObjectURL(file);
+      setSelectedFile(objectUrl);
+      setUploadModalOpen(true);
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -296,50 +293,100 @@ const Home = () => {
     // Save the raw File and local preview before clearing modal state
     const currentRawFile = rawFile;
     const currentSelectedFile = selectedFile;
+    
+    // Generate a valid UUID v4 robustly (handles insecure contexts where crypto.randomUUID is undefined)
+    const generateId = () => {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+    const optimisticId = generateId();
 
-    // Close modal instantly for snappy UX
+    // Close modal instantly for snappy UX, but keep isUploading true
     setUploadModalOpen(false);
     setSelectedFile(null);
     setRawFile(null);
     setCaptionText('');
-    setIsUploading(false);
 
-    // Optimistically show in local feed using blob preview
-    createLocalPostFallback(caption, currentSelectedFile);
+    // Optimistically show in local feed using blob preview with real UUID
+    createLocalPostFallback(caption, currentSelectedFile, optimisticId);
 
     // Upload to Storage then insert DB row in background
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
 
-      if (!session?.user) {
-        alert('You must be logged in to upload content.');
-        return;
+        if (!session?.user) {
+          alert('You must be logged in to upload content.');
+          return;
+        }
+
+        // Step 1: Upload file to Supabase Storage
+        const { url: storageUrl, error: uploadError } = await uploadPostMedia(session.user.id, currentRawFile);
+
+        if (uploadError || !storageUrl) {
+          console.error('Storage upload failed:', uploadError);
+          alert('Upload failed: ' + (uploadError?.message || 'Could not upload file'));
+          return;
+        }
+
+        // Step 2: Insert post row with public storage URL (Do NOT pass optimisticId, let Supabase auto-increment the ID)
+        const { data: realPost, error: postError } = await createPost(session.user.id, caption, storageUrl);
+
+        if (postError) {
+          console.error('Failed to create post:', postError);
+          alert('Post failed: ' + postError.message);
+          
+          // Remove the optimistic post since it failed
+          setAllPosts(prev => prev.filter(p => p.id !== optimisticId));
+          setVisiblePosts(prev => prev.filter(p => p.id !== optimisticId));
+          return;
+        }
+
+        if (realPost) {
+          // Swap out the optimistic post for the real post immediately so we don't get duplicates
+          const formattedReal = formatPostForUI(realPost);
+          
+          setAllPosts(prev => {
+            // If realtime already inserted the real post, just delete the optimistic one
+            if (prev.some(p => String(p.id) === String(realPost.id))) {
+              return prev.filter(p => String(p.id) !== String(optimisticId));
+            }
+            return prev.map(p => String(p.id) === String(optimisticId) ? formattedReal : p);
+          });
+          
+          setVisiblePosts(prev => {
+            if (prev.some(p => String(p.id) === String(realPost.id))) {
+              return prev.filter(p => String(p.id) !== String(optimisticId));
+            }
+            return prev.map(p => String(p.id) === String(optimisticId) ? formattedReal : p);
+          });
+        }
+      } finally {
+        setIsUploading(false); // Only set false when completely finished
       }
-
-      // Step 1: Upload file to Supabase Storage
-      const { url: storageUrl, error: uploadError } = await uploadPostMedia(session.user.id, currentRawFile);
-
-      if (uploadError || !storageUrl) {
-        console.error('Storage upload failed:', uploadError);
-        alert('Upload failed: ' + (uploadError?.message || 'Could not upload file'));
-        return;
-      }
-
-      // Step 2: Insert post row with public storage URL
-      const { error: postError } = await createPost(session.user.id, caption, storageUrl);
-
-      if (postError) {
-        console.error('Failed to create post:', postError);
-        alert('Post failed: ' + postError.message);
-      }
-      // Realtime subscription in useSupabasePosts will pick up the INSERT
-      // and push it to all connected users automatically
     })();
   };
 
-  const createLocalPostFallback = (caption: string, imageUrl: string) => {
+  // Prevent user from refreshing and cancelling the background upload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isUploading) {
+        e.preventDefault();
+        e.returnValue = ''; // Shows standard browser warning
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isUploading]);
+
+  const createLocalPostFallback = (caption: string, imageUrl: string, id: string) => {
     const localPost = {
-      id: Date.now(),
+      id: id,
       username: userProfile?.username || 'Guest',
       avatar: userProfile?.avatar || '/custom-empty-profile.png',
       image: imageUrl,
@@ -373,13 +420,25 @@ const Home = () => {
     }
     
     if (allPosts.length > 0) {
-      // Always populate on first load (visiblePosts empty but posts available)
-      // or when the set of unswiped posts changes
-      if (visiblePosts.length === 0 || visiblePosts.length !== unswipedPosts.length) {
+      // Compare by IDs AND content to ensure optimistic posts are updated with real URLs
+      const visibleIdSet = new Set(visiblePosts.map((p: any) => String(p.id)));
+      const unswipedIdSet = new Set(unswipedPosts.map((p: any) => String(p.id)));
+      
+      const hasNew = unswipedPosts.some((p: any) => !visibleIdSet.has(String(p.id)));
+      const hasRemoved = visiblePosts.some((p: any) => !unswipedIdSet.has(String(p.id)));
+      
+      // Check if any visible post has different content than the unswiped version
+      const hasContentChanged = visiblePosts.some((vp: any) => {
+        const up = unswipedPosts.find((p: any) => String(p.id) === String(vp.id));
+        if (!up) return false;
+        return JSON.stringify(vp) !== JSON.stringify(up);
+      });
+
+      if (visiblePosts.length === 0 || hasNew || hasRemoved || hasContentChanged) {
         setVisiblePosts(unswipedPosts);
       }
     }
-  }, [allPosts.length, unswipedPosts, visiblePosts.length, isChallengeEnded]);
+  }, [allPosts.length, unswipedPosts, visiblePosts, isChallengeEnded]);
 
 
   const [showInfo, setShowPillsInfo] = useState(false);

@@ -196,14 +196,17 @@ export async function uploadPostMedia(userId: string, file: File): Promise<{ url
 }
 
 // Create a new post — imageUrl should be a public storage URL (not base64)
-export async function createPost(userId: string, caption: string, imageUrl: string) {
+export async function createPost(userId: string, caption: string, imageUrl: string, id?: string) {
+  const payload: any = {
+    user_id: userId,
+    caption,
+    image_url: imageUrl,
+  };
+  if (id) payload.id = id;
+
   const { data, error } = await supabase
     .from('posts')
-    .insert({
-      user_id: userId,
-      caption,
-      image_url: imageUrl,
-    })
+    .insert(payload)
     .select(`
       *,
       profiles (

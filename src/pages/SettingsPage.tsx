@@ -16,10 +16,19 @@ const SettingsPage = () => {
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
 
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('settings_image_errors');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
 
   const handleImageError = (id: string) => {
-    setImageErrors(prev => ({ ...prev, [id]: true }));
+    setImageErrors(prev => {
+      const next = { ...prev, [id]: true };
+      try { localStorage.setItem('settings_image_errors', JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const handleLogout = () => {

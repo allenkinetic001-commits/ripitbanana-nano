@@ -5229,28 +5229,41 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (formattedPosts.length === 0) return;
     
     setAllPosts(prevAll => {
-      const merged = [...prevAll];
+      // Create a map for O(1) lookups of existing posts
+      const existingMap = new Map(prevAll.map(p => [String(p.id), p]));
       let changed = false;
 
+      // Start with the incoming formatted posts (which are already sorted newest-first)
+      const newMerged: any[] = [];
+      
       formattedPosts.forEach(dbPost => {
-        const index = merged.findIndex(p => String(p.id) === String(dbPost.id));
-        if (index === -1) {
-            merged.unshift(dbPost);
-            changed = true;
+        const existing = existingMap.get(String(dbPost.id));
+        if (!existing) {
+          newMerged.push(dbPost);
+          changed = true;
         } else {
-          // Update existing posts with latest data (lives, etc)
-          if (JSON.stringify(merged[index]) !== JSON.stringify(dbPost)) {
-            merged[index] = dbPost;
+          if (JSON.stringify(existing) !== JSON.stringify(dbPost)) {
+            newMerged.push(dbPost);
+            changed = true;
+          } else {
+            newMerged.push(existing);
+          }
+        }
+      });
+
+      // Preserve any optimistic posts (like those with 'opt-' IDs) that aren't in db yet
+      prevAll.forEach(p => {
+        if (String(p.id).startsWith('opt-') || String(p.id).includes('-')) {
+          // If it's an optimistic post, keep it at the top
+          if (!newMerged.find(mergedPost => String(mergedPost.id) === String(p.id))) {
+            newMerged.unshift(p);
             changed = true;
           }
         }
       });
 
-      if (!changed) return prevAll;
-
-      // Also sync visiblePosts when we first get posts (nothing swiped yet)
-      // Let Home's effect handle it after this state update propagates
-      return merged;
+      if (!changed && newMerged.length === prevAll.length) return prevAll;
+      return newMerged;
     });
   }, [formattedPosts, postsLoading]);
 
@@ -5785,10 +5798,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             ...roundHistory.flatMap(r => r?.survivors?.map(s => s?.id).filter(Boolean) || []),
             ...roundHistory.flatMap(r => r?.eliminated?.map(e => e?.id).filter(Boolean) || [])
           ]);
-
           setVisiblePosts(allPosts.filter(p => !historyIds.has(p.id)));
         } catch (e) {
-          setVisiblePosts([]); // Start clean if history fails
+          setVisiblePosts([]);
         }
       }, 20000);
       return () => clearTimeout(timeout);
