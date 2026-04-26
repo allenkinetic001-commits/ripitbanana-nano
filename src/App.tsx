@@ -41,9 +41,34 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const ImagePreloader = () => (
+  <div style={{ opacity: 0, position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }} aria-hidden="true">
+    <img src="/language-icon.png" alt="" />
+    <img src="/language-header.png" alt="" />
+    <img src="/theme-icon.png" alt="" />
+    <img src="/theme-header.png" alt="" />
+    <img src="/personalization-icon.png" alt="" />
+    <img src="/personalization-header.png" alt="" />
+    <img src="/model-icon.png" alt="" />
+    <img src="/model-header.png" alt="" />
+    <img src="/terms-icon.png" alt="" />
+    <img src="/terms-header.png" alt="" />
+    <img src="/privacy-icon.png" alt="" />
+    <img src="/privacy-header.png" alt="" />
+    <img src="/about-icon.png" alt="" />
+    <img src="/about-header.png" alt="" />
+    <img src="/contact-icon.png" alt="" />
+    <img src="/contact-header.png" alt="" />
+    <img src="/logout-icon.png" alt="" />
+    <img src="/logout-header.png" alt="" />
+    <img src="/btn-close.png" alt="" />
+  </div>
+);
+
 export default function App() {
   return (
     <Router>
+      <ImagePreloader />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
