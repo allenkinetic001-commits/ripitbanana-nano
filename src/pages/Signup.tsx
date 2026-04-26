@@ -152,7 +152,7 @@ export default function Signup() {
           <div className="text-center space-y-6 py-12 px-8 bg-white/50 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-2xl">
             <div className="flex justify-center">
               <div className="relative">
-                <img src="/signup-welcome-hydrant.png" alt="Email" className="w-64 h-auto object-contain animate-bounce" />
+                <img src="/signup-welcome-hydrant.png" alt="Email" className="w-64 h-auto object-contain" />
                 <div className="absolute -inset-4 bg-purple-100/50 blur-xl rounded-full -z-10" />
               </div>
             </div>
