@@ -4985,7 +4985,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const calculateUniversalTimeLeft = () => {
     const now = Math.floor(Date.now() / 1000);
-    const cycleSeconds = 120; // 2 minutes
+    const cycleSeconds = 240; // 4 minutes
     const remaining = cycleSeconds - (now % cycleSeconds);
     // Return 0 at the exact moment of reset
     const finalTime = remaining === cycleSeconds ? 0 : remaining;
