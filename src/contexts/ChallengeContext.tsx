@@ -5840,15 +5840,15 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
 
 
-  // Timer countdown
+  // Timer countdown - HALTED by user request
   useEffect(() => {
     const updateTimer = () => {
       setTimeLeft(calculateUniversalTimeLeft());
     };
 
     updateTimer(); // Initial call
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
+    // const interval = setInterval(updateTimer, 1000);
+    // return () => clearInterval(interval);
   }, []);
 
 
