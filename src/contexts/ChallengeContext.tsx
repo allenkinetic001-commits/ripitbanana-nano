@@ -5420,6 +5420,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setEliminated([]);
         setUserSelection(null);
         setIsChallengeEnded(false);
+        setIsActive(false);
+        setClickCounts({ pley: 0 });
+        setEliminationCounts({ pley: 0 });
+        setMadeItCounts({ pley: 0 });
+        setVariantFirstClickTime({ pley: 0 });
 
         const prevUserId = localStorage.getItem('supabaseUserId');
         if (prevUserId !== session.user.id) {
@@ -5476,6 +5481,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setUserVotes({});
         setUserSelection(null);
         setIsEliminationRoundActive(false);
+        setIsChallengeEnded(false);
+        setIsActive(false);
+        setClickCounts({ pley: 0 });
+        setEliminationCounts({ pley: 0 });
+        setMadeItCounts({ pley: 0 });
+        setVariantFirstClickTime({ pley: 0 });
         localStorage.removeItem('supabaseUserId');
       }
     });
