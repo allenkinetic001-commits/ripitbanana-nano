@@ -4109,27 +4109,27 @@ const translations: Record<string, Record<string, string>> = {
     'priv_intro': 'Rip It استعمال کر کے، آپ نیچے دی گئی معلومات کے جمع کرنے اور استعمال کرنے سے اتفاق کرتے ہیں۔',
     'priv_s1_title': '1️⃣ معلومات جو ہم جمع کرتے ہیں',
     'priv_s1_i1': 'اکاؤنٹ کی معلومات: صارف نام، ای میل، پروفائل ڈیٹا، اور ترجیحات۔',
-    'priv_s1_i2': 'گیم پلے کی معلومات: موڈ کی شرکت، ووٹ، ٹائمر، کامیابیاں۔',
-    'priv_s1_i3': 'ڈیوائس کی معلومات: آئی پی ایڈریس، ڈیوائس کی قسم، او ایس، اور استعمال کے اعداد و شمار۔',
-    'priv_s1_i4': 'اختیاری معلومات: سماجی روابط یا مواد جو آپ شیئر کرنے کے لیے منتخب کرتے ہیں۔',
+    'priv_s1_i2': 'گیم پلے کی معلومات: موڈ میں شرکت، ووٹ، ٹائمر، کامیابیاں۔',
+    'priv_s1_i3': 'آلہ کی معلومات: IP ایڈریس، آلہ کی قسم، OS، اور استعمال کے اعدادوشمار۔',
+    'priv_s1_i4': 'اختیاری معلومات: سوشل لنکس یا وہ مواد جو آپ شیئر کرنے کے لیے منتخب کرتے ہیں۔',
     'priv_s2_title': '2️⃣ ہم آپ کی معلومات کیسے استعمال کرتے ہیں',
     'priv_s2_i1': 'Rip It کی خصوصیات اور موڈز کو چلانے اور بہتر بنانے کے لیے۔',
-    'priv_s2_i2': 'آپ کے تجربے کو ذاتی بنانے کے لیے، بشمول پروفائل تھیمز اور حیثیت۔',
-    'priv_s2_i3': 'بدسلوکی، سپیم یا غیر محفوظ سرگرمی کا پتہ لگانے کے لیے۔',
-    'priv_s2_i4': 'آپ ڈیٹس، ایونٹس یا سپورٹ پیغامات پہنچانے کے لیے۔',
-    'priv_s3_title': '3️⃣ آپ کی معلومات شیئر کرنا',
+    'priv_s2_i2': 'آپ کے تجربے کو ذاتی بنانے کے لیے، بشمول پروفائل تھیمز اور اسٹیٹس۔',
+    'priv_s2_i3': 'بدسلوکی، سپیم، یا غیر محفوظ سرگرمی کا پتہ لگانے کے لیے۔',
+    'priv_s2_i4': 'اپ ڈیٹس، ایونٹس، یا سپورٹ پیغامات پہنچانے کے لیے۔',
+    'priv_s3_title': '3️⃣ آپ کی معلومات کا اشتراک',
     'priv_s3_i1': 'ہم آپ کی ذاتی معلومات فروخت نہیں کرتے ہیں۔',
-    'priv_s3_i2': 'کچھ ڈیٹا دوسرے صارفین کو نظر آ سکتا ہے (جیسے صارف نام، حیثیت اور لیڈر بورڈ کی معلومات)۔',
+    'priv_s3_i2': 'کچھ ڈیٹا دوسرے صارفین کو نظر آ سکتا ہے (جیسے صارف نام، اسٹیٹس، اور لیڈر بورڈ کی معلومات)۔',
     'priv_s3_i3': 'ہم سروس فراہم کنندگان کے ساتھ یا قانونی تعمیل کے لیے ڈیٹا شیئر کر سکتے ہیں۔',
     'priv_s4_title': '4️⃣ سیکیورٹی',
     'priv_s4_i1': 'ہم آپ کے ڈیٹا کی حفاظت کے لیے صنعت کے معیاری طریقے استعمال کرتے ہیں۔',
     'priv_s4_i2': 'کوئی بھی سسٹم مکمل نہیں ہے—شرکت میں خطرہ ہوتا ہے، خاص طور پر عوامی خصوصیات میں۔',
     'priv_s5_title': '5️⃣ آپ کے انتخاب',
     'priv_s5_i1': 'آپ کسی بھی وقت اپنا اکاؤنٹ اپ ڈیٹ یا حذف کر سکتے ہیں۔',
-    'priv_s5_i2': 'آپ ایپ میں اپنے پروفائل اور سرگرمی کی نمائش کو کنٹرول کر سکتے ہیں۔',
+    'priv_s5_i2': 'آپ ایپ میں اپنے پروفائل اور سرگرمی کی مرئیت کو کنٹرول کر سکتے ہیں۔',
     'priv_s5_i3': 'آپ غیر ضروری مواصلات سے آپٹ آؤٹ کر سکتے ہیں۔',
-    'priv_s6_title': '6️⃣ رازداری کی پالیسی میں تبدیلیاں',
-    'priv_s6_i1': 'ایپ کے تیار ہونے کے ساتھ ساتھ اپ ڈیٹس ہو سکتے ہیں۔',
+    'priv_s6_title': '6️⃣ پرائیویسی پالیسی میں تبدیلیاں',
+    'priv_s6_i1': 'ایپ تیار ہونے کے ساتھ ساتھ اپ ڈیٹس ہو سکتے ہیں۔',
     'priv_s6_i2': 'بڑی تبدیلیوں کا اعلان ایپ میں کیا جائے گا۔',
 
     // Terms Modal
@@ -5349,7 +5349,17 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [theme]);
 
   const fetchUserProfile = async (userId: string, authUser?: any) => {
-    // Start with data from auth metadata as immediate fallback
+    // 1. Try to load from userId-specific cache first for instant speed
+    const cacheKey = `profile_v2_${userId}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setUserProfile(parsed);
+      } catch (_) {}
+    }
+
+    // 2. Start with data from auth metadata as immediate secondary fallback
     if (authUser?.user_metadata?.username || authUser?.user_metadata?.full_name) {
       setUserProfile((prev: any) => ({
         ...prev,
@@ -5365,32 +5375,30 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       .single();
       
     if (data && !error) {
-      setUserProfile((prev: any) => ({
-        ...prev,
+      const fullProfile = {
         username: data.username || '',
         fullName: data.full_name || '',
         bio: data.bio || '',
         avatar: data.avatar_url || '',
         website: data.website || ''
-      }));
+      };
+      setUserProfile(fullProfile);
+      localStorage.setItem(cacheKey, JSON.stringify(fullProfile));
       setIsEliminated(false);
     } else if (error && authUser) {
       // PGRST116 means no rows found -> POTENTIALLY Eliminated
       if (error.code === 'PGRST116') {
-        // Check if user is very new (race condition with trigger)
         const createdAt = authUser?.created_at ? new Date(authUser.created_at).getTime() : 0;
         const now = new Date().getTime();
         const ageInSeconds = (now - createdAt) / 1000;
         
         if (createdAt > 0 && ageInSeconds < 30) {
-          console.log('User is new, retrying profile fetch in 2s...');
           setTimeout(() => fetchUserProfile(userId, authUser), 2000);
-          setIsEliminated(false); // Stay alive for now
+          setIsEliminated(false);
         } else {
           setIsEliminated(true);
         }
       }
-      // If profile row is missing (Eliminated), at least keep the username from auth
       setUserProfile((prev: any) => ({
         ...prev,
         username: authUser.user_metadata?.username || prev.username || 'user',
@@ -5478,22 +5486,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setVariantFirstClickTime({ pley: 0 });
 
         const prevUserId = localStorage.getItem('supabaseUserId');
-        if (prevUserId !== session.user.id) {
+        if (prevUserId && prevUserId !== session.user.id) {
           localStorage.removeItem('enemies');
           localStorage.removeItem('followedUsers');
           localStorage.removeItem('wallPosts');
-          localStorage.removeItem('allPosts');
-          localStorage.removeItem('allPosts_v2');
-          localStorage.removeItem('visiblePosts');
-          localStorage.removeItem('visiblePosts_v2');
           localStorage.removeItem('postComments');
           localStorage.removeItem('userSelection');
           localStorage.removeItem('isEliminationRoundActive');
           setEnemies([]);
           setFollowedUsers([]);
           setWallPosts([]);
-          setAllPosts([]);
-          setVisiblePosts([]);
           setPostComments({});
           setIsEliminationRoundActive(false);
 
@@ -5505,9 +5507,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             avatar: session.user.user_metadata?.avatar_url || '/custom-empty-profile.png',
             website: ''
           });
-
-          localStorage.setItem('supabaseUserId', session.user.id);
         }
+        localStorage.setItem('supabaseUserId', session.user.id);
 
         // Immediately seed visiblePosts from cache for instant display (feed is universal)
         const cachedPosts = localStorage.getItem('allPosts_v2');
@@ -5517,6 +5518,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             if (parsed.length > 0) {
               setAllPosts(parsed);
               setVisiblePosts(parsed);
+              console.log('⚡ Feed seeded from cache for instant-load experience');
             }
           } catch (_) {}
         }
@@ -5902,8 +5904,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
 
     updateTimer(); // Initial call
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
+    // const interval = setInterval(updateTimer, 1000);
+    // return () => clearInterval(interval);
   }, []);
 
 
