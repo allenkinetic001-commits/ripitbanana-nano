@@ -20,7 +20,7 @@ interface BottomNavProps {
 const BottomNav = ({ visible = true }: BottomNavProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, userProfile } = useChallenge();
+    const { t, userProfile, unreadMessageCount } = useChallenge();
   const [clickedPath, setClickedPath] = useState<string | null>(null);
 
   const handleNavClick = (path: string) => {
@@ -62,18 +62,26 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
           >
             <div className="h-14 flex items-center justify-center mb-1">
               {item.isImage ? (
-                <img 
-                  src={item.icon as string} 
-                  alt={item.label}
-                  className={cn(
-                    item.size || "h-9 w-9",
-                    "object-contain transition-all duration-300", 
-                    isActive ? "scale-110" : "scale-100",
-                    isBouncing && "animate-nav-bounce",
-                    "opacity-100",
-                    item.className
-                  )} 
-                />
+                <div className="relative">
+                  <img 
+                    src={item.icon as string} 
+                    alt={item.label}
+                    className={cn(
+                      item.size || "h-9 w-9",
+                      "object-contain transition-all duration-300", 
+                      isActive ? "scale-110" : "scale-100",
+                      isBouncing && "animate-nav-bounce",
+                      "opacity-100",
+                      item.className
+                    )} 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                  {item.path === '/notifications' && unreadMessageCount > 0 && (
+                    <div className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 bg-red-500 rounded-full flex items-center justify-center text-[8px] font-black text-white border border-white animate-pop-in">
+                      {unreadMessageCount > 9 ? '9+' : unreadMessageCount}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className={cn(isBouncing && "animate-nav-bounce")}>
                   {(() => {

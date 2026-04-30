@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Search, MessageCircle, MoreVertical, Send, Check, CheckCheck, Smile, Image as ImageIcon, Paperclip, X, Phone, Video, Flag, Mic, Plus, Camera, ChevronDown } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
+import { supabase } from '../lib/supabase';
 
 interface ChatMessage {
-  id: number;
-  sender: string;
+  id: string | number;
+  sender_id?: string;
+  receiver_id?: string;
   text: string;
   time: string;
   isMe: boolean;
@@ -15,19 +17,22 @@ interface ChatMessage {
 }
 
 interface ChatSession {
-  id: number;
+  id: string | number;
   username: string;
+  fullName?: string;
   avatar: string;
   lastMessage: string;
   time: string;
   unreadCount: number;
   isOnline: boolean;
+  partnerId?: string;
 }
 
 const Chat = () => {
   const navigate = useNavigate();
   const { username: routeUsername } = useParams();
   const { userProfile, t } = useChallenge();
+  const { setShowBottomNav } = useOutletContext<{ setShowBottomNav: (show: boolean) => void }>();
   const [selectedChat, setSelectedChat] = useState<ChatSession | null>(null);
   const [messageInput, setMessageInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,34 +41,213 @@ const Chat = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Chat sessions will be populated from Supabase messages in a future update
-  const [sessions] = useState<ChatSession[]>([]);
+  // State for active chat sessions (conversations list)
+  const [sessions, setSessions] = useState<ChatSession[]>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return [];
+    const saved = localStorage.getItem(`chat_sessions_${userId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  // Handle direct navigation from Profile/Post
+  // Persist sessions whenever they change
   useEffect(() => {
-    if (routeUsername) {
-      const existingSession = sessions.find(s => s.username === routeUsername || s.username.startsWith(routeUsername));
-      if (existingSession) {
-        setSelectedChat(existingSession);
-      } else {
-        // Create a temporary session for a new user
-        setSelectedChat({
-          id: Date.now(),
-          username: routeUsername,
-          avatar: "/custom-empty-profile.png",
-          lastMessage: '',
-          time: 'now',
-          unreadCount: 0,
-          isOnline: true
-        });
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`chat_sessions_${userId}`, JSON.stringify(sessions));
+  }, [sessions]);
+
+  // Clean up any existing duplicate sessions on mount
+  useEffect(() => {
+    setSessions(prev => {
+      const seen = new Set<string>();
+      return prev.filter(s => {
+        const lower = s.username.toLowerCase();
+        if (seen.has(lower)) return false;
+        seen.add(lower);
+        return true;
+      });
+    });
+  }, []);
+
+  // State for messages per user, scoped by current authenticated user
+  const [messagesData, setMessagesData] = useState<Record<string, ChatMessage[]>>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return {};
+    const saved = localStorage.getItem(`chat_messages_${userId}`);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Error parsing saved messages', e);
       }
     }
-  }, [routeUsername, sessions]);
+    return {};
+  });
 
-  // Scroll to bottom
+  // Save to user-scoped localStorage whenever messagesData changes
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`chat_messages_${userId}`, JSON.stringify(messagesData));
+  }, [messagesData]);
+
+  // Handle direct navigation from Profile/Post and fetch profile data if needed
+  useEffect(() => {
+    const initChat = async () => {
+      if (!routeUsername) return;
+      
+      const normalizedUsername = routeUsername.replace('😉', '').toLowerCase();
+      let existingSession = sessions.find(s => s.username.toLowerCase() === normalizedUsername);
+      
+      if (!existingSession || !existingSession.partnerId) {
+        // Fetch partner profile to get their ID and details
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('id, username, full_name, avatar_url')
+          .ilike('username', normalizedUsername)
+          .single();
+
+        if (!error && profile) {
+          const newSession: ChatSession = {
+            id: profile.id,
+            username: profile.username,
+            fullName: profile.full_name || `@${profile.username}`,
+            avatar: profile.avatar_url || '/custom-empty-profile.png',
+            lastMessage: 'Tap to start chatting',
+            time: 'now',
+            unreadCount: 0,
+            isOnline: true,
+            partnerId: profile.id
+          };
+          
+          setSelectedChat(newSession);
+          setSessions(prev => {
+            const exists = prev.some(s => s.username.toLowerCase() === normalizedUsername);
+            if (exists) return prev.map(s => s.username.toLowerCase() === normalizedUsername ? newSession : s);
+            return [newSession, ...prev];
+          });
+          existingSession = newSession;
+        }
+      } else {
+        setSelectedChat(existingSession);
+      }
+
+      // Fetch messages for this partner
+      if (existingSession?.partnerId) {
+        const userId = localStorage.getItem('supabaseUserId');
+        if (userId) {
+          const { data: messages, error } = await supabase
+            .from('messages')
+            .select('*')
+            .or(`and(sender_id.eq.${userId},receiver_id.eq.${existingSession.partnerId}),and(sender_id.eq.${existingSession.partnerId},receiver_id.eq.${userId})`)
+            .order('created_at', { ascending: true });
+
+          if (!error && messages) {
+            const formattedMessages: ChatMessage[] = messages.map(m => ({
+              id: m.id,
+              text: m.text,
+              time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isMe: m.sender_id === userId,
+              status: m.read ? 'read' : 'sent',
+              sender_id: m.sender_id,
+              receiver_id: m.receiver_id
+            }));
+            
+            setMessagesData(prev => ({
+              ...prev,
+              [normalizedUsername]: formattedMessages
+            }));
+          }
+        }
+      }
+    };
+
+    initChat();
+  }, [routeUsername]);
+
+  // Real-time subscription for new messages
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+
+    const channel = supabase
+      .channel('realtime_messages')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `receiver_id=eq.${userId}`
+      }, async (payload) => {
+        const newMessage = payload.new;
+        
+        // Fetch sender info if not in sessions
+        const { data: sender } = await supabase
+          .from('profiles')
+          .select('username, avatar_url, full_name')
+          .eq('id', newMessage.sender_id)
+          .single();
+
+        if (sender) {
+          const formatted: ChatMessage = {
+            id: newMessage.id,
+            text: newMessage.text,
+            time: new Date(newMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isMe: false,
+            status: 'sent',
+            sender_id: newMessage.sender_id,
+            receiver_id: newMessage.receiver_id
+          };
+
+          setMessagesData(prev => ({
+            ...prev,
+            [sender.username.toLowerCase()]: [...(prev[sender.username.toLowerCase()] || []), formatted]
+          }));
+
+          // Update session or add new one
+          setSessions(prev => {
+            const exists = prev.find(s => s.username.toLowerCase() === sender.username.toLowerCase());
+            if (exists) {
+              return prev.map(s => s.username.toLowerCase() === sender.username.toLowerCase() 
+                ? { ...s, lastMessage: newMessage.text, time: 'now', unreadCount: selectedChat?.username.toLowerCase() === sender.username.toLowerCase() ? 0 : (s.unreadCount + 1) }
+                : s
+              );
+            } else {
+              return [{
+                id: newMessage.sender_id,
+                username: sender.username,
+                fullName: sender.full_name || `@${sender.username}`,
+                avatar: sender.avatar_url || '/custom-empty-profile.png',
+                lastMessage: newMessage.text,
+                time: 'now',
+                unreadCount: 1,
+                isOnline: true,
+                partnerId: newMessage.sender_id
+              }, ...prev];
+            }
+          });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedChat?.username]);
+
+  // Scroll to bottom whenever selected chat or messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [selectedChat]);
+  }, [selectedChat, messagesData]);
+
+  // Manage BottomNav visibility
+  useEffect(() => {
+    if (selectedChat) {
+      setShowBottomNav(false);
+    } else {
+      setShowBottomNav(true);
+    }
+    return () => setShowBottomNav(true);
+  }, [selectedChat, setShowBottomNav]);
 
   const emojiCategories = [
     { 
@@ -90,37 +274,25 @@ const Chat = () => {
 
   const [activeEmojiCategory, setActiveEmojiCategory] = useState(emojiCategories[0].name);
 
-  // State for messages per user
-  const [messagesData, setMessagesData] = useState<Record<string, ChatMessage[]>>(() => {
-    const saved = localStorage.getItem('chat_messages');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error('Error parsing saved messages', e);
-      }
-    }
-    return {};
-  });
-
-  // Save to localStorage whenever messagesData changes
-  useEffect(() => {
-    localStorage.setItem('chat_messages', JSON.stringify(messagesData));
-  }, [messagesData]);
-
   const currentUsername = selectedChat?.username || '';
-  const messages = messagesData[currentUsername] || [
-    { id: Date.now(), sender: 'System', text: `Start your conversation with @${currentUsername}`, time: '', isMe: false, status: 'read' }
+  const messages = messagesData[currentUsername.toLowerCase()] || [
+    { id: 'system', text: `Start your conversation with @${currentUsername}`, time: '', isMe: false, status: 'read' }
   ];
 
-  const handleSendMessage = (e?: React.FormEvent) => {
+  const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!messageInput.trim() || !currentUsername) return;
+    if (!messageInput.trim() || !currentUsername || !selectedChat?.partnerId) return;
 
-    const newMessage: ChatMessage = {
-      id: Date.now(),
-      sender: 'Me',
-      text: messageInput.trim(),
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+
+    const text = messageInput.trim();
+    setMessageInput(''); // Clear input instantly
+
+    // Step 1: Optimistically update local state
+    const optimisticMessage: ChatMessage = {
+      id: Date.now().toString(),
+      text,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isMe: true,
       status: 'sent',
@@ -128,10 +300,31 @@ const Chat = () => {
 
     setMessagesData(prev => ({
       ...prev,
-      [currentUsername]: [...(prev[currentUsername] || []), newMessage]
+      [currentUsername.toLowerCase()]: [...(prev[currentUsername.toLowerCase()] || []), optimisticMessage]
     }));
+
+    // Step 2: Insert into Supabase
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({
+        sender_id: userId,
+        receiver_id: selectedChat.partnerId,
+        text: text
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      // Update the sessions list with the last message
+      setSessions(prev => prev.map(s => 
+        s.username.toLowerCase() === currentUsername.toLowerCase() 
+          ? { ...s, lastMessage: text, time: 'now' } 
+          : s
+      ));
+    } else {
+      console.error('Failed to send message:', error);
+    }
     
-    setMessageInput('');
     setShowEmojiPicker(false);
   };
 
@@ -154,6 +347,13 @@ const Chat = () => {
           ...prev,
           [currentUsername]: [...(prev[currentUsername] || []), newMessage]
         }));
+
+        // Update the sessions list with the last message
+        setSessions(prev => prev.map(s => 
+          s.username.toLowerCase() === currentUsername.toLowerCase() 
+            ? { ...s, lastMessage: 'Sent an image', time: 'now' } 
+            : s
+        ));
       };
       reader.readAsDataURL(file);
     }
@@ -243,9 +443,9 @@ const Chat = () => {
 
       {/* Detail View */}
       {selectedChat && (
-        <div className="absolute inset-0 flex flex-col z-40 bg-white shadow-2xl pb-[60px]">
+        <div className="fixed inset-0 flex flex-col z-[60] bg-white shadow-2xl max-w-md mx-auto">
           {/* Header matching Sarah_X screenshot */}
-          <header className="px-4 h-16 flex items-center justify-between sticky top-0 z-20 bg-white/80 text-zinc-900 border-b border-zinc-100 backdrop-blur-md">
+          <header className="px-4 h-16 flex items-center justify-between sticky top-0 z-20 bg-white text-zinc-900 border-b border-zinc-100 shadow-sm">
             <div className="flex items-center gap-3">
               <button onClick={() => { setSelectedChat(null); navigate('/chat'); }} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
                 <ArrowLeft size={24} className="text-zinc-900" />
@@ -348,8 +548,8 @@ const Chat = () => {
             </div>
           )}
 
-          {/* Input bar matching screenshot exactly */}
-          <div className="p-3 pb-8 bg-white border-t border-zinc-100">
+          {/* Input bar */}
+          <div className="p-3 bg-white border-t border-zinc-100">
             <div className="flex items-center gap-2 max-w-5xl mx-auto">
               
               <div className="flex-1 flex items-center gap-3 px-4 h-11 rounded-full transition-all bg-zinc-100 text-zinc-900">

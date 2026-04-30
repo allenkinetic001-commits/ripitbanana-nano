@@ -229,6 +229,7 @@ const Home = () => {
     isEliminationRoundActive, setIsEliminationRoundActive,
     showPills, setShowPills, activeTab, setActiveTab,
     majorityVariant,
+    unreadMessageCount,
     setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
     setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
     setUserSelection, setIsChallengeEnded,
@@ -699,8 +700,13 @@ const Home = () => {
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <img src="/nav-news-v3.png" alt="" className="w-full h-full object-contain" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img 
+                    src="/nav-news-v3.png" 
+                    alt="" 
+                    className="w-full h-full object-contain" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
                 </div>
                 <img src="/ripit-rules-header.png" alt="Rip It Rules" className="h-10 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
@@ -776,9 +782,14 @@ const Home = () => {
             </button>
             <button 
               onClick={() => navigate('/chat')}
-              className="text-zinc-700 hover:text-zinc-400 transition-colors"
+              className="text-zinc-700 hover:text-zinc-400 transition-colors relative"
             >
               <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+              {unreadMessageCount > 0 && (
+                <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full flex items-center justify-center text-[10px] font-black text-white border-2 border-white animate-pop-in">
+                  {unreadMessageCount > 9 ? '9+' : unreadMessageCount}
+                </div>
+              )}
             </button>
             <button 
               onClick={() => fileInputRef.current?.click()}

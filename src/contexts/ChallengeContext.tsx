@@ -95,6 +95,8 @@ interface ChallengeContextType {
   setActiveTab: (tab: string | null) => void;
   historyLoading: boolean;
   postsLoading: boolean;
+  unreadMessageCount: number;
+  setUnreadMessageCount: (count: number) => void;
   setTimeLeft: (time: number) => void;
   setIsActive: (active: boolean) => void;
   setClickCounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
@@ -5187,6 +5189,48 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     localStorage.setItem(`postComments_v7_${u}`, JSON.stringify(postComments));
   }, [userProfile.username, userVotes, enemies, followedUsers, wallPosts, postComments]);
 
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+
+  // Sync unread count from Supabase
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId || !isAuthenticated) {
+      setUnreadMessageCount(0);
+      return;
+    }
+
+    const fetchUnreadCount = async () => {
+      const { count, error } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiver_id', userId)
+        .eq('read', false);
+      
+      if (!error && count !== null) {
+        setUnreadMessageCount(count);
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Subscribe to new messages for notification badge
+    const channel = supabase
+      .channel('global_unread_messages')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `receiver_id=eq.${userId}`
+      }, () => {
+        setUnreadMessageCount(prev => prev + 1);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAuthenticated]);
+
   // Global/Public caches (not account-specific)
   useEffect(() => {
     localStorage.setItem('postLives_v6', JSON.stringify(postLives));
@@ -5896,6 +5940,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       enemies, postComments, wallPosts, followedUsers, toggleFollow, isLegend, isSurvivor, allPosts, setAllPosts,
       visiblePosts, setVisiblePosts,
       majorityVariant, survivors, eliminated, addEliminated, survivorHistory, roundHistory,
+      unreadMessageCount, setUnreadMessageCount,
       setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
       setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
       setUserSelection, setIsChallengeEnded, startNewChallenge,
