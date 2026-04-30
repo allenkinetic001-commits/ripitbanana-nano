@@ -307,10 +307,11 @@ const Home = () => {
     
     // Generate a valid UUID v4 robustly (handles insecure contexts where crypto.randomUUID is undefined)
     const generateId = () => {
+      const prefix = 'opt-';
       if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-        return crypto.randomUUID();
+        return prefix + crypto.randomUUID();
       }
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      return prefix + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
       });
@@ -430,33 +431,17 @@ const Home = () => {
       return;
     }
     
-    if (allPosts.length > 0) {
-      // Compare by IDs AND content to ensure optimistic posts are updated with real URLs
-      const visibleIdSet = new Set(visiblePosts.map((p: any) => String(p.id)));
-      const unswipedIdSet = new Set(unswipedPosts.map((p: any) => String(p.id)));
-      
-      const hasNew = unswipedPosts.some((p: any) => !visibleIdSet.has(String(p.id)));
-      const hasRemoved = visiblePosts.some((p: any) => !unswipedIdSet.has(String(p.id)));
-      
-      // Check if any visible post has different content than the unswiped version
-      const hasContentChanged = visiblePosts.some((vp: any) => {
-        const up = unswipedPosts.find((p: any) => String(p.id) === String(vp.id));
-        if (!up) return false;
-        return JSON.stringify(vp) !== JSON.stringify(up);
-      });
+    if (allPosts.length === 0) return;
 
-      // If all posts were swiped in a previous session but new posts exist in DB,
-      // reset the feed so users aren't permanently stuck on "The End" screen.
-      if (unswipedPosts.length === 0 && visiblePosts.length === 0 && allPosts.length > 0) {
-        setVisiblePosts(allPosts);
-        return;
-      }
-
-      if (visiblePosts.length === 0 || hasNew || hasRemoved || hasContentChanged) {
-        setVisiblePosts(unswipedPosts);
-      }
+    // Fast and reliable comparison of actual feed content to avoid unnecessary re-renders
+    // while ensuring any new or removed posts instantly reflect.
+    const visibleSimplified = visiblePosts.map((p: any) => `${p.id}-${p.comments?.length || 0}`);
+    const unswipedSimplified = unswipedPosts.map((p: any) => `${p.id}-${p.comments?.length || 0}`);
+    
+    if (JSON.stringify(visibleSimplified) !== JSON.stringify(unswipedSimplified)) {
+      setVisiblePosts(unswipedPosts);
     }
-  }, [allPosts.length, unswipedPosts, visiblePosts, isChallengeEnded]);
+  }, [unswipedPosts, visiblePosts, isChallengeEnded]);
 
 
   const [showInfo, setShowPillsInfo] = useState(false);

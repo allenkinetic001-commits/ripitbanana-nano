@@ -4987,7 +4987,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const calculateUniversalTimeLeft = () => {
     const now = Math.floor(Date.now() / 1000);
-    const cycleSeconds = 240; // 4 minutes
+    const cycleSeconds = 120; // 2 minutes
     const remaining = cycleSeconds - (now % cycleSeconds);
     // Return 0 at the exact moment of reset
     const finalTime = remaining === cycleSeconds ? 0 : remaining;
@@ -5270,44 +5270,49 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   useEffect(() => {
     if (postsLoading) return;
-    if (formattedPosts.length === 0) return;
     
     setAllPosts(prevAll => {
-      // Create a map for O(1) lookups of existing posts
-      const existingMap = new Map(prevAll.map(p => [String(p.id), p]));
+      // Create a map for O(1) lookups of existing posts in DB
+      const dbMap = new Map(formattedPosts.map(p => [String(p.id), p]));
       let changed = false;
 
-      // Start with the incoming formatted posts (which are already sorted newest-first)
-      const newMerged: any[] = [];
+      // Start with the incoming formatted posts from DB (source of truth)
+      const newMerged: any[] = [...formattedPosts];
       
-      formattedPosts.forEach(dbPost => {
-        const existing = existingMap.get(String(dbPost.id));
-        if (!existing) {
-          newMerged.push(dbPost);
-          changed = true;
-        } else {
-          if (JSON.stringify(existing) !== JSON.stringify(dbPost)) {
-            newMerged.push(dbPost);
-            changed = true;
-          } else {
-            newMerged.push(existing);
-          }
-        }
-      });
-
-      // Preserve any optimistic posts (like those with 'opt-' IDs) that aren't in db yet
+      // Preserve optimistic posts AND posts that were recently added/swapped locally but haven't hit DB yet
       prevAll.forEach(p => {
-        if (String(p.id).startsWith('opt-') || String(p.id).includes('-')) {
-          // If it's an optimistic post, keep it at the top
-          if (!newMerged.find(mergedPost => String(mergedPost.id) === String(p.id))) {
+        const idStr = String(p.id);
+        const isInDB = dbMap.has(idStr);
+        
+        if (!isInDB) {
+          // Keep if it's explicitly optimistic
+          if (idStr.startsWith('opt-')) {
             newMerged.unshift(p);
             changed = true;
+          } 
+          // OR if it's a real ID but we have it locally (likely just swapped or from a very recent insert)
+          // We keep it for a short grace period (e.g. if created in last 30s) or just keep it until DB has it
+          else {
+            const createdAt = p.createdAt ? new Date(p.createdAt).getTime() : 0;
+            const now = Date.now();
+            const isVeryRecent = (now - createdAt) < 30000; // 30 seconds
+            
+            if (isVeryRecent) {
+              newMerged.unshift(p);
+              changed = true;
+            }
           }
         }
       });
 
+      // If nothing changed and lengths match, avoid state update
       if (!changed && newMerged.length === prevAll.length) return prevAll;
-      return newMerged;
+      
+      // Ensure we don't have duplicates and sort by createdAt
+      const finalUnique = Array.from(new Map(newMerged.map(p => [String(p.id), p])).values())
+        .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+      return finalUnique;
     });
   }, [formattedPosts, postsLoading]);
 
@@ -5405,7 +5410,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           localStorage.removeItem('followedUsers');
           localStorage.removeItem('wallPosts');
           localStorage.removeItem('allPosts');
+          localStorage.removeItem('allPosts_v2');
           localStorage.removeItem('visiblePosts');
+          localStorage.removeItem('visiblePosts_v2');
           localStorage.removeItem('postComments');
           localStorage.removeItem('userSelection');
           localStorage.removeItem('isEliminationRoundActive');
@@ -5476,13 +5483,17 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           localStorage.removeItem('followedUsers');
           localStorage.removeItem('wallPosts');
           localStorage.removeItem('allPosts');
+          localStorage.removeItem('allPosts_v2');
           localStorage.removeItem('visiblePosts');
+          localStorage.removeItem('visiblePosts_v2');
           localStorage.removeItem('postComments');
           localStorage.removeItem('userSelection');
           localStorage.removeItem('isEliminationRoundActive');
           setEnemies([]);
           setFollowedUsers([]);
           setWallPosts([]);
+          setAllPosts([]);
+          setVisiblePosts([]);
           setPostComments({});
           setIsEliminationRoundActive(false);
 
@@ -5891,8 +5902,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
 
     updateTimer(); // Initial call
-    // const interval = setInterval(updateTimer, 1000);
-    // return () => clearInterval(interval);
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
   }, []);
 
 
