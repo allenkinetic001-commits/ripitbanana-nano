@@ -248,6 +248,16 @@ const Home = () => {
     if (allPosts.length > 0) setIsInitialSyncDone(true);
   }, [allPosts.length]);
 
+  // Auto-populate visiblePosts from allPosts when the feed is empty but posts exist.
+  // This fixes the bug where a new user logging in sees an empty feed even though
+  // other users have posted content — visiblePosts gets reset on login but allPosts
+  // is correctly loaded from Supabase.
+  useEffect(() => {
+    if (visiblePosts.length === 0 && allPosts.length > 0) {
+      setVisiblePosts(allPosts);
+    }
+  }, [allPosts, visiblePosts.length, setVisiblePosts]);
+
 
 
   // New state for upload modal
