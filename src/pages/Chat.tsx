@@ -38,6 +38,7 @@ const Chat = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -56,17 +57,67 @@ const Chat = () => {
     localStorage.setItem(`chat_sessions_${userId}`, JSON.stringify(sessions));
   }, [sessions]);
 
-  // Clean up any existing duplicate sessions on mount
+  // Fetch existing chats from DB on mount
   useEffect(() => {
-    setSessions(prev => {
-      const seen = new Set<string>();
-      return prev.filter(s => {
-        const lower = s.username.toLowerCase();
-        if (seen.has(lower)) return false;
-        seen.add(lower);
-        return true;
-      });
-    });
+    const fetchChats = async () => {
+      const userId = localStorage.getItem('supabaseUserId');
+      if (!userId) return;
+
+        const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          text,
+          created_at,
+          sender_id,
+          receiver_id,
+          read,
+          sender:sender_id (id, username, avatar_url, full_name),
+          receiver:receiver_id (id, username, avatar_url, full_name)
+        `)
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (!error && data) {
+        // Group by partner
+        const newSessions: Record<string, ChatSession> = {};
+        
+        data.forEach((m: any) => {
+          const isOutgoing = m.sender_id === userId;
+          const partnerProfile = isOutgoing ? m.receiver : m.sender;
+          if (!partnerProfile) return;
+          
+          const partnerId = partnerProfile.id;
+          const username = partnerProfile.username;
+          
+          if (!newSessions[username]) {
+            newSessions[username] = {
+              id: partnerId,
+              username: username,
+              fullName: partnerProfile.full_name || `@${username}`,
+              avatar: partnerProfile.avatar_url || '/custom-empty-profile.png',
+              lastMessage: isOutgoing ? `You: ${m.text}` : m.text,
+              time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              unreadCount: 0,
+              isOnline: true,
+              partnerId: partnerId
+            };
+          }
+          
+          if (!isOutgoing && !m.read) {
+            newSessions[username].unreadCount += 1;
+          }
+        });
+        
+        setSessions(prev => {
+          // Merge with existing if needed, but newSessions has the true unreadCount from DB now
+          return Object.values(newSessions);
+        });
+      }
+    };
+    
+    fetchChats();
   }, []);
 
   // State for messages per user, scoped by current authenticated user
@@ -96,6 +147,7 @@ const Chat = () => {
     const initChat = async () => {
       if (!routeUsername) return;
       
+      setIsLoadingMessages(true);
       const normalizedUsername = routeUsername.replace('😉', '').toLowerCase();
       let existingSession = sessions.find(s => s.username.toLowerCase() === normalizedUsername);
       
@@ -157,9 +209,26 @@ const Chat = () => {
               ...prev,
               [normalizedUsername]: formattedMessages
             }));
+
+            // Mark as read in DB
+            supabase
+              .from('messages')
+              .update({ read: true })
+              .eq('receiver_id', userId)
+              .eq('sender_id', existingSession.partnerId)
+              .eq('read', false)
+              .then();
+            
+            // Clear unread count locally
+            setSessions(prev => prev.map(s => 
+              s.username.toLowerCase() === normalizedUsername 
+                ? { ...s, unreadCount: 0 } 
+                : s
+            ));
           }
         }
       }
+      setIsLoadingMessages(false);
     };
 
     initChat();
@@ -335,7 +404,6 @@ const Chat = () => {
       reader.onloadend = () => {
         const newMessage: ChatMessage = {
           id: Date.now(),
-          sender: 'Me',
           text: 'Sent an image',
           image: reader.result as string,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -478,31 +546,38 @@ const Chat = () => {
             <div className="text-center py-4 mb-4">
               <span className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.3em]">Today</span>
             </div>
-            {messages.map((msg, index) => {
-              const isLastInGroup = index === messages.length - 1 || messages[index + 1].isMe !== msg.isMe;
-              return (
-                <div key={msg.id} className={cn("flex flex-col space-y-0.5", msg.isMe ? "ml-auto items-end" : "items-start")}>
-                  {msg.image ? (
-                    <div 
-                      onClick={() => setFullscreenImage(msg.image || null)}
-                      className="rounded-2xl overflow-hidden border-4 border-white shadow-md max-w-[85%] mt-2 cursor-pointer active:scale-[0.98] transition-transform"
-                    >
-                      <img src={msg.image} alt="Sent" className="max-w-full h-auto object-cover max-h-[300px]" />
-                    </div>
-                  ) : (
-                    <div className={cn(
-                      "px-4 py-2.5 text-[15px] font-medium shadow-sm transition-all duration-300 max-w-[85%]",
-                      msg.isMe 
-                        ? "bg-[#8A76D6] text-white rounded-[20px] rounded-br-md" 
-                        : "bg-[#F4F4F5] text-zinc-900 rounded-[20px] rounded-bl-md",
-                      !isLastInGroup && (msg.isMe ? "rounded-br-[20px]" : "rounded-bl-[20px]")
-                    )}>
-                      {msg.text}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            
+            {isLoadingMessages && (!messagesData[currentUsername.toLowerCase()] || messagesData[currentUsername.toLowerCase()].length === 0) ? (
+              <div className="flex justify-center py-10">
+                <div className="w-8 h-8 rounded-full border-2 border-zinc-200 border-t-zinc-800 animate-spin" />
+              </div>
+            ) : (
+              messages.map((msg, index) => {
+                const isLastInGroup = index === messages.length - 1 || messages[index + 1].isMe !== msg.isMe;
+                return (
+                  <div key={msg.id} className={cn("flex flex-col space-y-0.5", msg.isMe ? "ml-auto items-end" : "items-start")}>
+                    {msg.image ? (
+                      <div 
+                        onClick={() => setFullscreenImage(msg.image || null)}
+                        className="rounded-2xl overflow-hidden border-4 border-white shadow-md max-w-[85%] mt-2 cursor-pointer active:scale-[0.98] transition-transform"
+                      >
+                        <img src={msg.image} alt="Sent" className="max-w-full h-auto object-cover max-h-[300px]" />
+                      </div>
+                    ) : (
+                      <div className={cn(
+                        "px-4 py-2.5 text-[15px] font-medium shadow-sm transition-all duration-300 max-w-[85%]",
+                        msg.isMe 
+                          ? "bg-[#8A76D6] text-white rounded-[20px] rounded-br-md" 
+                          : "bg-[#F4F4F5] text-zinc-900 rounded-[20px] rounded-bl-md",
+                        !isLastInGroup && (msg.isMe ? "rounded-br-[20px]" : "rounded-bl-[20px]")
+                      )}>
+                        {msg.text}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
             <div ref={messagesEndRef} />
           </div>
 

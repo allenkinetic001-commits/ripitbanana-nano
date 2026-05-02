@@ -7,8 +7,11 @@ import EmptyFeed from '../components/Empty';
 const Notifications = () => {
   const navigate = useNavigate();
   const { t, toggleFollow, followedUsers, isSurvivor, setUnreadMessageCount } = useChallenge();
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState<any[]>(() => {
+    const saved = localStorage.getItem('notifications_cache');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [loading, setLoading] = useState(notifications.length === 0);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -33,19 +36,20 @@ const Notifications = () => {
         .eq('receiver_id', userId)
         .order('created_at', { ascending: false })
         .limit(20);
-
+      
       if (!error && data) {
         const formatted = data.map((m: any) => ({
           id: m.id,
-          user: m.profiles.username,
-          fullName: m.profiles.full_name,
-          avatar: m.profiles.avatar_url || '/custom-empty-profile.png',
-          content: `sent you a message: "${m.text.substring(0, 30)}${m.text.length > 30 ? '...' : ''}"`,
+          user: m.profiles?.username || 'unknown',
+          fullName: m.profiles?.full_name || 'Survivor',
+          avatar: m.profiles?.avatar_url || '/custom-empty-profile.png',
+          content: `sent you: "${m.text.substring(0, 30)}${m.text.length > 30 ? '...' : ''}"`,
           time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           read: m.read,
           type: 'message'
         }));
         setNotifications(formatted);
+        localStorage.setItem('notifications_cache', JSON.stringify(formatted));
       }
       setLoading(false);
     };
