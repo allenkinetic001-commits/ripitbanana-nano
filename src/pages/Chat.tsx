@@ -249,14 +249,30 @@ const Chat = () => {
       }, async (payload) => {
         const newMessage = payload.new;
         
-        // Fetch sender info if not in sessions
-        const { data: sender } = await supabase
-          .from('profiles')
-          .select('username, avatar_url, full_name')
-          .eq('id', newMessage.sender_id)
-          .single();
+        // Find existing session to avoid profile fetch
+        let senderInfo: { username: string, avatar_url: string, full_name: string } | null = null;
+        
+        // Use a state-based check or local sessions list
+        const existingSession = sessions.find(s => s.partnerId === newMessage.sender_id);
+        if (existingSession) {
+          senderInfo = {
+            username: existingSession.username,
+            avatar_url: existingSession.avatar,
+            full_name: existingSession.fullName
+          };
+        }
 
-        if (sender) {
+        // If not found in sessions, fetch once
+        if (!senderInfo) {
+          const { data: sender } = await supabase
+            .from('profiles')
+            .select('username, avatar_url, full_name')
+            .eq('id', newMessage.sender_id)
+            .single();
+          if (sender) senderInfo = sender;
+        }
+
+        if (senderInfo) {
           const formatted: ChatMessage = {
             id: newMessage.id,
             text: newMessage.text,
@@ -267,25 +283,31 @@ const Chat = () => {
             receiver_id: newMessage.receiver_id
           };
 
+          const usernameKey = senderInfo.username.toLowerCase();
           setMessagesData(prev => ({
             ...prev,
-            [sender.username.toLowerCase()]: [...(prev[sender.username.toLowerCase()] || []), formatted]
+            [usernameKey]: [...(prev[usernameKey] || []), formatted]
           }));
 
-          // Update session or add new one
+          // Update session list
           setSessions(prev => {
-            const exists = prev.find(s => s.username.toLowerCase() === sender.username.toLowerCase());
+            const exists = prev.find(s => s.partnerId === newMessage.sender_id);
             if (exists) {
-              return prev.map(s => s.username.toLowerCase() === sender.username.toLowerCase() 
-                ? { ...s, lastMessage: newMessage.text, time: 'now', unreadCount: selectedChat?.username.toLowerCase() === sender.username.toLowerCase() ? 0 : (s.unreadCount + 1) }
+              return prev.map(s => s.partnerId === newMessage.sender_id
+                ? { 
+                    ...s, 
+                    lastMessage: newMessage.text, 
+                    time: 'now', 
+                    unreadCount: selectedChat?.partnerId === newMessage.sender_id ? 0 : (s.unreadCount + 1) 
+                  }
                 : s
               );
             } else {
               return [{
                 id: newMessage.sender_id,
-                username: sender.username,
-                fullName: sender.full_name || `@${sender.username}`,
-                avatar: sender.avatar_url || '/custom-empty-profile.png',
+                username: senderInfo!.username,
+                fullName: senderInfo!.full_name || `@${senderInfo!.username}`,
+                avatar: senderInfo!.avatar_url || '/custom-empty-profile.png',
                 lastMessage: newMessage.text,
                 time: 'now',
                 unreadCount: 1,
@@ -301,7 +323,7 @@ const Chat = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [selectedChat?.username]);
+  }, [selectedChat?.partnerId, sessions]);
 
   // Scroll to bottom whenever selected chat or messages change
   useEffect(() => {

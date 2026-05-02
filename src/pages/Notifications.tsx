@@ -4,6 +4,7 @@ import { useChallenge } from '../contexts/ChallengeContext';
 import { supabase } from '../lib/supabase';
 import EmptyFeed from '../components/Empty';
 
+
 const Notifications = () => {
   const navigate = useNavigate();
   const { t, toggleFollow, followedUsers, isSurvivor, setUnreadMessageCount } = useChallenge();
@@ -13,10 +14,30 @@ const Notifications = () => {
   });
   const [loading, setLoading] = useState(notifications.length === 0);
 
+  const clearNotifications = async () => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+
+    const now = new Date().toISOString();
+    // 1. Set local persistent flag immediately
+    localStorage.setItem(`notifications_last_cleared_${userId}`, now);
+    localStorage.removeItem('notifications_cache');
+    localStorage.removeItem(`chat_messages_${userId}`); // Clear the chat cache too!
+    setNotifications([]);
+
+    // 2. Attempt universal deletion from DB
+    await supabase
+      .from('messages')
+      .delete()
+      .eq('receiver_id', userId);
+  };
+
   useEffect(() => {
     const fetchNotifications = async () => {
       const userId = localStorage.getItem('supabaseUserId');
       if (!userId) return;
+
+      const lastCleared = localStorage.getItem(`notifications_last_cleared_${userId}`);
 
       // Fetch recent messages received by the user
       const { data, error } = await supabase
@@ -35,19 +56,27 @@ const Notifications = () => {
         `)
         .eq('receiver_id', userId)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(40); // Fetch more to ensure we have enough after filtering
       
       if (!error && data) {
-        const formatted = data.map((m: any) => ({
+        let formatted = data.map((m: any) => ({
           id: m.id,
           user: m.profiles?.username || 'unknown',
           fullName: m.profiles?.full_name || 'Survivor',
           avatar: m.profiles?.avatar_url || '/custom-empty-profile.png',
           content: `sent you: "${m.text.substring(0, 30)}${m.text.length > 30 ? '...' : ''}"`,
           time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          created_at: m.created_at,
           read: m.read,
           type: 'message'
         }));
+
+        // STRICT FILTER: Remove anything older than the last clear action
+        if (lastCleared) {
+          const clearDate = new Date(lastCleared);
+          formatted = formatted.filter(n => new Date(n.created_at) > clearDate);
+        }
+
         setNotifications(formatted);
         localStorage.setItem('notifications_cache', JSON.stringify(formatted));
       }
@@ -73,7 +102,7 @@ const Notifications = () => {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20">
-      <header className="px-4 py-2 flex flex-col items-start border-b border-zinc-100 sticky top-0 bg-white z-10">
+      <header className="px-4 py-2 flex items-center justify-between border-b border-zinc-100 sticky top-0 bg-white z-10">
         <h1 className="flex items-center gap-2">
           <img src="/activity-icon.png" alt="" className="h-8 w-8 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
           <img 
@@ -83,6 +112,20 @@ const Notifications = () => {
             style={{ imageRendering: '-webkit-optimize-contrast' }} 
           />
         </h1>
+        <button 
+          onClick={clearNotifications}
+          className="p-2 hover:bg-zinc-100 rounded-full transition-colors"
+        >
+          <img 
+            src="/garbage-truck-v3.png" 
+            alt="Clear notifications" 
+            className="h-6 w-auto object-contain"
+            style={{ 
+              mixBlendMode: 'multiply',
+              opacity: 0.4
+            }}
+          />
+        </button>
       </header>
 
       {loading ? (
