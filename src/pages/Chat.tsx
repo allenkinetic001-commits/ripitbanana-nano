@@ -667,7 +667,17 @@ const Chat = () => {
                       <ImageIcon size={20} className="cursor-pointer text-zinc-400 hover:opacity-100" onClick={() => fileInputRef.current?.click()} />
                     </>
                   ) : (
-                    <button onClick={() => handleSendMessage()} className="font-bold text-sm px-1 active:scale-90 transition-all text-purple-600">Send</button>
+                    <button
+                        onClick={() => handleSendMessage()}
+                        className="active:scale-90 transition-all shrink-0"
+                      >
+                        <img
+                          src="/btn-send.png"
+                          alt="Send"
+                          className="h-4 w-auto object-contain pr-1"
+                          style={{ imageRendering: '-webkit-optimize-contrast' }}
+                        />
+                      </button>
                   )}
                 </div>
               </div>
