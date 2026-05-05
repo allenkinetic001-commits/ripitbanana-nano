@@ -974,7 +974,6 @@ const Home = () => {
                             ['pley']: (prev['pley'] || 0) + 1
                           }));
                           setVisiblePosts(allPosts);
-                          setShowPills(false);
                         }}
                         disabled={isEliminationRoundActive}
                         className={cn(
