@@ -895,34 +895,6 @@ const Home = () => {
 
               <div className="h-px w-full bg-zinc-100/80" />
 
-              {/* Start Button at Top for Visibility */}
-              <div className="flex justify-center w-full">
-                <button
-                  onClick={() => {
-                    if (isEliminationRoundActive) return;
-                    startNewChallenge();
-                    setUserSelection('pley');
-                    setClickCounts(prev => ({
-                      ...prev,
-                      ['pley']: (prev['pley'] || 0) + 1
-                    }));
-                    setVisiblePosts(allPosts);
-                  }}
-                  disabled={isEliminationRoundActive}
-                  className={cn(
-                    "mt-2 transition-transform flex items-center justify-center",
-                    !isEliminationRoundActive && "hover:scale-105 active:scale-95"
-                  )}
-                >
-                  <img 
-                    src={isEliminationRoundActive ? "/btn-submitted.png" : "/btn-start-elimination.png"} 
-                    alt={isEliminationRoundActive ? t('home_submitted') : "Start Elimination"} 
-                    className="h-10 w-auto object-contain drop-shadow-md" 
-                    style={{ imageRendering: '-webkit-optimize-contrast' }}
-                  />
-                </button>
-              </div>
-
               {/* Automated Cycle UI */}
               {activeTab && (
                 <div className="space-y-4 pt-2">
@@ -987,6 +959,34 @@ const Home = () => {
                       <p className="text-[11px] font-bold text-zinc-500 italic leading-relaxed">
                         Round reshuflled automatically at midnight.<br/>All survivors archived to Hall of Fame.
                       </p>
+                    </div>
+
+                    {/* Start Button at Bottom Right */}
+                    <div className="flex justify-end w-full pr-0">
+                      <button
+                        onClick={() => {
+                          if (isEliminationRoundActive) return;
+                          startNewChallenge();
+                          setUserSelection('pley');
+                          setClickCounts(prev => ({
+                            ...prev,
+                            ['pley']: (prev['pley'] || 0) + 1
+                          }));
+                          setVisiblePosts(allPosts);
+                        }}
+                        disabled={isEliminationRoundActive}
+                        className={cn(
+                          "mt-2 transition-transform flex items-center justify-center",
+                          !isEliminationRoundActive && "hover:scale-105 active:scale-95"
+                        )}
+                      >
+                        <img 
+                          src={isEliminationRoundActive ? "/btn-submitted.png" : "/btn-start-elimination.png"} 
+                          alt={isEliminationRoundActive ? t('home_submitted') : "Start Elimination"} 
+                          className="h-10 w-auto object-contain drop-shadow-md" 
+                          style={{ imageRendering: '-webkit-optimize-contrast' }}
+                        />
+                      </button>
                     </div>
                   </div>
                 </div>
