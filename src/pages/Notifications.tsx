@@ -168,7 +168,7 @@ const Notifications = () => {
           ))}
         </div>
       ) : (
-        <EmptyFeed subtitle="No recent activity" />
+        <EmptyFeed subtitle="No recent activity" className="-mt-16" imageClassName="!mt-16" />
       )}
     </div>
   );

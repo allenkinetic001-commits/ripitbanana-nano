@@ -31,7 +31,7 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
 
   const navItems: NavItem[] = [
     { icon: '/nav-home-v3.png', label: t('nav_home'), path: '/', isImage: true },
-    { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true, size: 'h-[50px] w-[50px]' },
+    { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true },
     { icon: '/nav-phone-v3.png', label: t('nav_notifications'), path: '/notifications', isImage: true },
     { 
       icon: userProfile.avatar || '/custom-empty-profile.png', 
@@ -67,7 +67,7 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                     src={item.icon as string} 
                     alt={item.label}
                     className={cn(
-                      item.size || "h-9 w-9",
+                      item.size || "h-11 w-11",
                       "object-contain transition-all duration-300", 
                       isActive ? "scale-110" : "scale-100",
                       isBouncing && "animate-nav-bounce",

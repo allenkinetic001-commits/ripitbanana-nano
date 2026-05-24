@@ -75,7 +75,12 @@ const SettingsPage = () => {
           <ChevronLeft size={24} />
         </button>
         <div className="flex items-center gap-2">
-          <span className="font-black text-zinc-900 text-lg uppercase tracking-tight">{t('settings')}</span>
+          <img 
+            src="/settings-title.png" 
+            alt={t('settings')} 
+            className="h-7 w-auto object-contain" 
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
+          />
         </div>
         <div className="w-10" /> {/* Spacer */}
       </header>

@@ -151,7 +151,7 @@ export default function Onboarding() {
             <img 
               src={stepsContent[step - 1].textImage} 
               alt="Description" 
-              className={`${step === 2 ? 'h-12' : step === 4 ? 'h-36' : step === 5 ? 'h-28' : step === 6 ? 'h-28' : step === 7 ? 'h-24' : step === 1 ? 'h-48' : 'h-[68px]'} w-auto object-contain mx-auto drop-shadow-md animate-in fade-in zoom-in duration-500`}
+              className={`${step === 2 ? 'h-12' : step === 4 ? 'h-56' : step === 5 ? 'h-28' : step === 6 ? 'h-28' : step === 7 ? 'h-24' : step === 1 ? 'h-48' : 'h-[68px]'} w-auto object-contain mx-auto drop-shadow-md animate-in fade-in zoom-in duration-500`}
             />
           </div>
         )}

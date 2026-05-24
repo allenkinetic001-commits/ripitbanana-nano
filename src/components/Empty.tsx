@@ -7,6 +7,7 @@ interface EmptyFeedProps {
   icon?: string;
   actionButton?: React.ReactNode;
   className?: string;
+  imageClassName?: string;
 }
 
 const EmptyFeed: React.FC<EmptyFeedProps> = ({ 
@@ -14,14 +15,15 @@ const EmptyFeed: React.FC<EmptyFeedProps> = ({
   subtitle = "No posts have been made yet", 
   icon = "/ice-bear.png",
   actionButton,
-  className
+  className,
+  imageClassName
 }) => {
   return (
     <div className={cn(
       "flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-700 min-h-[40vh]",
       className
     )}>
-      <div className="relative mb-6 mt-32">
+      <div className={cn("relative mb-6 mt-32", imageClassName)}>
         <img 
           src={icon} 
           alt="Empty" 
