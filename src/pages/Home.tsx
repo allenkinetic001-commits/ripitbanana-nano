@@ -754,7 +754,7 @@ const Home = () => {
               <img 
                 src="/header-logo-text.png" 
                 alt="RipIt" 
-                className="h-6 w-auto object-contain ml-4 mt-1" 
+                className="h-6 w-auto object-contain ml-0 mt-1" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </Link>
