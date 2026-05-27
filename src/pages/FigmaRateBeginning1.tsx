@@ -1,6 +1,6 @@
 import React from 'react';
 
-import RateBeginning1 from '../../.figma/16_9/index.jsx';
+// import RateBeginning1 from '../../.figma/16_9/index.jsx';
 
 export default function FigmaRateBeginning1() {
   return (
@@ -9,7 +9,8 @@ export default function FigmaRateBeginning1() {
         rate beginningn 1 preview
       </div>
       <div className="w-fit mx-auto shadow-2xl outline outline-2 outline-zinc-300 bg-white">
-        <RateBeginning1 />
+        {/* <RateBeginning1 /> */}
+        <div className="p-8 text-zinc-500">Preview not available</div>
       </div>
     </div>
   );
