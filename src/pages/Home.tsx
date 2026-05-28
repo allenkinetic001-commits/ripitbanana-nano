@@ -435,8 +435,8 @@ const Home = () => {
 
     // Fast and reliable comparison of actual feed content to avoid unnecessary re-renders
     // while ensuring any new or removed posts instantly reflect.
-    const visibleSimplified = visiblePosts.map((p: any) => `${p.id}-${p.comments?.length || 0}`);
-    const unswipedSimplified = unswipedPosts.map((p: any) => `${p.id}-${p.comments?.length || 0}`);
+    const visibleSimplified = visiblePosts.map((p: any) => `${p.id}-${p.avatar}-${p.username}-${p.isTraitorGlobal}-${p.globalLives}-${p.comments?.length || 0}`);
+    const unswipedSimplified = unswipedPosts.map((p: any) => `${p.id}-${p.avatar}-${p.username}-${p.isTraitorGlobal}-${p.globalLives}-${p.comments?.length || 0}`);
     
     if (JSON.stringify(visibleSimplified) !== JSON.stringify(unswipedSimplified)) {
       setVisiblePosts(unswipedPosts);

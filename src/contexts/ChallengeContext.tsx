@@ -5305,9 +5305,17 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       const finalUnique = Array.from(new Map(newMerged.map(p => [String(p.id), p])).values())
         .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
-      // Avoid re-render if nothing actually changed
+      // Avoid re-render if nothing actually changed (comparing key UI properties)
       if (finalUnique.length === prevAll.length &&
-          finalUnique.every((p, i) => String(p.id) === String(prevAll[i]?.id) && p.image === prevAll[i]?.image)) {
+          finalUnique.every((p, i) => 
+            String(p.id) === String(prevAll[i]?.id) && 
+            p.image === prevAll[i]?.image &&
+            p.avatar === prevAll[i]?.avatar &&
+            p.username === prevAll[i]?.username &&
+            p.caption === prevAll[i]?.caption &&
+            p.isTraitorGlobal === prevAll[i]?.isTraitorGlobal &&
+            p.globalLives === prevAll[i]?.globalLives
+          )) {
         return prevAll;
       }
 

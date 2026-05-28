@@ -22,6 +22,13 @@ const PostDetail = () => {
   const [liked, setLiked] = useState(false);
   const localComments = postComments[Number(id)] || [];
 
+  // Sync post state with context updates (e.g. profile picture edits)
+  useEffect(() => {
+    if (contextPost) {
+      setPost(contextPost);
+    }
+  }, [contextPost]);
+
   // Fetch from Supabase for freshness (background update if already in context)
   useEffect(() => {
     if (id) {

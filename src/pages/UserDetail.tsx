@@ -151,10 +151,16 @@ const UserDetail = () => {
 
   // Merge context posts with DB posts to ensure local optimistic posts are shown instantly
   const contextPosts = allPosts.filter((p: any) => p.username === username);
-  const userPosts = [...contextPosts];
+  const userPosts = [...contextPosts].map(p => ({
+    ...p,
+    avatar: profileData?.avatar_url || p.avatar
+  }));
   userPostsFromDB.forEach(dbPost => {
     if (!userPosts.some(p => p.id === dbPost.id)) {
-      userPosts.push(dbPost);
+      userPosts.push({
+        ...dbPost,
+        avatar: profileData?.avatar_url || dbPost.avatar
+      });
     }
   });
   userPosts.sort((a, b) => {
