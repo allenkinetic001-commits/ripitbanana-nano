@@ -23,7 +23,19 @@ export function useSupabasePosts() {
     const saved = localStorage.getItem('supabase_posts_cache');
     if (!saved) return [];
     try {
-      return JSON.parse(saved);
+      const parsed: SupabasePost[] = JSON.parse(saved);
+      // Strip any stale base64 or blob: URLs — they are broken after a page reload
+      const clean = parsed.filter(p => {
+        const url = p.image_url || '';
+        return !url.startsWith('data:') && !url.startsWith('blob:');
+      });
+      // If we stripped anything, clear the cache so DB fetch replaces it cleanly
+      if (clean.length !== parsed.length) {
+        localStorage.removeItem('supabase_posts_cache');
+        localStorage.removeItem('allPosts_v2');
+        localStorage.removeItem('visiblePosts_v2');
+      }
+      return clean;
     } catch (e) {
       console.error('Failed to parse supabase_posts_cache', e);
       return [];
