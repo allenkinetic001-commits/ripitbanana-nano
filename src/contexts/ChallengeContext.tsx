@@ -5069,11 +5069,21 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [enemies, setEnemies] = useState<Survivor[]>([]);
   const [allPosts, setAllPosts] = useState<any[]>(() => {
     const saved = localStorage.getItem('allPosts_v2');
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      // Strip stale blob: URLs — they die on page unload and will render as broken media
+      return parsed.filter((p: any) => !p.image?.startsWith('blob:'));
+    } catch { return []; }
   });
   const [visiblePosts, setVisiblePosts] = useState<any[]>(() => {
     const saved = localStorage.getItem('visiblePosts_v2');
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      // Strip stale blob: URLs — they die on page unload and will render as broken media
+      return parsed.filter((p: any) => !p.image?.startsWith('blob:'));
+    } catch { return []; }
   });
   const [wallPosts, setWallPosts] = useState<WallPost[]>([]);
   const [followedUsers, setFollowedUsers] = useState<string[]>([]);

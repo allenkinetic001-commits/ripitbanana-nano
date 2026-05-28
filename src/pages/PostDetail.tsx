@@ -41,7 +41,7 @@ const PostDetail = () => {
             caption: data.caption || '',
             likes: data.likes_count || 0,
             time: 'Recently',
-            type: data.image_url?.startsWith('data:video/') ? 'video' : 'image',
+            type: (data.image_url?.startsWith('data:video/') || /\.(mp4|mov|webm|ogg)(\?|$)/i.test(data.image_url || '')) ? 'video' : 'image',
             comments: [],
           });
         }
