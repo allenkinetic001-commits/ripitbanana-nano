@@ -20,7 +20,7 @@ interface BottomNavProps {
 const BottomNav = ({ visible = true }: BottomNavProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-    const { t, userProfile, unreadMessageCount } = useChallenge();
+    const { t, unreadMessageCount } = useChallenge();
   const [clickedPath, setClickedPath] = useState<string | null>(null);
 
   const handleNavClick = (path: string) => {
@@ -34,11 +34,10 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
     { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true },
     { icon: '/nav-phone-v3.png', label: t('nav_notifications'), path: '/notifications', isImage: true },
     { 
-      icon: userProfile.avatar || '/custom-empty-profile.png', 
+      icon: '/nav-profile-v3.png', 
       label: t('nav_profile'), 
       path: '/profile', 
-      isImage: true,
-      className: "object-cover rounded-none"
+      isImage: true
     },
   ];
 
