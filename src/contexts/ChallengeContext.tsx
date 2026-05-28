@@ -5270,47 +5270,36 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   useEffect(() => {
     if (postsLoading) return;
+    if (formattedPosts.length === 0) return; // Don't wipe feed if DB returns nothing (e.g., network error)
     
     setAllPosts(prevAll => {
-      // Create a map for O(1) lookups of existing posts in DB
+      // DB posts are the source of truth. Build a map keyed by ID.
       const dbMap = new Map(formattedPosts.map(p => [String(p.id), p]));
-      let changed = false;
 
-      // Start with the incoming formatted posts from DB (source of truth)
+      // Start with the incoming formatted posts from DB
       const newMerged: any[] = [...formattedPosts];
       
-      // Preserve optimistic posts AND posts that were recently added/swapped locally but haven't hit DB yet
+      // Preserve ONLY optimistic posts (opt- prefix) that haven't landed in DB yet.
+      // Real-ID posts that differ from DB version are dropped (DB wins).
       prevAll.forEach(p => {
         const idStr = String(p.id);
-        const isInDB = dbMap.has(idStr);
-        
-        if (!isInDB) {
-          // Keep if it's explicitly optimistic
-          if (idStr.startsWith('opt-')) {
+        if (!dbMap.has(idStr) && idStr.startsWith('opt-')) {
+          // Only keep if the image is not a stale blob URL (blob: URLs die on refresh)
+          if (p.image && !p.image.startsWith('blob:')) {
             newMerged.unshift(p);
-            changed = true;
-          } 
-          // OR if it's a real ID but we have it locally (likely just swapped or from a very recent insert)
-          // We keep it for a short grace period (e.g. if created in last 30s) or just keep it until DB has it
-          else {
-            const createdAt = p.createdAt ? new Date(p.createdAt).getTime() : 0;
-            const now = Date.now();
-            const isVeryRecent = (now - createdAt) < 30000; // 30 seconds
-            
-            if (isVeryRecent) {
-              newMerged.unshift(p);
-              changed = true;
-            }
           }
         }
       });
 
-      // If nothing changed and lengths match, avoid state update
-      if (!changed && newMerged.length === prevAll.length) return prevAll;
-      
-      // Ensure we don't have duplicates and sort by createdAt
+      // Deduplicate and sort newest-first
       const finalUnique = Array.from(new Map(newMerged.map(p => [String(p.id), p])).values())
         .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+      // Avoid re-render if nothing actually changed
+      if (finalUnique.length === prevAll.length &&
+          finalUnique.every((p, i) => String(p.id) === String(prevAll[i]?.id) && p.image === prevAll[i]?.image)) {
+        return prevAll;
+      }
 
       return finalUnique;
     });
@@ -5318,7 +5307,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   useEffect(() => {
     try {
-      localStorage.setItem('allPosts_v2', JSON.stringify(allPosts));
+      // Strip blob: URLs before persisting — they expire on page unload and cause broken images on refresh
+      const persistable = allPosts.filter(p => !p.image?.startsWith('blob:'));
+      localStorage.setItem('allPosts_v2', JSON.stringify(persistable));
     } catch(e) {
       console.warn('Storage quota exceeded for allPosts_v2');
     }
@@ -5326,7 +5317,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   useEffect(() => {
     try {
-      localStorage.setItem('visiblePosts_v2', JSON.stringify(visiblePosts));
+      // Strip blob: URLs before persisting — they expire on page unload and cause broken images on refresh
+      const persistable = visiblePosts.filter(p => !p.image?.startsWith('blob:'));
+      localStorage.setItem('visiblePosts_v2', JSON.stringify(persistable));
     } catch(e) {
       console.warn('Storage quota exceeded for visiblePosts_v2');
     }
