@@ -5294,8 +5294,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       prevAll.forEach(p => {
         const idStr = String(p.id);
         if (!dbMap.has(idStr) && idStr.startsWith('opt-')) {
-          // Only keep if the image is not a stale blob URL (blob: URLs die on refresh)
-          if (p.image && !p.image.startsWith('blob:')) {
+          // Keep active optimistic upload posts in memory (stale blob URLs are stripped during load/save to localStorage)
+          if (p.image) {
             newMerged.unshift(p);
           }
         }
