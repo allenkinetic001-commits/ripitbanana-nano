@@ -334,3 +334,48 @@ function getTimeAgo(dateStr: string): string {
   if (diffDays < 7) return `${diffDays}d ago`;
   return date.toLocaleDateString();
 }
+
+// Upload avatar file to Supabase Storage, return the public URL
+export async function uploadAvatar(userId: string, file: File): Promise<{ url: string | null; error: any }> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const fileName = `${userId}/${Date.now()}.${ext}`;
+
+  const { data, error } = await supabase.storage
+    .from('avatars')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: true,
+      contentType: file.type,
+    });
+
+  if (error) return { url: null, error };
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(data.path);
+
+  return { url: publicUrl, error: null };
+}
+
+// Update profile row on the Supabase backend
+export async function updateUserProfile(
+  userId: string, 
+  profile: { username?: string, fullName?: string, bio?: string, website?: string, avatarUrl?: string }
+) {
+  const payload: any = {};
+  if (profile.username !== undefined) payload.username = profile.username;
+  if (profile.fullName !== undefined) payload.full_name = profile.fullName;
+  if (profile.bio !== undefined) payload.bio = profile.bio;
+  if (profile.website !== undefined) payload.website = profile.website;
+  if (profile.avatarUrl !== undefined) payload.avatar_url = profile.avatarUrl;
+  payload.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(payload)
+    .eq('id', userId)
+    .select()
+    .single();
+
+  return { data, error };
+}

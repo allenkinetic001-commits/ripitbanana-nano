@@ -7,7 +7,7 @@ import { PixelHeart } from '../components/PixelHeart';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
 import { useLongPress } from '../hooks/useLongPress';
 import { supabase } from '../lib/supabase';
-import { fetchPostsByUsername, formatPostForUI } from '../hooks/useSupabase';
+import { fetchPostsByUsername, formatPostForUI, uploadAvatar, updateUserProfile } from '../hooks/useSupabase';
 import EmptyFeed from '../components/Empty';
 
 // Removed hardcoded userPosts
@@ -49,6 +49,14 @@ const Profile = () => {
   
   const [loadingPosts, setLoadingPosts] = useState(!userProfile?.username || userPosts.length === 0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditEditForm(userProfile);
+    }
+  }, [isEditing, userProfile]);
 
   useEffect(() => {
     const fetchProfileAndPosts = async () => {
@@ -117,24 +125,129 @@ const Profile = () => {
     };
   });
 
-  const handleSaveProfile = () => {
-    setUserProfile(editForm);
-    setIsEditing(false);
+  const handleDirectAvatarUpdate = async (file: File) => {
+    try {
+      setIsSaving(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        alert("You must be logged in to update your profile.");
+        return;
+      }
+
+      // 1. Upload to Storage
+      const { url: avatarUrl, error: uploadErr } = await uploadAvatar(session.user.id, file);
+      if (uploadErr || !avatarUrl) {
+        console.error("Avatar upload failed:", uploadErr);
+        alert("Failed to upload avatar: " + (uploadErr?.message || "Storage error"));
+        return;
+      }
+
+      // 2. Update Database
+      const { error: updateErr } = await updateUserProfile(session.user.id, { avatarUrl });
+      if (updateErr) {
+        console.error("Profile update failed:", updateErr);
+        alert("Failed to save avatar to profile: " + updateErr.message);
+        return;
+      }
+
+      // 3. Update Context & Local State
+      const updatedProfile = { ...userProfile, avatar: avatarUrl };
+      setUserProfile(updatedProfile);
+      setProfileData(prev => ({ ...prev, avatar_url: avatarUrl }));
+      
+      // Update cache
+      localStorage.setItem(`profile_v2_${session.user.id}`, JSON.stringify(updatedProfile));
+      localStorage.setItem(`user_profile_cache_${userProfile.username}`, JSON.stringify({ ...profileData, avatar_url: avatarUrl }));
+    } catch (e: any) {
+      alert("Error saving avatar: " + e.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      setIsSaving(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        alert("You must be logged in to update your profile.");
+        return;
+      }
+
+      let avatarUrl = editForm.avatar;
+
+      // 1. If there's a new avatar file, upload it first
+      if (avatarFile) {
+        const { url, error: uploadErr } = await uploadAvatar(session.user.id, avatarFile);
+        if (uploadErr || !url) {
+          console.error("Avatar upload failed:", uploadErr);
+          alert("Failed to upload avatar: " + (uploadErr?.message || "Storage error"));
+          return;
+        }
+        avatarUrl = url;
+      }
+
+      // 2. Save profile details to Supabase database
+      const { error: updateErr } = await updateUserProfile(session.user.id, {
+        username: editForm.username,
+        fullName: editForm.fullName,
+        bio: editForm.bio,
+        website: editForm.website,
+        avatarUrl: avatarUrl,
+      });
+
+      if (updateErr) {
+        console.error("Profile update failed:", updateErr);
+        alert("Failed to save profile: " + updateErr.message);
+        return;
+      }
+
+      // 3. Update Context & State
+      const finalProfile = {
+        ...editForm,
+        avatar: avatarUrl
+      };
+      
+      setUserProfile(finalProfile);
+      setProfileData(prev => ({
+        ...prev,
+        username: editForm.username,
+        full_name: editForm.fullName,
+        bio: editForm.bio,
+        website: editForm.website,
+        avatar_url: avatarUrl,
+      }));
+
+      // Update cache
+      localStorage.setItem(`profile_v2_${session.user.id}`, JSON.stringify(finalProfile));
+      localStorage.setItem(`user_profile_cache_${editForm.username}`, JSON.stringify({
+        ...profileData,
+        username: editForm.username,
+        full_name: editForm.fullName,
+        bio: editForm.bio,
+        website: editForm.website,
+        avatar_url: avatarUrl,
+      }));
+
+      setIsEditing(false);
+      setAvatarFile(null);
+    } catch (e: any) {
+      alert("Error saving changes: " + e.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        if (isEditing) {
-          setEditEditForm(prev => ({ ...prev, avatar: result }));
-        } else {
-          setUserProfile({ ...userProfile, avatar: result });
-        }
-      };
-      reader.readAsDataURL(file);
+      const objectUrl = URL.createObjectURL(file);
+      if (isEditing) {
+        setAvatarFile(file);
+        setEditEditForm(prev => ({ ...prev, avatar: objectUrl }));
+      } else {
+        handleDirectAvatarUpdate(file);
+      }
     }
   };
 
@@ -219,8 +332,16 @@ const Profile = () => {
               <X size={24} />
             </button>
             <h2 className="font-bold">Edit Profile</h2>
-            <button onClick={handleSaveProfile} className="text-zinc-900 font-bold">
-              <Check size={24} />
+            <button 
+              onClick={handleSaveProfile} 
+              disabled={isSaving} 
+              className={cn("text-zinc-900 font-bold transition-opacity", isSaving && "opacity-50 pointer-events-none")}
+            >
+              {isSaving ? (
+                <div className="w-5 h-5 rounded-full border-2 border-zinc-300 border-t-zinc-900 animate-spin" />
+              ) : (
+                <Check size={24} />
+              )}
             </button>
           </header>
           
