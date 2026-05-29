@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Grid, ShieldAlert, Send, Trash2, MessageSquare, List, Trophy, UserPlus } from 'lucide-react';
+import { ArrowLeft, Grid, ShieldAlert, Send, Trash2, MessageSquare, List, Trophy, UserPlus, Play } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
@@ -97,16 +97,21 @@ const UserDetail = () => {
         .order('created_at', { ascending: false });
       
       if (posts) {
-        const formatted = posts.map((p: any) => ({
-          id: p.id,
-          username: p.profiles?.username || username,
-          avatar: p.profiles?.avatar_url || profile.avatar_url || '/custom-empty-profile.png',
-          image: p.image_url || '',
-          caption: p.caption || '',
-          likes: p.likes_count || 0,
-          time: 'Recently',
-          comments: [],
-        }));
+        const formatted = posts.map((p: any) => {
+          const url = p.image_url || '';
+          const isVideo = url.startsWith('data:video/') || /\.(mp4|mov|webm|ogg)(\?|$)/i.test(url);
+          return {
+            id: p.id,
+            username: p.profiles?.username || username,
+            avatar: p.profiles?.avatar_url || profile.avatar_url || '/custom-empty-profile.png',
+            image: url,
+            type: isVideo ? 'video' : 'image',
+            caption: p.caption || '',
+            likes: p.likes_count || 0,
+            time: 'Recently',
+            comments: [],
+          };
+        });
         setUserPostsFromDB(formatted);
         try {
           localStorage.setItem(`user_posts_cache_${username}`, JSON.stringify(formatted));
@@ -448,9 +453,24 @@ const UserDetail = () => {
               <div 
                 key={index} 
                 onClick={() => navigate(`/post/${post.id}`)}
-                className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                className="relative aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
               >
-                <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
+                {post.type === 'video' ? (
+                  <div className="relative w-full h-full">
+                    <video 
+                      src={post.image} 
+                      className="w-full h-full object-cover pointer-events-none" 
+                      muted 
+                      playsInline
+                      preload="metadata"
+                    />
+                    <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-[2px] rounded-md p-1 flex items-center justify-center">
+                      <Play className="w-3.5 h-3.5 text-white fill-white" />
+                    </div>
+                  </div>
+                ) : (
+                  <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
+                )}
               </div>
             ))}
           </div>

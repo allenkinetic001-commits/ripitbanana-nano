@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles, MessageSquare } from 'lucide-react';
+import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles, MessageSquare, Play } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
@@ -588,9 +588,24 @@ const Profile = () => {
               <div 
                 key={index} 
                 onClick={() => navigate(`/post/${post.id}`)}
-                className="aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                className="relative aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
               >
-                <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
+                {post.type === 'video' ? (
+                  <div className="relative w-full h-full">
+                    <video 
+                      src={post.image} 
+                      className="w-full h-full object-cover pointer-events-none" 
+                      muted 
+                      playsInline
+                      preload="metadata"
+                    />
+                    <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-[2px] rounded-md p-1 flex items-center justify-center">
+                      <Play className="w-3.5 h-3.5 text-white fill-white" />
+                    </div>
+                  </div>
+                ) : (
+                  <img src={post.image} alt={`Post ${index}`} className="w-full h-full object-cover" />
+                )}
               </div>
             ))}
           </div>
