@@ -110,7 +110,7 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
     }
 
     if (!gameMode) {
-      alert("Click on the purple '+' icon and select any variant for the icons to work.");
+      alert("Click on the mustache icon to pley");
       return;
     }
 
