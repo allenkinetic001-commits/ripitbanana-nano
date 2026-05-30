@@ -5,7 +5,7 @@ import { useSupabasePosts, formatPostForUI } from '../hooks/useSupabase';
 import { supabase } from '../lib/supabase';
 
 interface Survivor {
-  id: number;
+  id: number | string;
   username: string;
   avatar: string;
   image: string;
@@ -73,7 +73,7 @@ interface ChallengeContextType {
   userSelection: string | null;
   isChallengeEnded: boolean;
   enemies: Survivor[];
-  postComments: Record<number, Comment[]>;
+  postComments: Record<string | number, Comment[]>;
   wallPosts: WallPost[];
   followedUsers: string[];
   toggleFollow: (username: string) => void;
@@ -116,8 +116,8 @@ interface ChallengeContextType {
   getVariantDisplayName: (key: string | null) => string;
   addEnemy: (survivor: Survivor) => void;
   addSwornEnemy: (survivor: Survivor) => void;
-  removeEnemy: (enemyId: number) => void;
-  addComment: (postId: number, text: string) => void;
+  removeEnemy: (enemyId: number | string) => void;
+  addComment: (postId: number | string, text: string) => void;
   addWallPost: (text: string, targetUser?: string) => void;
   isAuthenticated: boolean;
   authLoading: boolean;
@@ -5087,7 +5087,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   });
   const [wallPosts, setWallPosts] = useState<WallPost[]>([]);
   const [followedUsers, setFollowedUsers] = useState<string[]>([]);
-  const [postComments, setPostComments] = useState<Record<number, Comment[]>>({});
+  const [postComments, setPostComments] = useState<Record<string | number, Comment[]>>({});
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
@@ -5640,11 +5640,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     });
   };
 
-  const removeEnemy = (enemyId: number) => {
+  const removeEnemy = (enemyId: number | string) => {
     setEnemies(prev => prev.filter(e => e.id !== enemyId));
   };
 
-  const addComment = (postId: number, text: string) => {
+  const addComment = (postId: number | string, text: string) => {
     setPostComments(prev => {
       const existing = prev[postId] || [];
       const newComment: Comment = {

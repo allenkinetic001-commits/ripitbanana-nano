@@ -18,7 +18,7 @@ const PostDetail = () => {
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
-  const localComments = postComments[Number(id)] || [];
+  const localComments = (id ? postComments[id] : []) || postComments[Number(id)] || [];
 
   // Sync post state with context updates (e.g. profile picture edits)
   useEffect(() => {
@@ -59,7 +59,7 @@ const PostDetail = () => {
   const handleSendComment = () => {
     if (!commentText.trim()) return;
     const finalComment = replyingTo ? `@${replyingTo} ${commentText}` : commentText;
-    addComment(Number(id), finalComment);
+    addComment(id!, finalComment);
     setCommentText('');
     setReplyingTo(null);
     inputRef.current?.blur();

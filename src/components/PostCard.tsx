@@ -10,7 +10,7 @@ import { useLongPress } from '../hooks/useLongPress';
 import { decrementUserLives } from '../hooks/useSupabase';
 
 interface PostProps {
-  id: number;
+  id: number | string;
   username: string;
   avatar: string;
   image: string;
