@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, MessageCircle, X } from 'lucide-react';
-import { Trash2 } from 'lucide-react';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { useLongPress } from '../hooks/useLongPress';
 import { supabase } from '../lib/supabase';
-import { deletePost } from '../hooks/useSupabase';
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -67,18 +65,6 @@ const PostDetail = () => {
     inputRef.current?.blur();
   };
 
-  const isOwner = post?.username === userProfile.username;
-
-  const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
-    const { error } = await deletePost(post.id);
-    if (!error) {
-      navigate(-1);
-    } else {
-      alert('Failed to delete post: ' + error.message);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
@@ -108,15 +94,6 @@ const PostDetail = () => {
           <ArrowLeft size={22} />
         </button>
         <img src="/comments-header.png" alt="Comments" className="h-5 w-auto object-contain" />
-        {isOwner && (
-          <button
-            onClick={handleDelete}
-            className="ml-auto text-rose-500 hover:text-rose-600 transition-colors p-1.5 rounded-full hover:bg-rose-50"
-            title="Delete post"
-          >
-            <Trash2 size={18} />
-          </button>
-        )}
       </header>
 
       {/* ── Scrollable area ── */}
