@@ -5,11 +5,12 @@ import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { useLongPress } from '../hooks/useLongPress';
 import { supabase } from '../lib/supabase';
+import { fetchComments, getTimeAgo } from '../hooks/useSupabase';
 
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { postComments, addComment, allPosts, userProfile } = useChallenge();
+  const { postComments, setPostComments, addComment, allPosts, userProfile } = useChallenge();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const contextPost = allPosts.find((p: any) => String(p.id) === String(id));
@@ -26,6 +27,33 @@ const PostDetail = () => {
       setPost(contextPost);
     }
   }, [contextPost]);
+
+  // Fetch comments from Supabase on mount/load
+  useEffect(() => {
+    if (id) {
+      const getComments = async () => {
+        try {
+          const { data, error } = await fetchComments(id);
+          if (data && !error) {
+            const formatted = data.map((c: any) => ({
+              id: c.id,
+              username: c.profiles?.username || 'unknown',
+              avatar: c.profiles?.avatar_url || '/custom-empty-profile.png',
+              text: c.text,
+              time: getTimeAgo(c.created_at)
+            }));
+            setPostComments(prev => ({
+              ...prev,
+              [id]: formatted
+            }));
+          }
+        } catch (e) {
+          console.error("Failed to load comments for post:", e);
+        }
+      };
+      getComments();
+    }
+  }, [id, setPostComments]);
 
   // Fetch from Supabase for freshness (background update if already in context)
   useEffect(() => {

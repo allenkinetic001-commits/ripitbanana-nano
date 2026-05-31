@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { posts } from '../data/posts';
 import { formatDate } from '../lib/utils';
-import { useSupabasePosts, formatPostForUI } from '../hooks/useSupabase';
+import { useSupabasePosts, formatPostForUI, addCommentToPost } from '../hooks/useSupabase';
 import { supabase } from '../lib/supabase';
 
 interface Survivor {
@@ -11,7 +11,7 @@ interface Survivor {
   image: string;
   caption: string;
   time: string;
-  comments: { id: number; username: string; text: string; time: string; }[];
+  comments: { id: number | string; username: string; text: string; time: string; }[];
   survivalDate?: string;
   survivalTime?: string;
   roundDurationLabel?: string;
@@ -36,7 +36,7 @@ interface RoundRecord {
 }
 
 interface Comment {
-  id: number;
+  id: number | string;
   username: string;
   avatar: string;
   text: string;
@@ -74,6 +74,7 @@ interface ChallengeContextType {
   isChallengeEnded: boolean;
   enemies: Survivor[];
   postComments: Record<string | number, Comment[]>;
+  setPostComments: React.Dispatch<React.SetStateAction<Record<string | number, Comment[]>>>;
   wallPosts: WallPost[];
   followedUsers: string[];
   toggleFollow: (username: string) => void;
@@ -5088,6 +5089,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [wallPosts, setWallPosts] = useState<WallPost[]>([]);
   const [followedUsers, setFollowedUsers] = useState<string[]>([]);
   const [postComments, setPostComments] = useState<Record<string | number, Comment[]>>({});
+  const [loadedUsername, setLoadedUsername] = useState<string>('');
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
   const [survivors, setSurvivors] = useState<Survivor[]>([]);
@@ -5172,6 +5174,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setWallPosts([]);
       setPostComments({});
       setUserVotes({});
+      setLoadedUsername('');
       return;
     }
 
@@ -5186,18 +5189,19 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     load('followedUsers', setFollowedUsers, []);
     load('wallPosts', setWallPosts, []);
     load('postComments', setPostComments, {});
+    setLoadedUsername(u);
   }, [userProfile.username]);
 
   // Persist private data to scoped local storage
   useEffect(() => {
-    if (!userProfile.username) return;
+    if (!userProfile.username || loadedUsername !== userProfile.username) return;
     const u = userProfile.username;
     localStorage.setItem(`userVotes_v7_${u}`, JSON.stringify(userVotes));
     localStorage.setItem(`enemies_v7_${u}`, JSON.stringify(enemies));
     localStorage.setItem(`followedUsers_v7_${u}`, JSON.stringify(followedUsers));
     localStorage.setItem(`wallPosts_v7_${u}`, JSON.stringify(wallPosts));
     localStorage.setItem(`postComments_v7_${u}`, JSON.stringify(postComments));
-  }, [userProfile.username, userVotes, enemies, followedUsers, wallPosts, postComments]);
+  }, [loadedUsername, userProfile.username, userVotes, enemies, followedUsers, wallPosts, postComments]);
 
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
@@ -5320,6 +5324,34 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       }
 
       return finalUnique;
+    });
+  }, [formattedPosts, postsLoading]);
+
+  // Load comments from formattedPosts into postComments context state
+  useEffect(() => {
+    if (postsLoading) return;
+    if (formattedPosts.length === 0) return;
+    
+    setPostComments(prev => {
+      const updated = { ...prev };
+      formattedPosts.forEach(post => {
+        const existing = prev[post.id] || [];
+        const dbComments = post.comments || [];
+        
+        // Merge: keep DB comments, and add any local/optimistic comments (like 'Just now') that aren't in DB yet
+        const merged = [...dbComments];
+        existing.forEach((localC: any) => {
+          const alreadyInDb = dbComments.some((dbC: any) => 
+            dbC.text === localC.text && dbC.username === localC.username
+          );
+          if (!alreadyInDb && String(localC.id).startsWith('opt-')) {
+            merged.push(localC);
+          }
+        });
+        
+        updated[post.id] = merged;
+      });
+      return updated;
     });
   }, [formattedPosts, postsLoading]);
 
@@ -5644,13 +5676,19 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     setEnemies(prev => prev.filter(e => e.id !== enemyId));
   };
 
-  const addComment = (postId: number | string, text: string) => {
+  const addComment = async (postId: number | string, text: string) => {
+    const u = userProfile.username;
+    const avatar = userProfile.avatar;
+    const userId = localStorage.getItem('supabaseUserId');
+    const optId = 'opt-' + Date.now();
+
+    // 1. Optimistic local update
     setPostComments(prev => {
       const existing = prev[postId] || [];
       const newComment: Comment = {
-        id: existing.length + 1,
-        username: userProfile.username,
-        avatar: userProfile.avatar,
+        id: optId,
+        username: u,
+        avatar: avatar,
         text,
         time: 'Just now'
       };
@@ -5659,6 +5697,37 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         [postId]: [...existing, newComment]
       };
     });
+
+    // 2. Persist to Supabase database
+    if (userId) {
+      try {
+        const { data, error } = await addCommentToPost(String(postId), userId, text);
+        if (error) {
+          console.error('Error adding comment to Supabase:', error);
+        } else if (data) {
+          // Replace the optimistic comment with the real one returned from Supabase
+          setPostComments(prev => {
+            const existing = prev[postId] || [];
+            return {
+              ...prev,
+              [postId]: existing.map((c: any) => 
+                c.id === optId 
+                  ? {
+                      id: data.id,
+                      username: data.profiles?.username || u,
+                      avatar: data.profiles?.avatar_url || avatar,
+                      text: data.text,
+                      time: 'Just now'
+                    }
+                  : c
+              )
+            };
+          });
+        }
+      } catch (e) {
+        console.error('Failed to add comment to Supabase:', e);
+      }
+    }
   };
 
   const addWallPost = (text: string, targetUser?: string) => {
@@ -5961,7 +6030,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       variantDurations, variantFirstClickTime, userSelection, isChallengeEnded,
       isEliminationRoundActive, setIsEliminationRoundActive,
       showPills, setShowPills, activeTab, setActiveTab,
-      enemies, postComments, wallPosts, followedUsers, toggleFollow, isLegend, isSurvivor, allPosts, setAllPosts,
+      enemies, postComments, setPostComments, wallPosts, followedUsers, toggleFollow, isLegend, isSurvivor, allPosts, setAllPosts,
       visiblePosts, setVisiblePosts,
       majorityVariant, survivors, eliminated, addEliminated, survivorHistory, roundHistory,
       unreadMessageCount, setUnreadMessageCount,

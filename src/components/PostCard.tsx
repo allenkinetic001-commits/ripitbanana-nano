@@ -21,7 +21,7 @@ interface PostProps {
   gameMode?: string | null;
   onDelete?: () => void;
   onPass?: () => void;
-  comments: { id: number; username: string; text: string; time: string; }[];
+  comments: { id: number | string; username: string; text: string; time: string; }[];
   isTraitorGlobal?: boolean;
   globalLives?: number;
 }

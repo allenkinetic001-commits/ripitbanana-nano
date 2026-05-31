@@ -56,6 +56,15 @@ export function useSupabasePosts() {
           avatar_url,
           is_traitor,
           lives
+        ),
+        comments (
+          id,
+          text,
+          created_at,
+          profiles (
+            username,
+            avatar_url
+          )
         )
       `)
       .order('created_at', { ascending: false })
@@ -82,7 +91,19 @@ export function useSupabasePosts() {
         for (let i = 0; i < 3; i++) {
           const { data } = await supabase
             .from('posts')
-            .select('*, profiles(username, full_name, avatar_url, is_traitor, lives)')
+            .select(`
+              *,
+              profiles (username, full_name, avatar_url, is_traitor, lives),
+              comments (
+                id,
+                text,
+                created_at,
+                profiles (
+                  username,
+                  avatar_url
+                )
+              )
+            `)
             .eq('id', payload.new.id)
             .single();
             
@@ -305,6 +326,16 @@ export function formatPostForUI(post: any) {
     url.startsWith('data:video/') ||
     /\.(mp4|mov|webm|ogg)(\?|$)/i.test(url);
   
+  // Format comments from database
+  const formattedComments = (post.comments || []).map((c: any) => ({
+    id: c.id,
+    username: c.profiles?.username || 'unknown',
+    avatar: c.profiles?.avatar_url || '/custom-empty-profile.png',
+    text: c.text,
+    time: getTimeAgo(c.created_at),
+    createdAt: c.created_at
+  })).sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
   return {
     id: post.id,
     username: post.profiles?.username || 'unknown',
@@ -316,11 +347,11 @@ export function formatPostForUI(post: any) {
     globalLives: post.profiles?.lives ?? 3,
     time: timeAgo,
     createdAt: post.created_at,
-    comments: [],
+    comments: formattedComments,
   };
 }
 
-function getTimeAgo(dateStr: string): string {
+export function getTimeAgo(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
