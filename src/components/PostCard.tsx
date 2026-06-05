@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowBigUp, ArrowBigDown, Bookmark, MessageCircle } from 'lucide-react';
+import { ArrowBigUp, ArrowBigDown, Bookmark } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
@@ -326,7 +326,7 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
               onClick={() => navigate(`/post/${id}`)}
               className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-8 w-8 rounded-full transition-colors group"
             >
-              <MessageCircle size={20} stroke="black" />
+              <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" />
             </button>
             {!hasActed && (
               <div 

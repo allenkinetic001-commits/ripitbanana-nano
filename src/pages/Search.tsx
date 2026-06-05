@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Skull, Trophy, Sparkles, MessageCircle, Bookmark, MoreHorizontal, ArrowBigUp, ArrowBigDown, Zap, Filter, Clock, History, ChevronLeft, ChevronRight, Trash2, Send, Search as SearchIcon, X } from 'lucide-react';
+import { Skull, Trophy, Sparkles, Bookmark, MoreHorizontal, ArrowBigUp, ArrowBigDown, Zap, Filter, Clock, History, ChevronLeft, ChevronRight, Trash2, Send, Search as SearchIcon, X } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn, formatDate } from '../lib/utils';
@@ -134,7 +134,7 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
               onClick={() => navigate(`/post/${survivor.id}`)}
               className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-10 w-10 rounded-full transition-all active:scale-90"
             >
-              <MessageCircle size={18} className="text-zinc-600" />
+              <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" />
             </button>
             
             <button 
