@@ -326,7 +326,7 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
               onClick={() => navigate(`/post/${id}`)}
               className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-8 w-8 rounded-full transition-colors group"
             >
-              <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" />
+              <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             {!hasActed && (
               <div 

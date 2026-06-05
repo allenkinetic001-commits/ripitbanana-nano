@@ -134,7 +134,7 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
               onClick={() => navigate(`/post/${survivor.id}`)}
               className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-10 w-10 rounded-full transition-all active:scale-90"
             >
-              <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" />
+              <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             
             <button 

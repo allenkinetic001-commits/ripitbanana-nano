@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
-import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, MessageCircle, Calendar, ChevronRight, Trophy } from 'lucide-react';
+import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, Calendar, ChevronRight, Trophy } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { useSupabasePosts, createPost, uploadPostMedia, formatPostForUI } from '../hooks/useSupabase';
 import { supabase } from '../lib/supabase';
