@@ -26,6 +26,10 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
   const [showHearts, setShowHearts] = useState(false);
   const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
 
+  const isVideo = survivor.type === 'video' || 
+    survivor.image?.startsWith('data:video/') || 
+    /\.(mp4|mov|webm|ogg)(\?|$)/i.test(survivor.image || '');
+
   return (
     <div className="mx-4 mb-4 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-2xl transition-all">
       {/* Header Info */}
@@ -83,7 +87,19 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
 
       {/* Main Visual */}
       <div className="aspect-[4/5] bg-zinc-50 overflow-hidden relative group mx-2 rounded-[1.8rem]">
-        <img src={survivor.image} alt="Survival Proof" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        {isVideo ? (
+          <video 
+            src={survivor.image} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 bg-zinc-50" 
+            controls 
+            loop 
+            muted 
+            playsInline
+            autoPlay
+          />
+        ) : (
+          <img src={survivor.image} alt="Survival Proof" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        )}
         
         {/* Status Badge Overlays */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">

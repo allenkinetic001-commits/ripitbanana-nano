@@ -4995,7 +4995,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const [timeLeft, setTimeLeft] = useState(calculateUniversalTimeLeft());
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState<boolean>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return false;
+    return localStorage.getItem(`isActive_${userId}`) === 'true';
+  });
   const [currentDate, setCurrentDate] = useState(new Date().toDateString());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('userProfile');
@@ -5119,6 +5123,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (!userId) return;
     localStorage.setItem(`isChallengeEnded_${userId}`, String(isChallengeEnded));
   }, [isChallengeEnded]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`isActive_${userId}`, String(isActive));
+  }, [isActive]);
 
   // Hall of Fame is now derived from universal round history
   const survivorHistory = useMemo(() => {
@@ -5881,6 +5891,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           username: p.username, 
           avatar: p.avatar,
           image: p.image,
+          type: p.type,
           caption: p.caption,
           time: p.time,
           comments: p.comments,
@@ -5952,6 +5963,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (isChallengeEnded) {
       const timeout = setTimeout(() => {
         setIsChallengeEnded(false);
+        setIsActive(false);
         setSurvivors([]);
         setEliminated([]);
         setClickCounts({ pley: 0 });
