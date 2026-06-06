@@ -5809,7 +5809,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         timestamp: r.round_timestamp
       }));
       console.log('📥 Fetched', formatted.length, 'rounds from Supabase');
-      setRoundHistory(formatted);
+      setRoundHistory(prev => {
+        const dbTimestamps = new Set(formatted.map(r => r.timestamp).filter(Boolean));
+        const localOnly = prev.filter(r => String(r.id).startsWith('temp-') && !dbTimestamps.has(r.timestamp));
+        return [...localOnly, ...formatted];
+      });
     }
     setHistoryLoading(false);
   };

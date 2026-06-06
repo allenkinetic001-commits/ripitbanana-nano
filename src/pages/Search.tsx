@@ -299,7 +299,16 @@ const SearchPage = () => {
 
   // Find selected round data
   const selectedRound = useMemo(() => {
-    return mergedRounds.find((r: any) => r.id === selectedRoundId);
+    const found = mergedRounds.find((r: any) => r.id === selectedRoundId);
+    if (found) return found;
+    // Fallback: If selectedRoundId was a temp ID (e.g. temp-1780741861), try to match by timestamp
+    if (selectedRoundId && String(selectedRoundId).startsWith('temp-')) {
+      const ts = parseInt(String(selectedRoundId).replace('temp-', ''), 10);
+      if (!isNaN(ts)) {
+        return mergedRounds.find((r: any) => r.timestamp === ts);
+      }
+    }
+    return undefined;
   }, [mergedRounds, selectedRoundId]);
 
   const handleVote = (survivorId: number, roundId: string | null, vote: 'up' | 'down') => {
