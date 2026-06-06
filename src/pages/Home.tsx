@@ -740,11 +740,11 @@ const Home = () => {
           <div 
             className="absolute inset-0 pointer-events-none z-0"
             style={{
-              backgroundImage: "url('/doodle-pattern-processed.png')",
+              backgroundImage: "url('/doodle-pattern-colored.png')",
               backgroundSize: 'auto 100%',
               backgroundRepeat: 'repeat-x',
               backgroundPosition: 'center',
-              opacity: 0.09, // 8-10% opacity
+              opacity: 0.1, // 8-10% opacity
             }}
           />
           
