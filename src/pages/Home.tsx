@@ -735,8 +735,20 @@ const Home = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
-        <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between">
-          <div className="flex items-center gap-0">
+        <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between relative overflow-hidden bg-[#F9F9FB]">
+          {/* Decorative background pattern */}
+          <div 
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              backgroundImage: "url('/doodle-pattern-processed.png')",
+              backgroundSize: 'auto 100%',
+              backgroundRepeat: 'repeat-x',
+              backgroundPosition: 'center',
+              opacity: 0.09, // 8-10% opacity
+            }}
+          />
+          
+          <div className="flex items-center gap-0 relative z-10">
             <button 
               onClick={() => setShowMustache(!showMustache)}
               className="transition-all active:scale-95 flex items-center gap-0"
@@ -760,7 +772,7 @@ const Home = () => {
               />
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative z-10">
             <button 
               onClick={() => {
                 setActiveTab('pley');
