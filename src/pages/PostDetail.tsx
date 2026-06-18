@@ -19,6 +19,25 @@ const PostDetail = () => {
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
+  const [likedComments, setLikedComments] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('liked_comments_v1');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('liked_comments_v1', JSON.stringify(likedComments));
+  }, [likedComments]);
+
+  const toggleLikeComment = (commentId: string | number) => {
+    setLikedComments(prev => ({
+      ...prev,
+      [commentId]: !prev[commentId]
+    }));
+  };
   const localComments = (id ? postComments[id] : []) || postComments[Number(id)] || [];
 
   // Sync post state with context updates (e.g. profile picture edits)
@@ -205,8 +224,17 @@ const PostDetail = () => {
                   </div>
                 </div>
                 {/* Like */}
-                <button className="shrink-0 self-start mt-2 text-zinc-300 hover:text-rose-400 transition-colors">
-                  <Heart size={14} />
+                <button
+                  onClick={() => toggleLikeComment(comment.id)}
+                  className={cn(
+                    "shrink-0 self-start mt-2 transition-all active:scale-90",
+                    likedComments[comment.id] ? "text-rose-500 hover:text-rose-600" : "text-zinc-300 hover:text-rose-400"
+                  )}
+                >
+                  <Heart
+                    size={14}
+                    className={cn(likedComments[comment.id] && "fill-rose-500 text-rose-500")}
+                  />
                 </button>
               </div>
             ))
