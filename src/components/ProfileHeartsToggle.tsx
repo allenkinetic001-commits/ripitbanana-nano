@@ -12,7 +12,7 @@ interface ProfileHeartsToggleProps {
 export const ProfileHeartsToggle = ({ 
   isVisible, 
   lives = 3, 
-  heartClassName = "w-7 h-7", 
+  heartClassName = "w-9 h-9", 
   className 
 }: ProfileHeartsToggleProps) => {
   return (

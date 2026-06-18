@@ -233,7 +233,7 @@ const Home = () => {
     setTimeLeft, setIsActive, setClickCounts, setEliminationCounts,
     setMadeItCounts, setVariantDurations, setVariantFirstClickTime,
     setUserSelection, setIsChallengeEnded,
-    setSurvivors, addEliminated, startNewChallenge, getVariantDisplayName, userProfile,
+    setSurvivors, addEliminated, startNewChallenge, getVariantDisplayName, userProfile, eliminateSelf,
     allPosts, setAllPosts, wallPosts, addWallPost,
     visiblePosts, setVisiblePosts,
     language,
@@ -334,6 +334,9 @@ const Home = () => {
 
         if (!session?.user) {
           alert('You must be logged in to upload content.');
+          // Remove the optimistic post since we are not logged in
+          setAllPosts(prev => prev.filter(p => p.id !== optimisticId));
+          setVisiblePosts(prev => prev.filter(p => p.id !== optimisticId));
           return;
         }
 
@@ -343,6 +346,9 @@ const Home = () => {
         if (uploadError || !storageUrl) {
           console.error('Storage upload failed:', uploadError);
           alert('Upload failed: ' + (uploadError?.message || 'Could not upload file'));
+          // Remove the optimistic post since upload failed
+          setAllPosts(prev => prev.filter(p => p.id !== optimisticId));
+          setVisiblePosts(prev => prev.filter(p => p.id !== optimisticId));
           return;
         }
 
@@ -378,6 +384,12 @@ const Home = () => {
             return prev.map(p => String(p.id) === String(optimisticId) ? formattedReal : p);
           });
         }
+      } catch (err: any) {
+        console.error('Error during post creation background task:', err);
+        alert('An unexpected error occurred during upload: ' + (err?.message || err));
+        // Remove the optimistic post since it failed
+        setAllPosts(prev => prev.filter(p => p.id !== optimisticId));
+        setVisiblePosts(prev => prev.filter(p => p.id !== optimisticId));
       } finally {
         setIsUploading(false); // Only set false when completely finished
       }
@@ -419,9 +431,13 @@ const Home = () => {
     ...eliminated.map((e: any) => e.id)
   ]), [survivors, eliminated]);
 
+  const eliminatedUsernames = useMemo(() => new Set(
+    eliminated.map((e: any) => e.username)
+  ), [eliminated]);
+
   const unswipedPosts = useMemo(() => 
-    allPosts.filter(p => !swipedIds.has(p.id)),
-  [allPosts, swipedIds]);
+    allPosts.filter(p => !swipedIds.has(p.id) && !eliminatedUsernames.has(p.username)),
+  [allPosts, swipedIds, eliminatedUsernames]);
 
   // Deterministic feed synchronization: Ensures the feed always matches new posts minus swiped ones
   useEffect(() => {
@@ -527,6 +543,11 @@ const Home = () => {
     
     const eliminatedPost = visiblePosts.find(post => post.id === postId);
     if (eliminatedPost) {
+      if (eliminatedPost.username === userProfile?.username) {
+        eliminateSelf();
+        return;
+      }
+
       addEliminated({
         id: eliminatedPost.id,
         username: eliminatedPost.username,
@@ -537,9 +558,12 @@ const Home = () => {
         comments: eliminatedPost.comments,
         madeIt: false
       });
+      
+      // Wipe out all posts from this user immediately
+      setVisiblePosts(prev => prev.filter(post => post.username !== eliminatedPost.username));
+    } else {
+      setVisiblePosts(prev => prev.filter(post => post.id !== postId));
     }
-
-    setVisiblePosts(prev => prev.filter(post => post.id !== postId));
     
     // Track eliminations for the current active mode
     if (activeMode && Object.prototype.hasOwnProperty.call(eliminationCounts, activeMode)) {
@@ -694,7 +718,21 @@ const Home = () => {
             onClick={() => setShowPillsInfo(false)}
           />
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+            {/* Decorative doodle background pattern — ultra-faint, WhatsApp-style */}
+            <div 
+              className="absolute inset-0 pointer-events-none z-0"
+              style={{
+                backgroundImage: "url('/solo.png')",
+                backgroundSize: '340px auto',
+                backgroundRepeat: 'repeat',
+                backgroundPosition: '10px 8px',
+                mixBlendMode: 'multiply',
+                opacity: 0.10,
+                transform: 'rotate(-2deg) scale(1.2)',
+                transformOrigin: 'center center',
+              }}
+            />
+            <div className="p-6 border-b border-zinc-100/50 flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 flex items-center justify-center">
                   <img 
@@ -713,7 +751,7 @@ const Home = () => {
                 ✕
               </button>
             </div>
-            <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto">
+            <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto relative z-10">
               <div className="flex flex-col gap-4">
                 <p className="text-base text-zinc-800 leading-relaxed font-bold italic border-l-4 border-red-600 pl-4 py-4 bg-zinc-50 rounded-r-2xl">
                   RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.
@@ -721,7 +759,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-zinc-50 border-t border-zinc-100 flex justify-center">
+            <div className="p-4 bg-zinc-50/80 border-t border-zinc-100 flex justify-center relative z-10">
               <button 
                 onClick={() => setShowPillsInfo(false)}
                 className="transition-all hover:scale-105 active:scale-95"
@@ -928,8 +966,8 @@ const Home = () => {
                   )}
                 >
                   <img 
-                    src="/btn-start-elimination.png"
-                    alt="Start Elimination"
+                    src={isEliminationRoundActive ? "/btn-submitted.png" : "/btn-start-elimination.png"}
+                    alt={isEliminationRoundActive ? "Submitted" : "Start Elimination"}
                     className="h-10 w-auto object-contain drop-shadow-md" 
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />

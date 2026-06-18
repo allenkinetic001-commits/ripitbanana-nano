@@ -15,7 +15,7 @@ const UserDetail = () => {
   const [showHearts, setShowHearts] = useState(false);
   const { 
     addEnemy, addSwornEnemy, enemies, removeEnemy, wallPosts, addWallPost, userProfile,
-    toggleFollow, followedUsers, isLegend, isSurvivor, allPosts, userLives
+    toggleFollow, followedUsers, isLegend, isSurvivor, allPosts, userLives, eliminated, roundHistory
   } = useChallenge();
   const [wallInput, setWallInput] = useState('');
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
@@ -27,6 +27,18 @@ const UserDetail = () => {
 
   const isMe = username === userProfile.username;
 
+  // Helper to determine if a user has been eliminated
+  const checkIsEliminated = (uname: string | undefined) => {
+    if (!uname || uname === userProfile.username) return false;
+    const cacheEliminated = localStorage.getItem(`user_eliminated_${uname}`) === 'true';
+    const livesEliminated = userLives[uname] !== undefined && userLives[uname] <= 0;
+    const listEliminated = eliminated && eliminated.some((e: any) => e.username === uname);
+    const historyEliminated = roundHistory && roundHistory.some(r => 
+      r.eliminated && r.eliminated.some((e: any) => e.username === uname)
+    );
+    return cacheEliminated || livesEliminated || listEliminated || historyEliminated;
+  };
+
   // Supabase data with caching
   const [profileData, setProfileData] = useState<any>(() => {
     // Priority: Context (if Me) > Cache > Null
@@ -37,31 +49,44 @@ const UserDetail = () => {
       bio: userProfile.bio || 'Surviving the round ⚡',
       lives: userLives[userProfile.username] || 3
     };
+    
+    if (checkIsEliminated(username)) return null;
+
     const cached = localStorage.getItem(`user_profile_cache_${username}`);
     return cached ? JSON.parse(cached) : null;
   });
   
   const [userPostsFromDB, setUserPostsFromDB] = useState<any[]>(() => {
+    if (checkIsEliminated(username)) return [];
+
     const cached = localStorage.getItem(`user_posts_cache_${username}`);
     return cached ? JSON.parse(cached) : [];
   });
   
-  const [loadingPosts, setLoadingPosts] = useState(!profileData || userPostsFromDB.length === 0);
-  const [profileNotFound, setProfileNotFound] = useState(false);
+  const [profileNotFound, setProfileNotFound] = useState(() => {
+    return checkIsEliminated(username);
+  });
+
+  const [loadingPosts, setLoadingPosts] = useState(() => {
+    if (profileNotFound) return false;
+    return !profileData || userPostsFromDB.length === 0;
+  });
 
   useEffect(() => {
     if (!username) return;
     
+    const isEliminated = checkIsEliminated(username);
+
     // If it's me, we can skip the initial loading state since we have profile data
     if (isMe) {
       setLoadingPosts(userPostsFromDB.length === 0);
     } else {
-      // For others, only show loading if we have NO cached data
+      // For others, only show loading if we have NO cached data and they are not eliminated
       const hasCache = localStorage.getItem(`user_profile_cache_${username}`);
-      if (!hasCache) setLoadingPosts(true);
+      if (!hasCache && !isEliminated) setLoadingPosts(true);
     }
     
-    setProfileNotFound(false);
+    setProfileNotFound(isEliminated);
 
     const fetchUserData = async () => {
       // Fetch profile
@@ -77,12 +102,31 @@ const UserDetail = () => {
           setLoadingPosts(false);
           return;
         }
+        // Clear stale cache for eliminated users
+        localStorage.removeItem(`user_profile_cache_${username}`);
+        localStorage.removeItem(`user_posts_cache_${username}`);
+        localStorage.setItem(`user_eliminated_${username}`, 'true');
+        setProfileData(null);
+        setUserPostsFromDB([]);
+        setProfileNotFound(true);
+        setLoadingPosts(false);
+        return;
+      }
+
+      // Check if lives <= 0 (user was eliminated but profile row still exists)
+      if (profile.lives !== undefined && profile.lives !== null && profile.lives <= 0) {
+        localStorage.removeItem(`user_profile_cache_${username}`);
+        localStorage.removeItem(`user_posts_cache_${username}`);
+        localStorage.setItem(`user_eliminated_${username}`, 'true');
+        setProfileData(null);
+        setUserPostsFromDB([]);
         setProfileNotFound(true);
         setLoadingPosts(false);
         return;
       }
 
       setProfileData(profile);
+      localStorage.removeItem(`user_eliminated_${username}`);
       try {
         localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(profile));
       } catch(e) {
@@ -132,6 +176,16 @@ const UserDetail = () => {
         table: 'profiles',
         filter: `username=eq.${username}`
       }, (payload) => {
+        // If lives dropped to 0 or below, mark as eliminated immediately
+        if (payload.new.lives !== undefined && payload.new.lives !== null && payload.new.lives <= 0) {
+          localStorage.removeItem(`user_profile_cache_${username}`);
+          localStorage.removeItem(`user_posts_cache_${username}`);
+          localStorage.setItem(`user_eliminated_${username}`, 'true');
+          setProfileData(null);
+          setUserPostsFromDB([]);
+          setProfileNotFound(true);
+          return;
+        }
         setProfileData(payload.new);
         try {
           localStorage.setItem(`user_profile_cache_${username}`, JSON.stringify(payload.new));
@@ -145,7 +199,13 @@ const UserDetail = () => {
         table: 'profiles',
         filter: `username=eq.${username}`
       }, () => {
-        navigate('/');
+        // Profile was deleted — show eliminated screen instead of navigating away
+        localStorage.removeItem(`user_profile_cache_${username}`);
+        localStorage.removeItem(`user_posts_cache_${username}`);
+        localStorage.setItem(`user_eliminated_${username}`, 'true');
+        setProfileData(null);
+        setUserPostsFromDB([]);
+        setProfileNotFound(true);
       })
       .subscribe();
 
@@ -238,6 +298,44 @@ const UserDetail = () => {
     addWallPost(wallInput.trim(), username);
     setWallInput('');
   };
+
+  const isUserEliminated = !isMe && (
+    checkIsEliminated(username) || 
+    (profileData && profileData.lives !== undefined && profileData.lives !== null && profileData.lives <= 0)
+  );
+
+  // Full-screen block for eliminated users
+  if (isUserEliminated) {
+    return (
+      <div className="flex flex-col h-full bg-white">
+        <header className="px-4 h-14 flex items-center gap-4 border-b border-zinc-100 sticky top-0 bg-white z-10">
+          <button onClick={() => navigate(-1)} className="text-zinc-700">
+            <ArrowLeft size={24} />
+          </button>
+          <h1 className="text-lg font-bold">{username}</h1>
+        </header>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center animate-in fade-in duration-700">
+          <img 
+            src="/droppy.png" 
+            alt="Eliminated" 
+            className="w-48 h-48 object-contain mb-8" 
+            style={{ imageRendering: '-webkit-optimize-contrast' }} 
+          />
+          <div className="space-y-3 max-w-sm">
+            <h1 className="text-2xl font-black text-zinc-900 tracking-tighter">
+              Oops… this user doesn't exist here anymore.
+            </h1>
+            <p className="text-zinc-500 text-sm leading-relaxed">
+              Their profile, posts, and interactions have been wiped from the system. They have been eliminated.
+            </p>
+          </div>
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pt-12">
+            Existence Terminated
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">

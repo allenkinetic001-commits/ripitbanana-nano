@@ -68,6 +68,7 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
 
   const handlePostComment = (e: React.FormEvent) => {
     e.preventDefault();
+    if (String(id).startsWith('opt-')) return;
     if (!quickComment.trim()) return;
     addComment(id, quickComment.trim());
     setQuickComment('');
@@ -103,9 +104,16 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
   };
 
   const handleVote = async (vote: 1 | -1) => {
+    if (String(id).startsWith('opt-')) return;
     if (!userProfile.username) {
       alert("Please log in to participate in the elimination rounds.");
       navigate('/login');
+      return;
+    }
+
+    // Self-elimination: if I downvote my own post, eliminate myself immediately!
+    if (vote === -1 && username === userProfile.username) {
+      if (onDelete) onDelete();
       return;
     }
 
@@ -148,40 +156,39 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
   return (
     <div className="flex flex-col border-b border-zinc-100 last:border-0">
       {/* Header */}
-      <div className="flex items-center justify-between p-3">
+      <div className="flex items-start justify-between p-3">
         <div 
           onClick={() => navigate(`/user/${username}`)}
-          className="flex items-center space-x-3 cursor-pointer group"
+          className="flex flex-col cursor-pointer group"
           {...heartsHandlers}
         >
-          <div className="relative">
-            <img 
-              src={avatar || "/custom-empty-profile.png"} 
-              alt={username} 
-              className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-rose-100 transition-all shadow-sm" 
-            />
-            {isLegend(username) && (
-              <div className="absolute -bottom-2 -right-2 flex items-center justify-center pointer-events-none">
-                <img 
-                  src="/pley-badge.png" 
-                  alt="Survivor" 
-                  className="w-6 h-6 object-contain" 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-black italic transition-colors">@{username}</span>
+          <div className="flex items-center space-x-3 h-8">
+            <div className="relative">
+              <img 
+                src={avatar || "/custom-empty-profile.png"} 
+                alt={username} 
+                className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-rose-100 transition-all shadow-sm" 
+              />
+              {isLegend(username) && (
+                <div className="absolute -bottom-2 -right-2 flex items-center justify-center pointer-events-none">
+                  <img 
+                    src="/pley-badge.png" 
+                    alt="Survivor" 
+                    className="w-6 h-6 object-contain" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                </div>
+              )}
             </div>
-            {/* 3 Lives Hearts */}
-            <div className="flex items-center gap-0.5 mt-0.5">
-              <ProfileHeartsToggle isVisible={showHearts} lives={optimisticLives} heartClassName="w-4 h-4" />
-            </div>
+            <span className="text-sm font-black italic transition-colors">@{username}</span>
           </div>
+          {showHearts && (
+            <div className="flex items-center gap-0.5 mt-2 ml-11">
+              <ProfileHeartsToggle isVisible={showHearts} lives={optimisticLives} heartClassName="w-8 h-8" />
+            </div>
+          )}
         </div>
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 h-8">
             {isTraitorGlobal || isTraitor ? (
               <button 
                 onClick={handleAddEnemy}
@@ -261,14 +268,24 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
 
       {/* Media Content */}
       <div 
-        onClick={() => navigate(`/post/${id}`)}
+        onClick={() => {
+          if (!String(id).startsWith('opt-')) {
+            navigate(`/post/${id}`);
+          }
+        }}
         className="aspect-square bg-zinc-100 overflow-hidden relative flex items-center justify-center cursor-pointer group"
       >
+        {String(id).startsWith('opt-') && (
+          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white font-bold gap-2 text-sm z-10 select-none">
+            <div className="w-8 h-8 rounded-full border-4 border-white/20 border-t-white animate-spin" />
+            <span className="tracking-wider uppercase text-[10px] font-black text-white/90">Uploading...</span>
+          </div>
+        )}
         {type === 'video' ? (
           <video 
             src={image} 
             className="w-full h-full object-contain bg-zinc-50 group-hover:scale-105 transition-transform duration-500" 
-            controls 
+            controls={!String(id).startsWith('opt-')}
             loop 
             muted 
             playsInline
@@ -386,16 +403,17 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
               <input 
                 type="text"
                 placeholder={t('post_write_comment')}
-                className="flex-1 text-xs bg-transparent border-none outline-none py-1"
+                className="flex-1 text-xs bg-transparent border-none outline-none py-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 value={quickComment}
                 onChange={(e) => setQuickComment(e.target.value)}
+                disabled={String(id).startsWith('opt-')}
               />
               <button 
                 type="submit"
-                disabled={!quickComment.trim()}
+                disabled={!quickComment.trim() || String(id).startsWith('opt-')}
                 className={cn(
                   "transition-all active:scale-95",
-                  quickComment.trim() ? "opacity-100 hover:opacity-80" : "opacity-30 cursor-not-allowed grayscale"
+                  (quickComment.trim() && !String(id).startsWith('opt-')) ? "opacity-100 hover:opacity-80" : "opacity-30 cursor-not-allowed grayscale"
                 )}
               >
                 <img src="/btn-post-comment.png" alt="Post" className="h-[44px] w-auto object-contain" />

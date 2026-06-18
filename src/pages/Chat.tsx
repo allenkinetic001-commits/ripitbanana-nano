@@ -33,15 +33,6 @@ const Chat = () => {
   const { username: routeUsername } = useParams();
   const { userProfile, t } = useChallenge();
   const { setShowBottomNav } = useOutletContext<{ setShowBottomNav: (show: boolean) => void }>();
-  const [selectedChat, setSelectedChat] = useState<ChatSession | null>(null);
-  const [messageInput, setMessageInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
   // State for active chat sessions (conversations list)
   const [sessions, setSessions] = useState<ChatSession[]>(() => {
     const userId = localStorage.getItem('supabaseUserId');
@@ -49,6 +40,62 @@ const Chat = () => {
     const saved = localStorage.getItem(`chat_sessions_${userId}`);
     return saved ? JSON.parse(saved) : [];
   });
+
+  // State for selected active chat session, initialized synchronously if routeUsername is present
+  const [selectedChat, setSelectedChat] = useState<ChatSession | null>(() => {
+    if (!routeUsername) return null;
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return null;
+    const saved = localStorage.getItem(`chat_sessions_${userId}`);
+    const localSessions: ChatSession[] = saved ? JSON.parse(saved) : [];
+    const normalizedUsername = routeUsername.replace('😉', '').toLowerCase();
+    const found = localSessions.find(s => s.username.toLowerCase() === normalizedUsername);
+    if (found) return found;
+    // Fallback placeholder so the Detail View renders immediately without flashing the List View
+    return {
+      id: 'temp-' + Date.now(),
+      username: routeUsername.replace('😉', ''),
+      fullName: `@${routeUsername.replace('😉', '')}`,
+      avatar: '/custom-empty-profile.png',
+      lastMessage: 'Loading...',
+      time: '',
+      unreadCount: 0,
+      isOnline: true,
+      partnerId: undefined
+    };
+  });
+
+  const [prevRouteUsername, setPrevRouteUsername] = useState<string | undefined>(routeUsername);
+
+  // Render-phase update to handle direct route transitions instantly
+  if (routeUsername !== prevRouteUsername) {
+    setPrevRouteUsername(routeUsername);
+    if (routeUsername) {
+      const normalizedUsername = routeUsername.replace('😉', '').toLowerCase();
+      const found = sessions.find(s => s.username.toLowerCase() === normalizedUsername);
+      setSelectedChat(found || {
+        id: 'temp-' + Date.now(),
+        username: routeUsername.replace('😉', ''),
+        fullName: `@${routeUsername.replace('😉', '')}`,
+        avatar: '/custom-empty-profile.png',
+        lastMessage: 'Loading...',
+        time: '',
+        unreadCount: 0,
+        isOnline: true,
+        partnerId: undefined
+      });
+    } else {
+      setSelectedChat(null);
+    }
+  }
+
+  const [messageInput, setMessageInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Persist sessions whenever they change
   useEffect(() => {

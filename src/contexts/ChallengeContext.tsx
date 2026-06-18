@@ -136,6 +136,8 @@ interface ChallengeContextType {
   userLives: Record<string, number>;
   setUserLivesForUser: (username: string, lives: number) => void;
   isEliminated: boolean;
+  setIsEliminated: (val: boolean) => void;
+  eliminateSelf: () => Promise<void>;
 }
 
 const translations: Record<string, Record<string, string>> = {
@@ -4994,6 +4996,10 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     return Math.floor((midnight.getTime() - now.getTime()) / 1000);
   };
 
+  const getCycleStartTimestamp = () => {
+    return Math.floor(Date.now() / 1000 / 120) * 120;
+  };
+
   const [timeLeft, setTimeLeft] = useState(calculateUniversalTimeLeft());
   const [isActive, setIsActive] = useState<boolean>(() => {
     const userId = localStorage.getItem('supabaseUserId');
@@ -5018,11 +5024,29 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       website: ''
     };
   });
-  const [clickCounts, setClickCounts] = useState<Record<string, number>>({
-    pley: 0
+  const [clickCounts, setClickCounts] = useState<Record<string, number>>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return { pley: 0 };
+    const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
+    const currentCycleStart = String(getCycleStartTimestamp());
+    if (storedCycleStart !== currentCycleStart) {
+      localStorage.removeItem(`clickCounts_${userId}`);
+      return { pley: 0 };
+    }
+    const saved = localStorage.getItem(`clickCounts_${userId}`);
+    return saved ? JSON.parse(saved) : { pley: 0 };
   });
-  const [eliminationCounts, setEliminationCounts] = useState<Record<string, number>>({
-    pley: 0
+  const [eliminationCounts, setEliminationCounts] = useState<Record<string, number>>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return { pley: 0 };
+    const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
+    const currentCycleStart = String(getCycleStartTimestamp());
+    if (storedCycleStart !== currentCycleStart) {
+      localStorage.removeItem(`eliminationCounts_${userId}`);
+      return { pley: 0 };
+    }
+    const saved = localStorage.getItem(`eliminationCounts_${userId}`);
+    return saved ? JSON.parse(saved) : { pley: 0 };
   });
   const [madeItCounts, setMadeItCounts] = useState<Record<string, number>>(() => {
     const saved = localStorage.getItem('madeItCounts');
@@ -5034,7 +5058,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [variantFirstClickTime, setVariantFirstClickTime] = useState<Record<string, number>>({
     pley: 0
   });
-  const [isEliminated, setIsEliminated] = useState(false);
+  const [isEliminated, setIsEliminated] = useState<boolean>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return false;
+    return localStorage.getItem(`isEliminated_${userId}`) === 'true';
+  });
   const [userSelection, setUserSelection] = useState<string | null>(() => {
     const userId = localStorage.getItem('supabaseUserId');
     if (!userId) return null;
@@ -5043,32 +5071,26 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isChallengeEnded, setIsChallengeEnded] = useState<boolean>(() => {
     const userId = localStorage.getItem('supabaseUserId');
     if (!userId) return false;
-    const stored = localStorage.getItem(`isChallengeEnded_${userId}`) === 'true';
-    if (!stored) return false;
-    // Clear stale state — only valid if timer is currently at 0
-    const now = Math.floor(Date.now() / 1000);
-    const isAtZero = (now % 120) === 0;
-    if (!isAtZero) {
+    const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
+    const currentCycleStart = String(getCycleStartTimestamp());
+    if (storedCycleStart !== currentCycleStart) {
       localStorage.setItem(`isChallengeEnded_${userId}`, 'false');
       return false;
     }
-    return true;
+    const stored = localStorage.getItem(`isChallengeEnded_${userId}`) === 'true';
+    return stored;
   });
   const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(() => {
     const userId = localStorage.getItem('supabaseUserId');
     if (!userId) return false;
-    const stored = localStorage.getItem(`isEliminationRoundActive_${userId}`) === 'true';
-    if (!stored) return false;
-    // Clear stale submitted state if timer has already cycled (not at 0)
-    const now = Math.floor(Date.now() / 1000);
-    const isAtZero = (now % 120) === 0;
-    if (!isAtZero) {
-      // Only keep if there are still seconds remaining in the SAME cycle they submitted
-      // We can't know exactly, so keep it — it will be cleared when timer hits 0
-      return true;
+    const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
+    const currentCycleStart = String(getCycleStartTimestamp());
+    if (storedCycleStart !== currentCycleStart) {
+      localStorage.setItem(`isEliminationRoundActive_${userId}`, 'false');
+      return false;
     }
-    localStorage.setItem(`isEliminationRoundActive_${userId}`, 'false');
-    return false;
+    const stored = localStorage.getItem(`isEliminationRoundActive_${userId}`) === 'true';
+    return stored;
   });
   const [enemies, setEnemies] = useState<Survivor[]>([]);
   const [allPosts, setAllPosts] = useState<any[]>(() => {
@@ -5095,7 +5117,18 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [loadedUsername, setLoadedUsername] = useState<string>('');
   const [showPills, setShowPills] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('pley');
-  const [survivors, setSurvivors] = useState<Survivor[]>([]);
+  const [survivors, setSurvivors] = useState<Survivor[]>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return [];
+    const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
+    const currentCycleStart = String(getCycleStartTimestamp());
+    if (storedCycleStart !== currentCycleStart) {
+      localStorage.removeItem(`survivors_${userId}`);
+      return [];
+    }
+    const saved = localStorage.getItem(`survivors_${userId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [roundHistory, setRoundHistory] = useState<RoundRecord[]>(() => {
     const saved = localStorage.getItem('roundHistory');
     return saved ? JSON.parse(saved) : [];
@@ -5104,6 +5137,57 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [historyLoading, setHistoryLoading] = useState(() => {
     return !localStorage.getItem('roundHistory');
   });
+
+  const loadUserStates = (userId: string) => {
+    const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
+    const currentCycleStart = String(getCycleStartTimestamp());
+    const isCycleValid = storedCycleStart === currentCycleStart;
+
+    if (!isCycleValid) {
+      localStorage.setItem(`isEliminationRoundActive_${userId}`, 'false');
+      localStorage.setItem(`isChallengeEnded_${userId}`, 'false');
+      localStorage.setItem(`isActive_${userId}`, 'false');
+      localStorage.removeItem(`userSelection_${userId}`);
+      localStorage.removeItem(`survivors_${userId}`);
+      localStorage.removeItem(`eliminated_${userId}`);
+      localStorage.removeItem(`eliminationCounts_${userId}`);
+      localStorage.removeItem(`clickCounts_${userId}`);
+      
+      setIsEliminationRoundActive(false);
+      setIsChallengeEnded(false);
+      setIsActive(false);
+      setUserSelection(null);
+      setSurvivors([]);
+      setEliminated([]);
+      setEliminationCounts({ pley: 0 });
+      setClickCounts({ pley: 0 });
+      
+      // Do not clear the isEliminated flag in local storage, and check it to set the state correctly
+      const storedIsEliminated = localStorage.getItem(`isEliminated_${userId}`) === 'true';
+      setIsEliminated(storedIsEliminated);
+    } else {
+      const storedElimActive = localStorage.getItem(`isEliminationRoundActive_${userId}`) === 'true';
+      const storedChallengeEnded = localStorage.getItem(`isChallengeEnded_${userId}`) === 'true';
+      const storedActive = localStorage.getItem(`isActive_${userId}`) === 'true';
+      const storedSelection = localStorage.getItem(`userSelection_${userId}`);
+      const storedIsEliminated = localStorage.getItem(`isEliminated_${userId}`) === 'true';
+      
+      const savedSurvivors = localStorage.getItem(`survivors_${userId}`);
+      const savedEliminated = localStorage.getItem(`eliminated_${userId}`);
+      const savedElimCounts = localStorage.getItem(`eliminationCounts_${userId}`);
+      const savedClickCounts = localStorage.getItem(`clickCounts_${userId}`);
+      
+      setIsEliminationRoundActive(storedElimActive);
+      setIsChallengeEnded(storedChallengeEnded);
+      setIsActive(storedActive);
+      setUserSelection(storedSelection);
+      setIsEliminated(storedIsEliminated);
+      setSurvivors(savedSurvivors ? JSON.parse(savedSurvivors) : []);
+      setEliminated(savedEliminated ? JSON.parse(savedEliminated) : []);
+      setEliminationCounts(savedElimCounts ? JSON.parse(savedElimCounts) : { pley: 0 });
+      setClickCounts(savedClickCounts ? JSON.parse(savedClickCounts) : { pley: 0 });
+    }
+  };
 
   useEffect(() => {
     const userId = localStorage.getItem('supabaseUserId');
@@ -5130,6 +5214,24 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     localStorage.setItem(`isActive_${userId}`, String(isActive));
   }, [isActive]);
 
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`clickCounts_${userId}`, JSON.stringify(clickCounts));
+  }, [clickCounts]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`eliminationCounts_${userId}`, JSON.stringify(eliminationCounts));
+  }, [eliminationCounts]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`survivors_${userId}`, JSON.stringify(survivors));
+  }, [survivors]);
+
   // Hall of Fame is now derived from universal round history
   const survivorHistory = useMemo(() => {
     const allSurvivors: Survivor[] = [];
@@ -5142,7 +5244,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         if (!s || !s.username) return;
         // Deduplicate by username so each person appears once in Hall of Fame
         if (!seenUsernames.has(s.username)) {
-          allSurvivors.push({ ...s, madeIt: true });
+          allSurvivors.push({ 
+            ...s, 
+            madeIt: true,
+            roundDurationLabel: round.durationLabel
+          });
           seenUsernames.add(s.username);
         }
       });
@@ -5401,6 +5507,13 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [theme]);
 
   const fetchUserProfile = async (userId: string, authUser?: any) => {
+    // If user is already flagged as eliminated locally, trigger block and terminate
+    if (localStorage.getItem(`isEliminated_${userId}`) === 'true') {
+      setIsEliminated(true);
+      eliminateSelf();
+      return;
+    }
+
     // 1. Try to load from userId-specific cache first for instant speed
     const cacheKey = `profile_v2_${userId}`;
     const cached = localStorage.getItem(cacheKey);
@@ -5427,6 +5540,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       .single();
       
     if (data && !error) {
+      // Check if lives <= 0 (Fail-safe)
+      if (data.lives <= 0) {
+        eliminateSelf();
+        return;
+      }
       const fullProfile = {
         username: data.username || '',
         fullName: data.full_name || '',
@@ -5437,6 +5555,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setUserProfile(fullProfile);
       localStorage.setItem(cacheKey, JSON.stringify(fullProfile));
       setIsEliminated(false);
+      localStorage.setItem(`isEliminated_${userId}`, 'false');
     } else if (error && authUser) {
       // PGRST116 means no rows found -> POTENTIALLY Eliminated
       if (error.code === 'PGRST116') {
@@ -5447,8 +5566,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         if (createdAt > 0 && ageInSeconds < 30) {
           setTimeout(() => fetchUserProfile(userId, authUser), 2000);
           setIsEliminated(false);
+          localStorage.setItem(`isEliminated_${userId}`, 'false');
         } else {
           setIsEliminated(true);
+          localStorage.setItem(`isEliminated_${userId}`, 'true');
+          eliminateSelf(); // Clean up client states and sign out
         }
       }
       setUserProfile((prev: any) => ({
@@ -5463,6 +5585,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
       if (session?.user) {
+        // ── CRITICAL: Block eliminated users immediately at boot ──
+        if (localStorage.getItem(`isEliminated_${session.user.id}`) === 'true') {
+          setIsEliminated(true);
+          eliminateSelf();
+          return;
+        }
         fetchUserProfile(session.user.id, session.user);
         const prevUserId = localStorage.getItem('supabaseUserId');
         if (prevUserId !== session.user.id) {
@@ -5503,7 +5631,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
           setIsChallengeEnded(false);
           localStorage.setItem('isChallengeEnded_false', 'false'); // Legacy cleanup
-          localStorage.setItem('supabaseUserId', session.user.id);
         } else {
           // Even if user ID hasn't changed, ensure profile is synced if it's currently empty
           setUserProfile((prev: any) => {
@@ -5517,6 +5644,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             return prev;
           });
         }
+        loadUserStates(session.user.id);
+        localStorage.setItem('supabaseUserId', session.user.id);
       }
       setAuthLoading(false);
     });
@@ -5524,21 +5653,19 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
       if (session?.user) {
+        // ── CRITICAL: Block eliminated users immediately before any state loads ──
+        if (localStorage.getItem(`isEliminated_${session.user.id}`) === 'true') {
+          setIsEliminated(true);
+          eliminateSelf();
+          return;
+        }
+
         fetchUserProfile(session.user.id, session.user);
 
-        // Always reset round state on login so old swiped posts never block the feed
-        setSurvivors([]);
-        setEliminated([]);
-        setUserSelection(null);
-        setIsChallengeEnded(false);
-        setIsActive(false);
-        setClickCounts({ pley: 0 });
-        setEliminationCounts({ pley: 0 });
-        setMadeItCounts({ pley: 0 });
-        setVariantFirstClickTime({ pley: 0 });
-
         const prevUserId = localStorage.getItem('supabaseUserId');
-        if (prevUserId && prevUserId !== session.user.id) {
+        const isUserChanged = prevUserId !== session.user.id;
+
+        if (isUserChanged) {
           localStorage.removeItem('enemies');
           localStorage.removeItem('followedUsers');
           localStorage.removeItem('wallPosts');
@@ -5560,6 +5687,8 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             website: ''
           });
         }
+        
+        loadUserStates(session.user.id);
         localStorage.setItem('supabaseUserId', session.user.id);
 
         // Immediately seed visiblePosts from cache for instant display (feed is universal)
@@ -5600,7 +5729,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       }
     });
 
-    // Real-time listener for profile deletion (Total Destruction Detection)
+    // Real-time listener for profile deletion (Total Destruction Detection) and updates
     const profileChannel = supabase
       .channel('profile_wipe_detection')
       .on('postgres_changes', { 
@@ -5612,6 +5741,24 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (session?.user && payload.old.id === session.user.id) {
             setIsEliminated(true);
+            localStorage.setItem(`isEliminated_${session.user.id}`, 'true');
+            eliminateSelf(); // Full cleanup & sign out
+          }
+        });
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles'
+      }, (payload) => {
+        // If the updated profile is the current user and lives drop to 0 or less
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user && payload.new.id === session.user.id) {
+            if (payload.new.lives <= 0) {
+              setIsEliminated(true);
+              localStorage.setItem(`isEliminated_${session.user.id}`, 'true');
+              eliminateSelf(); // Full cleanup & sign out
+            }
           }
         });
       })
@@ -5771,7 +5918,24 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     return survivorHistory.some(s => s.username === username);
   };
 
-  const [eliminated, setEliminated] = useState<Survivor[]>([]);
+  const [eliminated, setEliminated] = useState<Survivor[]>(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return [];
+    const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
+    const currentCycleStart = String(getCycleStartTimestamp());
+    if (storedCycleStart !== currentCycleStart) {
+      localStorage.removeItem(`eliminated_${userId}`);
+      return [];
+    }
+    const saved = localStorage.getItem(`eliminated_${userId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    localStorage.setItem(`eliminated_${userId}`, JSON.stringify(eliminated));
+  }, [eliminated]);
 
   const addEliminated = (user: Survivor) => {
     setEliminated(prev => {
@@ -5839,6 +6003,10 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
 
   const startNewChallenge = () => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (userId) {
+      localStorage.setItem(`challengeCycleStart_${userId}`, String(getCycleStartTimestamp()));
+    }
     setIsActive(true);
     setIsEliminationRoundActive(true);
     setTimeLeft(calculateUniversalTimeLeft());
@@ -5921,7 +6089,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             date: today,
             time: survivalTime,
             variant: activeMode === 'pley' ? 'Pley' : activeMode,
-            durationLabel: '2 min',
+            durationLabel: '24hrs',
             survivors: roundSurvivors,
             eliminated: roundEliminated,
             timestamp: roundTimestamp
@@ -5943,7 +6111,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
                 date: today,
                 time: survivalTime,
                 variant: activeMode === 'pley' ? 'Pley' : activeMode,
-                duration_label: '2 min',
+                duration_label: '24hrs',
                 survivors: roundSurvivors,
                 eliminated: roundEliminated,
                 round_timestamp: roundTimestamp
@@ -6039,6 +6207,83 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     return () => clearInterval(interval);
   }, [isActive, timeLeft, majorityVariant]);
 
+  const eliminateSelf = async () => {
+    const userId = localStorage.getItem('supabaseUserId');
+    if (!userId) return;
+    
+    // ── 1. Set eliminated state IMMEDIATELY so the UI shows Eliminated page right away ──
+    setIsEliminated(true);
+    localStorage.setItem(`isEliminated_${userId}`, 'true');
+
+    // ── 2. Nuke ALL cached posts / feed data so nothing pops back on reload ──
+    localStorage.removeItem('allPosts_v2');
+    localStorage.removeItem('allPosts');
+    localStorage.removeItem('visiblePosts_v2');
+    localStorage.removeItem('visiblePosts');
+    localStorage.removeItem('supabase_posts_cache');
+    localStorage.removeItem(`profile_v2_${userId}`);
+
+    // ── 3. Clean up all game states for this user ──
+    localStorage.setItem(`isChallengeEnded_${userId}`, 'true');
+    localStorage.setItem(`isEliminationRoundActive_${userId}`, 'false');
+    localStorage.setItem(`isActive_${userId}`, 'false');
+    localStorage.removeItem(`eliminated_${userId}`);
+    localStorage.removeItem(`survivors_${userId}`);
+    localStorage.removeItem(`eliminationCounts_${userId}`);
+    localStorage.removeItem(`clickCounts_${userId}`);
+    localStorage.removeItem(`userSelection_${userId}`);
+
+    // ── 4. CRITICAL: Set lives to 0 in the database FIRST ──
+    // This is the fail-safe: even if the DELETE operations below fail due to RLS,
+    // the profile will have lives=0 and Login.tsx will block re-entry.
+    try {
+      const { error: livesError } = await supabase
+        .from('profiles')
+        .update({ lives: 0 })
+        .eq('id', userId);
+      if (livesError) {
+        console.error('Failed to set lives to 0:', livesError.message);
+        // Also try via RPC as fallback
+        const currentUsername = userProfile?.username;
+        if (currentUsername) {
+          await supabase.rpc('decrement_lives', { target_username: currentUsername });
+        }
+      }
+    } catch (err) {
+      console.error('Error setting lives to 0:', err);
+    }
+
+    // ── 5. Delete posts, comments, messages and profile from Supabase ──
+    try {
+      // Delete comments on user's posts first
+      const { data: userPosts } = await supabase.from('posts').select('id').eq('user_id', userId);
+      if (userPosts && userPosts.length > 0) {
+        const postIds = userPosts.map(p => p.id);
+        await supabase.from('comments').delete().in('post_id', postIds);
+      }
+      
+      // Delete comments made by user
+      await supabase.from('comments').delete().eq('user_id', userId);
+      
+      // Delete user's posts
+      await supabase.from('posts').delete().eq('user_id', userId);
+      
+      // Delete user's messages
+      await supabase.from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+      
+      // Delete user profile
+      const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
+      if (profileError) {
+        console.error('Database profile deletion failed:', profileError.message);
+      }
+    } catch (err) {
+      console.error('Error deleting profile/posts/comments/messages during elimination:', err);
+    }
+
+    // ── 6. Sign out the Supabase auth session completely so they cannot come back on reload ──
+    await supabase.auth.signOut();
+  };
+
   return (
     <ChallengeContext.Provider value={{
       timeLeft, isActive, userProfile, setUserProfile, clickCounts, eliminationCounts, madeItCounts,
@@ -6055,7 +6300,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setSurvivors, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
       addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, authLoading, login, logout, language, setLanguage, theme, setTheme, t,
       userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser,
-      isEliminated, historyLoading, postsLoading
+      isEliminated, setIsEliminated, eliminateSelf, historyLoading, postsLoading
     }}>
       {children}
     </ChallengeContext.Provider>

@@ -454,12 +454,15 @@ const Profile = () => {
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
-            <div className="flex flex-col items-center">
-              <span className="font-bold">0</span>
+            <div 
+              onClick={() => setViewMode('enemies')}
+              className="flex flex-col items-center cursor-pointer group"
+            >
+              <span className="font-bold text-rose-600">{enemies.length}</span>
               <img 
-                src="/followers-title.png" 
-                alt="Followers" 
-                className="h-3 w-auto object-contain opacity-40" 
+                src="/enemies-title.png" 
+                alt="Enemies" 
+                className="h-3 w-auto object-contain brightness-90 group-hover:brightness-100 transition-all" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
@@ -475,15 +478,12 @@ const Profile = () => {
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
-            <div 
-              onClick={() => setViewMode('enemies')}
-              className="flex flex-col items-center cursor-pointer group"
-            >
-              <span className="font-bold text-rose-600">{enemies.length}</span>
+            <div className="flex flex-col items-center">
+              <span className="font-bold">0</span>
               <img 
-                src="/enemies-title.png" 
-                alt="Enemies" 
-                className="h-3 w-auto object-contain brightness-90 group-hover:brightness-100 transition-all" 
+                src="/followers-title.png" 
+                alt="Followers" 
+                className="h-3 w-auto object-contain opacity-40" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>

@@ -35,16 +35,24 @@ export default function Login() {
 
         if (signInError) throw signInError;
         
-        // After successful auth, check if the profile exists
-        // If it doesn't, it means the user was eliminated (destroyed)
+        // After successful auth, check if the profile exists and is active
+        // If it doesn't exist or has 0 lives, it means the user was eliminated
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('id, has_onboarded')
+          .select('id, has_onboarded, lives')
           .eq('id', data.user.id)
           .single();
           
-        if (!profile || profileError) {
-          // Profile missing = Eliminated
+        if (!profile || profileError || (profile.lives !== undefined && profile.lives !== null && profile.lives <= 0)) {
+          // Profile missing or 0 lives = Eliminated
+          localStorage.setItem(`isEliminated_${data.user.id}`, 'true');
+          await supabase.auth.signOut();
+          setError("Oops… you don’t exist here anymore.");
+          return;
+        }
+
+        // Double check local storage block flag for safety
+        if (localStorage.getItem(`isEliminated_${data.user.id}`) === 'true') {
           await supabase.auth.signOut();
           setError("Oops… you don’t exist here anymore.");
           return;

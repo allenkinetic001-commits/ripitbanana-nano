@@ -73,8 +73,10 @@ export function useSupabasePosts() {
     if (fetchError) {
       setError(fetchError.message);
     } else {
-      setPosts(data as any[]);
-      localStorage.setItem('supabase_posts_cache', JSON.stringify(data));
+      // Filter out posts where profile is null (meaning the user has been eliminated)
+      const validPosts = (data || []).filter((post: any) => post.profiles !== null);
+      setPosts(validPosts as any[]);
+      localStorage.setItem('supabase_posts_cache', JSON.stringify(validPosts));
     }
     setLoading(false);
   };
@@ -115,7 +117,7 @@ export function useSupabasePosts() {
           await new Promise(r => setTimeout(r, 500));
         }
           
-        if (newPostWithProfile) {
+        if (newPostWithProfile && newPostWithProfile.profiles !== null) {
           setPosts(prev => {
             const next = [newPostWithProfile as SupabasePost, ...prev];
             localStorage.setItem('supabase_posts_cache', JSON.stringify(next));
@@ -124,21 +126,37 @@ export function useSupabasePosts() {
         }
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'posts' }, (payload) => {
-        setPosts(prev => prev.filter(post => post.id !== payload.old.id));
+        setPosts(prev => {
+          const next = prev.filter(post => post.id !== payload.old.id);
+          localStorage.setItem('supabase_posts_cache', JSON.stringify(next));
+          return next;
+        });
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'profiles' }, (payload) => {
+        // Remove all posts belonging to the deleted profile (eliminated user)
+        setPosts(prev => {
+          const next = prev.filter(post => post.user_id !== payload.old.id);
+          localStorage.setItem('supabase_posts_cache', JSON.stringify(next));
+          return next;
+        });
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
-        setPosts(prev => prev.map(post => {
-          if (post.user_id === payload.new.id) {
-            return {
-              ...post,
-              profiles: {
-                ...post.profiles,
-                ...payload.new
-              }
-            };
-          }
-          return post;
-        }));
+        setPosts(prev => {
+          const next = prev.map(post => {
+            if (post.user_id === payload.new.id) {
+              return {
+                ...post,
+                profiles: {
+                  ...post.profiles,
+                  ...payload.new
+                }
+              };
+            }
+            return post;
+          });
+          localStorage.setItem('supabase_posts_cache', JSON.stringify(next));
+          return next;
+        });
       })
       .subscribe();
 
@@ -208,7 +226,7 @@ export async function fetchProfileByUsername(username: string) {
 
 // Upload media file to Supabase Storage, return the public URL
 export async function uploadPostMedia(userId: string, file: File): Promise<{ url: string | null; error: any }> {
-  const ext = file.name.split('.').pop() || (file.type.includes('video') ? 'mp4' : 'jpg');
+  const ext = (file?.name || '').split('.').pop() || (file?.type?.includes('video') ? 'mp4' : 'jpg');
   const fileName = `${userId}/${Date.now()}.${ext}`;
 
   const { data, error } = await supabase.storage
@@ -338,6 +356,7 @@ export function formatPostForUI(post: any) {
 
   return {
     id: post.id,
+    userId: post.user_id,
     username: post.profiles?.username || 'unknown',
     avatar: post.profiles?.avatar_url || '/custom-empty-profile.png',
     isTraitorGlobal: post.profiles?.is_traitor || false,

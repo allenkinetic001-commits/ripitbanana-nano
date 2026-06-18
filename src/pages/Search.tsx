@@ -40,7 +40,7 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
         >
           <div className="relative">
             <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden shadow-lg group-hover:scale-105 transition-transform">
-              <img src={survivor.avatar} alt={survivor.username} className="w-full h-full object-cover" />
+              <img src={survivor.avatar || "/custom-empty-profile.png"} alt={survivor.username} className="w-full h-full object-cover" />
             </div>
             <div className="absolute -bottom-2 -right-2">
               <img 
@@ -54,7 +54,7 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-black text-zinc-900 italic tracking-tight">@{survivor.username}</span>
-              <ProfileHeartsToggle isVisible={showHearts} heartClassName="w-3.5 h-3.5" />
+              <ProfileHeartsToggle isVisible={showHearts} heartClassName="w-7 h-7" />
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">
@@ -64,7 +64,7 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
                 <div className="flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
                   <img src="/duration-alarm.png" alt="" className="h-3 w-auto object-contain" />
                   <span className="text-[8px] text-purple-600 font-black uppercase tracking-tighter">
-                    {survivor.roundDurationLabel}
+                    {survivor.roundDurationLabel === '2 min' || survivor.roundDurationLabel === '2 mins' ? '24hrs' : survivor.roundDurationLabel}
                   </span>
                 </div>
               )}
@@ -222,9 +222,9 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
                 {round.survivors.length} SURVIVORS
               </div>
             </div>
-            <div className="flex items-center gap-2">
+             <div className="flex items-center gap-2">
               <span className="text-[9px] font-black bg-zinc-100 text-zinc-600 px-3 py-1 rounded-full uppercase tracking-wider border border-zinc-200/50">
-                 Duration: {round.durationLabel}
+                 Duration: {round.durationLabel === '2 min' || round.durationLabel === '2 mins' ? '24hrs' : round.durationLabel}
               </span>
             </div>
           </div>
@@ -233,7 +233,7 @@ const RoundCard = ({ round, onClick }: { round: any, onClick: () => void }) => {
             <div className="flex -space-x-4">
               {round.survivors.slice(0, 6).map((s: any, i: number) => (
                 <div key={s.id} className="w-14 h-14 rounded-full border-4 border-white overflow-hidden shadow-xl transform transition-transform group-hover:scale-110 group-hover:-translate-y-1" style={{ zIndex: 10 - i }}>
-                  <img src={s.avatar} alt={s.username} className="w-full h-full object-cover" />
+                  <img src={s.avatar || "/custom-empty-profile.png"} alt={s.username} className="w-full h-full object-cover" />
                 </div>
               ))}
               {round.survivors.length > 6 && (
@@ -347,7 +347,8 @@ const SearchPage = () => {
                 madeIt: true,
                 roundId: round.id,
                 roundDate: round.date,
-                roundTime: round.time
+                roundTime: round.time,
+                roundDurationLabel: round.durationLabel
               });
               seenUsernames.add(s.username);
             }
@@ -357,7 +358,8 @@ const SearchPage = () => {
               madeIt: true,
               roundId: round.id,
               roundDate: round.date,
-              roundTime: round.time
+              roundTime: round.time,
+              roundDurationLabel: round.durationLabel
             });
           }
         }
