@@ -22,7 +22,7 @@ const UserDetail = () => {
   // Derived state from context
   const hasActed = enemies.some(e => e.username === username);
   const [isSwornLocal, setIsSwornLocal] = useState(false);
-  const [viewMode, setViewMode] = useState<'posts' | 'wall'>('posts');
+  const [viewMode, setViewMode] = useState<'posts' | 'wall' | 'enemies'>('posts');
   const [isTraitor, setIsTraitor] = useState(false);
 
   const isMe = username === userProfile.username;
@@ -61,6 +61,20 @@ const UserDetail = () => {
   };
 
   const enemiesOfCount = getEnemiesOfCount(username);
+
+  const getUserEnemies = (targetUsername: string | undefined) => {
+    if (!targetUsername) return [];
+    try {
+      const listStr = localStorage.getItem(`enemies_v7_${targetUsername}`);
+      if (listStr) {
+        const list = JSON.parse(listStr);
+        if (Array.isArray(list)) return list;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return [];
+  };
 
   // Helper to determine if a user has been eliminated
   const checkIsEliminated = (uname: string | undefined) => {
@@ -412,12 +426,15 @@ const UserDetail = () => {
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
-            <div className="flex flex-col items-center">
+            <div 
+              onClick={() => setViewMode(viewMode === 'enemies' ? 'posts' : 'enemies')}
+              className="flex flex-col items-center cursor-pointer group"
+            >
               <span className="font-bold text-rose-600">{enemiesOfCount}</span>
               <img 
                 src="/enemies-title.png" 
                 alt="Enemies" 
-                className="h-3 w-auto object-contain brightness-90" 
+                className="h-3 w-auto object-contain brightness-90 group-hover:brightness-100 transition-all" 
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
@@ -540,24 +557,21 @@ const UserDetail = () => {
         </div>
 
         {/* Your Enemies Banner */}
-        <div className="relative rounded-2xl overflow-hidden shadow-md border border-rose-100/50 bg-rose-50/10 backdrop-blur-sm transition-all duration-300 hover:shadow-lg mt-4">
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 to-rose-600/5 pointer-events-none" />
-          <div className="flex flex-col items-center justify-center p-6 relative z-10 gap-3">
-            <img 
-              src="/your-enemies.png" 
-              alt="Your Enemies" 
-              className="h-14 w-auto object-contain"
-              style={{ imageRendering: '-webkit-optimize-contrast' }}
-            />
-            <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-6 py-2 shadow-md min-w-[3.5rem] animate-pulse">
-              <span className="text-2xl font-black font-mono">
-                {enemiesOfCount}
-              </span>
-            </div>
-            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-              Targeted by Survivors
+        <div className="flex flex-col items-center justify-center py-4 gap-2 mt-2">
+          <img 
+            src="/your-enemies.png" 
+            alt="Your Enemies" 
+            className="h-14 w-auto object-contain"
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
+          />
+          <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-6 py-2 shadow-md min-w-[3.5rem] animate-pulse">
+            <span className="text-2xl font-black font-mono">
+              {enemiesOfCount}
             </span>
           </div>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+            Targeted by Survivors
+          </span>
         </div>
       </div>
 
@@ -585,10 +599,17 @@ const UserDetail = () => {
           </div>
         )}
         <button 
-          className="flex-1 flex items-center justify-center h-12 border-b-2 border-transparent text-zinc-400 opacity-20 cursor-not-allowed"
-          title="Enemies view coming soon"
+          onClick={() => setViewMode(viewMode === 'enemies' ? 'posts' : 'enemies')}
+          className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'enemies' ? 'border-rose-600' : 'border-transparent text-zinc-400'}`}
         >
-          <ShieldAlert size={24} />
+          <img 
+            src="/enemies-icon.png" 
+            alt="Enemies" 
+            className={cn(
+              "w-7 h-7 object-contain transition-all duration-300",
+              viewMode === 'enemies' ? "brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" : "opacity-40"
+            )}
+          />
         </button>
         <button 
           className="flex-1 flex items-center justify-center h-12 border-b-2 border-transparent text-zinc-400 opacity-20 cursor-not-allowed"
@@ -640,6 +661,37 @@ const UserDetail = () => {
         ) : (
           <EmptyFeed className="min-h-[40vh] pt-36" subtitle="Nobody yet" />
         )
+      ) : viewMode === 'enemies' ? (
+        <div className="flex-1 bg-zinc-50/50 p-4">
+          <div className="space-y-3">
+            {getUserEnemies(username).length > 0 ? (
+              getUserEnemies(username).map((enemy: any) => (
+                <div 
+                  key={enemy.id} 
+                  onClick={() => navigate(`/profile/${enemy.username}`)}
+                  className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 active:scale-[0.99] transition-all"
+                >
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={enemy.avatar || "/custom-empty-profile.png"} 
+                      className="w-10 h-10 rounded-full border border-zinc-50 object-cover" 
+                      alt={enemy.username} 
+                    />
+                    <span className="font-bold text-sm">@{enemy.username}</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                    View Profile
+                  </span>
+                </div>
+              ))
+            ) : (
+              <EmptyFeed 
+                className="min-h-[40vh] pt-16" 
+                subtitle="Nobody yet" 
+              />
+            )}
+          </div>
+        </div>
       ) : (
         <div className="flex-1 bg-zinc-50/50 p-4">
           {/* Default empty state or other content */}

@@ -569,24 +569,21 @@ const Profile = () => {
         </div>
 
         {/* Your Enemies Banner */}
-        <div className="relative rounded-2xl overflow-hidden shadow-md border border-rose-100/50 bg-rose-50/10 backdrop-blur-sm transition-all duration-300 hover:shadow-lg mt-4">
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 to-rose-600/5 pointer-events-none" />
-          <div className="flex flex-col items-center justify-center p-6 relative z-10 gap-3">
-            <img 
-              src="/your-enemies.png" 
-              alt="Your Enemies" 
-              className="h-14 w-auto object-contain"
-              style={{ imageRendering: '-webkit-optimize-contrast' }}
-            />
-            <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-6 py-2 shadow-md min-w-[3.5rem] animate-pulse">
-              <span className="text-2xl font-black font-mono">
-                {enemiesOfCount}
-              </span>
-            </div>
-            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-              Targeted by Survivors
+        <div className="flex flex-col items-center justify-center py-4 gap-2 mt-2">
+          <img 
+            src="/your-enemies.png" 
+            alt="Your Enemies" 
+            className="h-14 w-auto object-contain"
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
+          />
+          <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-6 py-2 shadow-md min-w-[3.5rem] animate-pulse">
+            <span className="text-2xl font-black font-mono">
+              {enemiesOfCount}
             </span>
           </div>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+            Targeted by Survivors
+          </span>
         </div>
       </div>
 
@@ -674,19 +671,20 @@ const Profile = () => {
             {enemies.length > 0 ? (
               enemies.map((enemy) => (
                 <div key={enemy.id} className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center">
-                      <img 
-                        src="/enemies-icon.png" 
-                        alt="Enemy" 
-                        className="w-6 h-6 object-contain brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" 
-                      />
-                    </div>
+                  <div 
+                    onClick={() => navigate(`/profile/${enemy.username}`)}
+                    className="flex items-center space-x-3 cursor-pointer hover:opacity-85 transition-opacity"
+                  >
+                    <img 
+                      src={enemy.avatar || "/custom-empty-profile.png"} 
+                      className="w-10 h-10 rounded-full border border-zinc-50 object-cover animate-pop-in" 
+                      alt={enemy.username} 
+                    />
                     <span className="font-bold text-sm">@{enemy.username}</span>
                   </div>
                   <button 
                     onClick={() => removeEnemy(enemy.id)}
-                    className="text-xs text-zinc-400 font-bold hover:text-zinc-600 transition-colors"
+                    className="text-xs text-rose-600 font-bold hover:text-rose-700 transition-colors p-1"
                   >
                     Remove
                   </button>
