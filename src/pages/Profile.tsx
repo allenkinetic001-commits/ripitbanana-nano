@@ -735,7 +735,7 @@ const Profile = () => {
                 enemies.map((enemy) => (
                   <div key={enemy.id} className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between">
                     <div 
-                      onClick={() => navigate(`/profile/${enemy.username}`)}
+                      onClick={() => navigate(`/user/${enemy.username}`)}
                       className="flex items-center space-x-3 cursor-pointer hover:opacity-85 transition-opacity"
                     >
                       <img 
@@ -764,7 +764,7 @@ const Profile = () => {
                 getAddedByList(userProfile.username).map((enemy: any) => (
                   <div 
                     key={enemy.id} 
-                    onClick={() => navigate(`/profile/${enemy.username}`)}
+                    onClick={() => navigate(`/user/${enemy.username}`)}
                     className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 active:scale-[0.99] transition-all animate-in fade-in duration-200"
                   >
                     <div className="flex items-center space-x-3">

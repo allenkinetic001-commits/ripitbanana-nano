@@ -706,32 +706,77 @@ const UserDetail = () => {
         )
       ) : viewMode === 'enemies' ? (
         <div className="flex-1 bg-zinc-50/50 p-4">
+          {/* Sub Tabs */}
+          <div className="flex bg-zinc-100 p-0.5 rounded-lg mb-4">
+            <button 
+              onClick={() => setEnemiesSubTab('added_them')}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${enemiesSubTab === 'added_them' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
+            >
+              Added by Them
+            </button>
+            <button 
+              onClick={() => setEnemiesSubTab('added_me')}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${enemiesSubTab === 'added_me' ? 'bg-rose-600 text-white shadow-sm' : 'text-zinc-500 hover:text-rose-600'}`}
+            >
+              Who Added Them
+            </button>
+          </div>
+
           <div className="space-y-3">
-            {getUserEnemies(username).length > 0 ? (
-              getUserEnemies(username).map((enemy: any) => (
-                <div 
-                  key={enemy.id} 
-                  onClick={() => navigate(`/profile/${enemy.username}`)}
-                  className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 active:scale-[0.99] transition-all"
-                >
-                  <div className="flex items-center space-x-3">
-                    <img 
-                      src={enemy.avatar || "/custom-empty-profile.png"} 
-                      className="w-10 h-10 rounded-full border border-zinc-50 object-cover" 
-                      alt={enemy.username} 
-                    />
-                    <span className="font-bold text-sm">@{enemy.username}</span>
+            {enemiesSubTab === 'added_them' ? (
+              getUserEnemies(username).length > 0 ? (
+                getUserEnemies(username).map((enemy: any) => (
+                  <div 
+                    key={enemy.id} 
+                    onClick={() => navigate(`/user/${enemy.username}`)}
+                    className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 active:scale-[0.99] transition-all animate-in fade-in duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <img 
+                        src={enemy.avatar || "/custom-empty-profile.png"} 
+                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover" 
+                        alt={enemy.username} 
+                      />
+                      <span className="font-bold text-sm">@{enemy.username}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                      View Profile
+                    </span>
                   </div>
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                    View Profile
-                  </span>
-                </div>
-              ))
+                ))
+              ) : (
+                <EmptyFeed 
+                  className="min-h-[30vh] pt-12" 
+                  subtitle="Nobody yet" 
+                />
+              )
             ) : (
-              <EmptyFeed 
-                className="min-h-[40vh] pt-16" 
-                subtitle="Nobody yet" 
-              />
+              getAddedByList(username).length > 0 ? (
+                getAddedByList(username).map((enemy: any) => (
+                  <div 
+                    key={enemy.id} 
+                    onClick={() => navigate(`/user/${enemy.username}`)}
+                    className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 active:scale-[0.99] transition-all animate-in fade-in duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <img 
+                        src={enemy.avatar || "/custom-empty-profile.png"} 
+                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover" 
+                        alt={enemy.username} 
+                      />
+                      <span className="font-bold text-sm">@{enemy.username}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                      View Profile
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <EmptyFeed 
+                  className="min-h-[30vh] pt-12" 
+                  subtitle="Nobody yet" 
+                />
+              )
             )}
           </div>
         </div>
