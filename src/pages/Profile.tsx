@@ -26,6 +26,7 @@ const Profile = () => {
     setShowHearts(prev => !prev);
   }, 400);
   const [viewMode, setViewMode] = useState<'posts' | 'wall' | 'enemies' | 'following'>('posts');
+  const [enemiesSubTab, setEnemiesSubTab] = useState<'added_them' | 'added_me'>('added_them');
   const [wallInput, setWallInput] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditEditForm] = useState(userProfile);
@@ -317,6 +318,42 @@ const Profile = () => {
 
   const enemiesOfCount = getEnemiesOfCount(userProfile.username);
 
+  const getAddedByList = (targetUsername: string | undefined) => {
+    if (!targetUsername) return [];
+    const list: any[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('enemies_v7_')) {
+          const listStr = localStorage.getItem(key);
+          if (listStr) {
+            const enemiesList = JSON.parse(listStr);
+            if (Array.isArray(enemiesList)) {
+              const found = enemiesList.find((e: any) => e.username === targetUsername);
+              if (found) {
+                const sourceUsername = key.replace('enemies_v7_', '');
+                const cachedProfileStr = localStorage.getItem(`user_profile_cache_${sourceUsername}`);
+                let avatar = '/custom-empty-profile.png';
+                if (cachedProfileStr) {
+                  const cached = JSON.parse(cachedProfileStr);
+                  avatar = cached?.avatar_url || avatar;
+                }
+                list.push({
+                  id: sourceUsername,
+                  username: sourceUsername,
+                  avatar: avatar
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return list;
+  };
+
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">
       <input 
@@ -490,7 +527,10 @@ const Profile = () => {
               />
             </div>
             <div 
-              onClick={() => setViewMode('enemies')}
+              onClick={() => {
+                setViewMode('enemies');
+                setEnemiesSubTab('added_me');
+              }}
               className="flex flex-col items-center cursor-pointer group"
             >
               <span className="font-bold text-rose-600">{enemiesOfCount}</span>
@@ -569,7 +609,13 @@ const Profile = () => {
         </div>
 
         {/* Your Enemies Banner */}
-        <div className="flex flex-col items-center justify-center py-4 gap-2 mt-2">
+        <div 
+          onClick={() => {
+            setViewMode('enemies');
+            setEnemiesSubTab('added_me');
+          }}
+          className="flex flex-col items-center justify-center py-4 gap-2 mt-2 cursor-pointer group hover:opacity-80 transition-opacity"
+        >
           <img 
             src="/your-enemies.png" 
             alt="Your Enemies" 
@@ -667,34 +713,79 @@ const Profile = () => {
         )
       ) : viewMode === 'enemies' ? (
         <div className="flex-1 bg-zinc-50/50 p-4">
+          {/* Sub Tabs */}
+          <div className="flex bg-zinc-100 p-0.5 rounded-lg mb-4">
+            <button 
+              onClick={() => setEnemiesSubTab('added_them')}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${enemiesSubTab === 'added_them' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
+            >
+              Added by Me
+            </button>
+            <button 
+              onClick={() => setEnemiesSubTab('added_me')}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${enemiesSubTab === 'added_me' ? 'bg-rose-600 text-white shadow-sm' : 'text-zinc-500 hover:text-rose-600'}`}
+            >
+              Added Me
+            </button>
+          </div>
+
           <div className="space-y-3">
-            {enemies.length > 0 ? (
-              enemies.map((enemy) => (
-                <div key={enemy.id} className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between">
-                  <div 
-                    onClick={() => navigate(`/profile/${enemy.username}`)}
-                    className="flex items-center space-x-3 cursor-pointer hover:opacity-85 transition-opacity"
-                  >
-                    <img 
-                      src={enemy.avatar || "/custom-empty-profile.png"} 
-                      className="w-10 h-10 rounded-full border border-zinc-50 object-cover animate-pop-in" 
-                      alt={enemy.username} 
-                    />
-                    <span className="font-bold text-sm">@{enemy.username}</span>
+            {enemiesSubTab === 'added_them' ? (
+              enemies.length > 0 ? (
+                enemies.map((enemy) => (
+                  <div key={enemy.id} className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between">
+                    <div 
+                      onClick={() => navigate(`/profile/${enemy.username}`)}
+                      className="flex items-center space-x-3 cursor-pointer hover:opacity-85 transition-opacity"
+                    >
+                      <img 
+                        src={enemy.avatar || "/custom-empty-profile.png"} 
+                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover animate-pop-in" 
+                        alt={enemy.username} 
+                      />
+                      <span className="font-bold text-sm">@{enemy.username}</span>
+                    </div>
+                    <button 
+                      onClick={() => removeEnemy(enemy.id)}
+                      className="text-xs text-rose-600 font-bold hover:text-rose-700 transition-colors p-1"
+                    >
+                      Remove
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => removeEnemy(enemy.id)}
-                    className="text-xs text-rose-600 font-bold hover:text-rose-700 transition-colors p-1"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))
+                ))
+              ) : (
+                <EmptyFeed 
+                  className="min-h-[30vh] pt-12" 
+                  subtitle="Nobody yet" 
+                />
+              )
             ) : (
-              <EmptyFeed 
-                className="min-h-[40vh] pt-16" 
-                subtitle="Nobody yet" 
-              />
+              getAddedByList(userProfile.username).length > 0 ? (
+                getAddedByList(userProfile.username).map((enemy: any) => (
+                  <div 
+                    key={enemy.id} 
+                    onClick={() => navigate(`/profile/${enemy.username}`)}
+                    className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 active:scale-[0.99] transition-all animate-in fade-in duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <img 
+                        src={enemy.avatar || "/custom-empty-profile.png"} 
+                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover" 
+                        alt={enemy.username} 
+                      />
+                      <span className="font-bold text-sm">@{enemy.username}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                      View Profile
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <EmptyFeed 
+                  className="min-h-[30vh] pt-12" 
+                  subtitle="Nobody yet" 
+                />
+              )
             )}
           </div>
         </div>

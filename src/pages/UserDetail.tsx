@@ -23,6 +23,7 @@ const UserDetail = () => {
   const hasActed = enemies.some(e => e.username === username);
   const [isSwornLocal, setIsSwornLocal] = useState(false);
   const [viewMode, setViewMode] = useState<'posts' | 'wall' | 'enemies'>('posts');
+  const [enemiesSubTab, setEnemiesSubTab] = useState<'added_them' | 'added_me'>('added_them');
   const [isTraitor, setIsTraitor] = useState(false);
 
   const isMe = username === userProfile.username;
@@ -74,6 +75,42 @@ const UserDetail = () => {
       console.error(e);
     }
     return [];
+  };
+
+  const getAddedByList = (targetUsername: string | undefined) => {
+    if (!targetUsername) return [];
+    const list: any[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('enemies_v7_')) {
+          const listStr = localStorage.getItem(key);
+          if (listStr) {
+            const enemiesList = JSON.parse(listStr);
+            if (Array.isArray(enemiesList)) {
+              const found = enemiesList.find((e: any) => e.username === targetUsername);
+              if (found) {
+                const sourceUsername = key.replace('enemies_v7_', '');
+                const cachedProfileStr = localStorage.getItem(`user_profile_cache_${sourceUsername}`);
+                let avatar = '/custom-empty-profile.png';
+                if (cachedProfileStr) {
+                  const cached = JSON.parse(cachedProfileStr);
+                  avatar = cached?.avatar_url || avatar;
+                }
+                list.push({
+                  id: sourceUsername,
+                  username: sourceUsername,
+                  avatar: avatar
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return list;
   };
 
   // Helper to determine if a user has been eliminated
@@ -557,7 +594,13 @@ const UserDetail = () => {
         </div>
 
         {/* Your Enemies Banner */}
-        <div className="flex flex-col items-center justify-center py-4 gap-2 mt-2">
+        <div 
+          onClick={() => {
+            setViewMode('enemies');
+            setEnemiesSubTab('added_me');
+          }}
+          className="flex flex-col items-center justify-center py-4 gap-2 mt-2 cursor-pointer group hover:opacity-80 transition-opacity"
+        >
           <img 
             src="/your-enemies.png" 
             alt="Your Enemies" 
