@@ -27,6 +27,41 @@ const UserDetail = () => {
 
   const isMe = username === userProfile.username;
 
+  const getEnemiesOfCount = (targetUsername: string | undefined) => {
+    if (!targetUsername) return 0;
+    let count = 0;
+    const currentUsername = userProfile?.username;
+    
+    // 1. Check if current user has targetUsername as enemy
+    const currentHasAdded = enemies.some((e: any) => e.username === targetUsername);
+    if (currentHasAdded) {
+      count++;
+    }
+    
+    // 2. Scan other users' stored enemy lists in localStorage
+    try {
+      const currentUserKey = currentUsername ? `enemies_v7_${currentUsername}` : null;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('enemies_v7_') && key !== currentUserKey) {
+          const listStr = localStorage.getItem(key);
+          if (listStr) {
+            const list = JSON.parse(listStr);
+            if (Array.isArray(list) && list.some((e: any) => e.username === targetUsername)) {
+              count++;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error scanning enemies list:', e);
+    }
+    
+    return count;
+  };
+
+  const enemiesOfCount = getEnemiesOfCount(username);
+
   // Helper to determine if a user has been eliminated
   const checkIsEliminated = (uname: string | undefined) => {
     if (!uname || uname === userProfile.username) return false;
@@ -378,7 +413,7 @@ const UserDetail = () => {
               />
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold text-rose-600">0</span>
+              <span className="font-bold text-rose-600">{enemiesOfCount}</span>
               <img 
                 src="/enemies-title.png" 
                 alt="Enemies" 
@@ -502,6 +537,38 @@ const UserDetail = () => {
               Message
             </button>
           )}
+        </div>
+
+        {/* Your Enemies Banner */}
+        <div className="relative rounded-2xl overflow-hidden shadow-md border border-rose-100/50 bg-rose-50/10 backdrop-blur-sm transition-all duration-300 hover:shadow-lg mt-4">
+          <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 to-rose-600/5 pointer-events-none" />
+          <div className="flex items-center justify-between p-4 relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-rose-100/60 flex items-center justify-center shadow-inner">
+                <img 
+                  src="/enemies-icon.png" 
+                  alt="Enemies Icon" 
+                  className="w-7 h-7 object-contain brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" 
+                />
+              </div>
+              <div className="flex flex-col">
+                <img 
+                  src="/your-enemies.png" 
+                  alt="Your Enemies" 
+                  className="h-5 w-auto object-contain self-start"
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
+                  Targeted by Survivors
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-4 py-2 shadow-md min-w-[3rem] animate-pulse">
+              <span className="text-xl font-black font-mono">
+                {enemiesOfCount}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
