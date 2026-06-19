@@ -542,32 +542,21 @@ const UserDetail = () => {
         {/* Your Enemies Banner */}
         <div className="relative rounded-2xl overflow-hidden shadow-md border border-rose-100/50 bg-rose-50/10 backdrop-blur-sm transition-all duration-300 hover:shadow-lg mt-4">
           <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 to-rose-600/5 pointer-events-none" />
-          <div className="flex items-center justify-between p-4 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-rose-100/60 flex items-center justify-center shadow-inner">
-                <img 
-                  src="/enemies-icon.png" 
-                  alt="Enemies Icon" 
-                  className="w-7 h-7 object-contain brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" 
-                />
-              </div>
-              <div className="flex flex-col">
-                <img 
-                  src="/your-enemies.png" 
-                  alt="Your Enemies" 
-                  className="h-5 w-auto object-contain self-start"
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
-                  Targeted by Survivors
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-4 py-2 shadow-md min-w-[3rem] animate-pulse">
-              <span className="text-xl font-black font-mono">
+          <div className="flex flex-col items-center justify-center p-6 relative z-10 gap-3">
+            <img 
+              src="/your-enemies.png" 
+              alt="Your Enemies" 
+              className="h-14 w-auto object-contain"
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
+            <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-6 py-2 shadow-md min-w-[3.5rem] animate-pulse">
+              <span className="text-2xl font-black font-mono">
                 {enemiesOfCount}
               </span>
             </div>
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+              Targeted by Survivors
+            </span>
           </div>
         </div>
       </div>
