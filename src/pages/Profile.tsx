@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles, MessageSquare, Play } from 'lucide-react';
+import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles, MessageSquare, Play } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
@@ -388,13 +388,9 @@ const Profile = () => {
           <div className="relative">
             <button 
               onClick={() => navigate('/settings')}
-              className="flex items-center justify-center hover:opacity-70 transition-opacity"
+              className="text-zinc-700 hover:text-zinc-400 transition-colors"
             >
-              <img 
-                src="/ballad.png" 
-                alt="Settings" 
-                className="w-6 h-6 object-contain" 
-              />
+              <Menu size={24} />
             </button>
           </div>
         </div>
