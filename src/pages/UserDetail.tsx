@@ -646,7 +646,7 @@ const UserDetail = () => {
           className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'enemies' ? 'border-rose-600' : 'border-transparent text-zinc-400'}`}
         >
           <img 
-            src="/enemies-icon.png" 
+            src="/ballad.png" 
             alt="Enemies" 
             className={cn(
               "w-7 h-7 object-contain transition-all duration-300",

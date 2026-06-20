@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles, MessageSquare, Play } from 'lucide-react';
+import { Grid, List, Trash2, ShieldAlert, X, Check, Camera, UserPlus, Trophy, Sparkles, MessageSquare, Play } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
@@ -377,7 +377,7 @@ const Profile = () => {
             title={viewMode === 'enemies' ? "Back to Posts" : "View Enemies"}
           >
             <img 
-              src="/enemies-icon.png" 
+              src="/ballad.png" 
               alt="Enemies" 
               className={cn(
                 "w-7 h-7 object-contain transition-all duration-300",
@@ -388,9 +388,13 @@ const Profile = () => {
           <div className="relative">
             <button 
               onClick={() => navigate('/settings')}
-              className="text-zinc-700 hover:text-zinc-400 transition-colors"
+              className="flex items-center justify-center hover:opacity-70 transition-opacity"
             >
-              <Menu size={24} />
+              <img 
+                src="/ballad.png" 
+                alt="Settings" 
+                className="w-6 h-6 object-contain" 
+              />
             </button>
           </div>
         </div>
@@ -654,7 +658,7 @@ const Profile = () => {
           className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'enemies' ? 'border-rose-600' : 'border-transparent text-zinc-400'}`}
         >
           <img 
-            src="/enemies-icon.png" 
+            src="/ballad.png" 
             alt="Enemies" 
             className={cn(
               "w-7 h-7 object-contain transition-all duration-300",
