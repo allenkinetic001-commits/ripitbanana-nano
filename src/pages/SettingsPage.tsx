@@ -112,7 +112,7 @@ const SettingsPage = () => {
                     src="/be-part.png" 
                     alt={t('be_part_of_it')} 
                     onError={() => handleImageError('be_part_header')} 
-                    className="h-8 w-auto object-contain -ml-2" 
+                    className="h-6 w-auto object-contain -ml-2" 
                     style={{ imageRendering: '-webkit-optimize-contrast' }} 
                   />
                 ) : (
