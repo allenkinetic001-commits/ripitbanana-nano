@@ -91,6 +91,28 @@ const SettingsPage = () => {
           <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest ml-1">{t('app')}</h3>
           <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 shadow-sm">
             <div 
+              onClick={() => setShowContactModal(true)}
+              className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 flex items-center justify-center">
+                  {!imageErrors['contact_icon'] ? (
+                    <img 
+                      src="/contact-icon.png" 
+                      alt="" 
+                      onError={() => handleImageError('contact_icon')}
+                      className="w-full h-full object-contain" 
+                    />
+                  ) : (
+                    <MessageCircle size={24} className="text-zinc-500" />
+                  )}
+                </div>
+                <span className="font-bold text-zinc-900 -ml-2">{t('be_part_of_it')}</span>
+              </div>
+              <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
+            </div>
+
+            <div 
               onClick={() => setShowLanguageModal(true)}
               className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
             >
@@ -295,43 +317,7 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* BE PART OF IT Section */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest ml-1">{t('be_part_of_it')}</h3>
-          <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 shadow-sm">
-            <div 
-              onClick={() => setShowContactModal(true)}
-              className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors cursor-pointer group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center">
-                  {!imageErrors['contact_icon'] ? (
-                    <img 
-                      src="/contact-icon.png" 
-                      alt="" 
-                      onError={() => handleImageError('contact_icon')}
-                      className="w-full h-full object-contain" 
-                    />
-                  ) : (
-                    <MessageCircle size={24} className="text-zinc-500" />
-                  )}
-                </div>
-                {!imageErrors['contact_header'] ? (
-                  <img 
-                    src="/contact-header.png" 
-                    alt={t('contact')} 
-                    onError={() => handleImageError('contact_header')}
-                    className="h-8 w-auto object-contain -ml-2" 
-                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
-                  />
-                ) : (
-                  <span className="font-bold text-zinc-900 -ml-2">{t('contact')}</span>
-                )}
-              </div>
-              <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
-            </div>
-          </div>
-        </div>
+
 
         {/* Logout Section */}
         <div className="pb-6">
