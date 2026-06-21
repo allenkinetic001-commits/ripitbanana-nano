@@ -107,7 +107,17 @@ const SettingsPage = () => {
                     <MessageCircle size={24} className="text-zinc-500" />
                   )}
                 </div>
-                <span className="font-bold text-zinc-900 -ml-2">{t('be_part_of_it')}</span>
+                {!imageErrors['be_part_header'] ? (
+                  <img 
+                    src="/be-part.png" 
+                    alt={t('be_part_of_it')} 
+                    onError={() => handleImageError('be_part_header')} 
+                    className="h-8 w-auto object-contain -ml-2" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                  />
+                ) : (
+                  <span className="font-bold text-zinc-900 -ml-2">{t('be_part_of_it')}</span>
+                )}
               </div>
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>

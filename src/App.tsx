@@ -49,6 +49,7 @@ const ImagePreloader = () => (
     <img src="/theme-header.png" alt="" />
     <img src="/personalization-icon.png" alt="" />
     <img src="/personalization-header.png" alt="" />
+    <img src="/be-part.png" alt="" />
     <img src="/model-icon.png" alt="" />
     <img src="/model-header.png" alt="" />
     <img src="/terms-icon.png" alt="" />
