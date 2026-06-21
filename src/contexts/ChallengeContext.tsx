@@ -299,11 +299,11 @@ const translations: Record<string, Record<string, string>> = {
     'partnership_title': 'Partnership',
     'partnership_desc': 'We ripit team are official decided to partner with Mayor of $67DOGE and $67DOGE will serve as the future crypto payment for our app and other future projects in Perpetuity under ripit company no matter what official handle of ripit and co partners and friend',
     'partnership_x_label': '1. X twitter handle',
-    'partnership_x_value': '@Officialripitai @official67doge',
+    'partnership_x_value': '@Officialripitai and @official67doge',
     'partnership_instagram_label': '2. instagram',
     'partnership_instagram_value': 'ripit.ai and redyeti_ripit',
     'partnership_reddit_label': '3. reddit',
-    'partnership_reddit_value': 'ripit_ai, antigravity',
+    'partnership_reddit_value': 'ripit_ai',
 
     // Model Modal
     'model_title': 'Rip It – App Model',
