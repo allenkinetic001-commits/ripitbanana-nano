@@ -6057,19 +6057,24 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         // ALWAYS reset the submission state for ALL users at timer zero
         setIsEliminationRoundActive(false);
 
-        // Survivors: use visiblePosts (the actual in-round feed) as the source of truth
-        const roundSurvivors = visiblePosts.map(p => ({ 
-          id: p.id,
-          username: p.username, 
-          avatar: p.avatar,
-          image: p.image,
-          type: p.type,
-          caption: p.caption,
-          time: p.time,
-          comments: p.comments,
-          madeIt: true,
-          variant: activeMode
-        }));
+        // Survivors: All posts from allPosts except the ones that were eliminated in the round.
+        // We use allPosts because visiblePosts is filtered as the user swipes, so if the user swipes
+        // on all posts, visiblePosts becomes empty.
+        const eliminatedUsernames = new Set(eliminated.map(e => e.username));
+        const roundSurvivors = allPosts
+          .filter(p => !eliminatedUsernames.has(p.username))
+          .map(p => ({ 
+            id: p.id,
+            username: p.username, 
+            avatar: p.avatar,
+            image: p.image,
+            type: p.type,
+            caption: p.caption,
+            time: p.time,
+            comments: p.comments,
+            madeIt: true,
+            variant: activeMode
+          }));
 
         const roundEliminated = eliminated.map(e => ({ ...e, madeIt: false, userVote: null }));
 
@@ -6126,10 +6131,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
         // Only participating users get the "The End" victory screen
         if (isActive) {
+          setSurvivors(roundSurvivors);
           setIsChallengeEnded(true);
         }
     }
-  }, [timeLeft, isActive, visiblePosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
+  }, [timeLeft, isActive, allPosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
 
   useEffect(() => {
     if (isChallengeEnded) {
