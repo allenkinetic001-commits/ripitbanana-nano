@@ -439,32 +439,68 @@ const SettingsPage = () => {
       {/* Contact Modal */}
       {showContactModal && (
         <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
+          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-4 animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
             <div className="flex flex-col items-center border-b border-zinc-100 pb-4 shrink-0 gap-2">
               <div className="w-12 h-12 flex-shrink-0">
-                {!imageErrors['modal_contact_icon'] ? (
-                  <img src="/contact-icon.png" alt="" onError={() => handleImageError('modal_contact_icon')} className="w-full h-full object-contain" />
+                {!imageErrors['modal_be_part_icon'] ? (
+                  <img src="/contact-icon.png" alt="" onError={() => handleImageError('modal_be_part_icon')} className="w-full h-full object-contain" />
                 ) : (
                   <MessageCircle size={32} className="text-zinc-500" />
                 )}
               </div>
-              {!imageErrors['modal_contact_header'] ? (
+              {!imageErrors['modal_be_part_header'] ? (
                 <img 
-                  src="/contact-header.png" 
-                  alt={t('contact')} 
-                  onError={() => handleImageError('modal_contact_header')}
-                  className="h-16 w-auto object-contain" 
+                  src="/be-part.png" 
+                  alt={t('be_part_of_it')} 
+                  onError={() => handleImageError('modal_be_part_header')}
+                  className="h-8 w-auto object-contain" 
                   style={{ imageRendering: '-webkit-optimize-contrast' }} 
                 />
               ) : (
-                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('contact')}</span>
+                <span className="font-bold text-zinc-900 text-2xl tracking-tighter uppercase">{t('be_part_of_it')}</span>
               )}
             </div>
             
-            <div className="space-y-4 text-xs text-zinc-600">
-              <p className="font-medium text-zinc-800">{t('contact_desc')}</p>
-              
-              <div className="space-y-2">
+            <div className="space-y-5 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
+              {/* Partnership Section */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-bold text-zinc-900 uppercase tracking-wide border-b border-zinc-100 pb-1">
+                  {t('partnership_title')}
+                </h4>
+                <p className="leading-relaxed text-zinc-700 font-medium bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                  {t('partnership_desc')}
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <span className="text-base mt-0.5">🐦</span>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-zinc-900">{t('partnership_x_label')}</span>
+                      <span className="text-zinc-700 font-semibold">{t('partnership_x_value')}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <span className="text-base mt-0.5">📸</span>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-zinc-900">{t('partnership_instagram_label')}</span>
+                      <span className="text-zinc-700 font-semibold">{t('partnership_instagram_value')}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <span className="text-base mt-0.5">👽</span>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-zinc-900">{t('partnership_reddit_label')}</span>
+                      <span className="text-zinc-700 font-semibold">{t('partnership_reddit_value')}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact/Feedback Section */}
+              <div className="space-y-3 pt-2">
+                <h4 className="text-sm font-bold text-zinc-900 uppercase tracking-wide border-b border-zinc-100 pb-1">
+                  {t('contact_title')}
+                </h4>
+                <p className="font-medium text-zinc-800">{t('contact_desc')}</p>
                 <div className="flex items-center gap-2 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
                   <span className="text-xl">📧</span>
                   <div className="flex flex-col">
@@ -479,7 +515,7 @@ const SettingsPage = () => {
 
             <button
               onClick={() => setShowContactModal(false)}
-              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-4"
+              className="w-full flex justify-center transition-all active:scale-95 hover:scale-105 mt-4 shrink-0"
             >
               {!imageErrors['btn_close_contact'] ? (
                 <img 
