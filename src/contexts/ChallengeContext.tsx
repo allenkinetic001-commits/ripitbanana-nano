@@ -297,7 +297,7 @@ const translations: Record<string, Record<string, string>> = {
     'contact_footer': 'We’ll get back to you as fast as a Pley timer counting down.',
     'contact_close': 'Close',
     'partnership_title': 'Partnership',
-    'partnership_desc': 'We ripit team are official decided to partner with Mayor of $67DOGE and $67DOGE will serve as the future crypto payment for our app and other future projects in Perpetuity under ripit company no matter what official handle of ripit and co partners and friend',
+    'partnership_desc': 'We ripit team have officially decided to partner with Mayor of $67DOGE and $67DOGE will serve as the future crypto payment for our app and other future projects in Perpetuity under ripit company no matter what official handle of ripit and co partners and friend',
     'partnership_x_label': '1. X twitter handle',
     'partnership_x_value': '@Officialripitai and @official67doge',
     'partnership_instagram_label': '2. instagram',
