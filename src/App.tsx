@@ -53,6 +53,7 @@ const ImagePreloader = () => (
     <img src="/instagram-purple.png" alt="" />
     <img src="/x-black.png" alt="" />
     <img src="/reddit-orange.png" alt="" />
+    <img src="/pump-icon.png" alt="" />
     <img src="/model-icon.png" alt="" />
     <img src="/model-header.png" alt="" />
     <img src="/terms-icon.png" alt="" />

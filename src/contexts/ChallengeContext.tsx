@@ -304,6 +304,8 @@ const translations: Record<string, Record<string, string>> = {
     'partnership_instagram_value': 'ripit.ai and redyeti_ripit',
     'partnership_reddit_label': '3. reddit',
     'partnership_reddit_value': 'ripit_ai',
+    'partnership_pump_label': '4. pump.fun',
+    'partnership_pump_value': 'G59uYtk9rbVroVV5dn4FUsYqDuCZDz8qYNwdTuCupump',
 
     // Model Modal
     'model_title': 'Rip It – App Model',
