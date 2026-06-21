@@ -464,21 +464,9 @@ const SettingsPage = () => {
             <div className="space-y-5 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
               {/* Partnership Section */}
               <div className="space-y-3">
-                <div className="border-b border-zinc-100 pb-1">
-                  {!imageErrors['partnership_header'] ? (
-                    <img 
-                      src="/partnership-header.png" 
-                      alt={t('partnership_title')} 
-                      onError={() => handleImageError('partnership_header')}
-                      className="h-6 w-auto object-contain" 
-                      style={{ imageRendering: '-webkit-optimize-contrast' }} 
-                    />
-                  ) : (
-                    <h4 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">
-                      {t('partnership_title')}
-                    </h4>
-                  )}
-                </div>
+                <h4 className="text-sm font-bold text-zinc-900 uppercase tracking-wide border-b border-zinc-100 pb-1">
+                  {t('partnership_title')}
+                </h4>
                 <p className="leading-relaxed text-zinc-700 font-medium bg-zinc-50 p-3 rounded-xl border border-zinc-100">
                   {t('partnership_desc')}
                 </p>
