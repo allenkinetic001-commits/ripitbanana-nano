@@ -312,6 +312,8 @@ const translations: Record<string, Record<string, string>> = {
     'partnership_pump_created': '28 May 2026 07:41',
     'partnership_pump_token_mint': 'G59uYtk9rbVroVV5dn4FUsYqDuCZDz8qYNwdTuCupump',
     'partnership_pump_creator_wallet': '5gPtFmqXwPrjX2HTVsS8pcmTfg5k1w8q6qfJAAaDJ62C',
+    'partnership_pump_mcap_label': 'Market Cap',
+    'partnership_pump_mcap_value': 'Starts at $251',
     'partnership_pump_stakepoint_search': 'Search the token name and every info there on Stakepoint.app',
 
     // Model Modal

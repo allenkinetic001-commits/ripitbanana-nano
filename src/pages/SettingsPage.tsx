@@ -529,6 +529,10 @@ const SettingsPage = () => {
                             <span className="text-zinc-400 font-semibold block uppercase tracking-wider text-[9px]">Creator Wallet</span>
                             <span className="text-zinc-700 font-mono break-all select-all font-semibold block">{t('partnership_pump_creator_wallet')}</span>
                           </div>
+                          <div className="pt-1.5 border-t border-zinc-100">
+                            <span className="text-zinc-400 font-semibold block uppercase tracking-wider text-[9px]">{t('partnership_pump_mcap_label')}</span>
+                            <span className="text-emerald-600 font-bold block">{t('partnership_pump_mcap_value')}</span>
+                          </div>
                         </div>
                         <div className="text-center pt-0.5">
                           <a 
