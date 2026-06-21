@@ -306,6 +306,13 @@ const translations: Record<string, Record<string, string>> = {
     'partnership_reddit_value': 'ripit_ai',
     'partnership_pump_label': '4. pump.fun',
     'partnership_pump_value': 'G59uYtk9rbVroVV5dn4FUsYqDuCZDz8qYNwdTuCupump',
+    'partnership_pump_lock_desc': '$67DOGE is locked in Stakepoint for the next 6 years',
+    'partnership_pump_lock_id': '#1779950463162',
+    'partnership_pump_pool_id': '#1000',
+    'partnership_pump_created': '28 May 2026 07:41',
+    'partnership_pump_token_mint': 'G59uYtk9rbVroVV5dn4FUsYqDuCZDz8qYNwdTuCupump',
+    'partnership_pump_creator_wallet': '5gPtFmqXwPrjX2HTVsS8pcmTfg5k1w8q6qfJAAaDJ62C',
+    'partnership_pump_stakepoint_search': 'Search the token name and every info there on Stakepoint.app',
 
     // Model Modal
     'model_title': 'Rip It – App Model',

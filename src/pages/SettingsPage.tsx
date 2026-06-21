@@ -494,10 +494,53 @@ const SettingsPage = () => {
                   </div>
                   <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
                     <img src="/pump-icon.png" className="w-3.5 h-3.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-bold text-zinc-900">{t('partnership_pump_label')}</span>
-                      <span className="text-zinc-700 font-semibold break-all">{t('partnership_pump_value')}</span>
-                      <span className="text-emerald-600 font-bold mt-0.5">$67DOGE</span>
+                    <div className="flex flex-col min-w-0 flex-1 space-y-2">
+                      <div>
+                        <span className="font-bold text-zinc-900">{t('partnership_pump_label')}</span>
+                        <span className="text-zinc-700 font-semibold block break-all">{t('partnership_pump_value')}</span>
+                        <span className="text-emerald-600 font-bold mt-0.5 block">$67DOGE</span>
+                      </div>
+                      
+                      {/* Lock & Stakepoint Info */}
+                      <div className="mt-1.5 pt-2 border-t border-zinc-200/60 space-y-1.5 text-[10px] text-zinc-500 font-medium leading-relaxed">
+                        <div className="text-zinc-700 font-bold bg-amber-50 border border-amber-100 p-2 rounded-lg text-xs leading-normal">
+                          🔒 {t('partnership_pump_lock_desc')}
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5 bg-white p-2 rounded-lg border border-zinc-100">
+                          <div>
+                            <span className="text-zinc-400 font-semibold block uppercase tracking-wider text-[9px]">LOCK ID</span>
+                            <span className="text-zinc-800 font-bold break-all">{t('partnership_pump_lock_id')}</span>
+                          </div>
+                          <div>
+                            <span className="text-zinc-400 font-semibold block uppercase tracking-wider text-[9px]">POOL ID</span>
+                            <span className="text-zinc-800 font-bold">{t('partnership_pump_pool_id')}</span>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-zinc-400 font-semibold block uppercase tracking-wider text-[9px]">CREATED</span>
+                            <span className="text-zinc-800 font-bold">{t('partnership_pump_created')}</span>
+                          </div>
+                        </div>
+                        <div className="space-y-1 bg-white p-2 rounded-lg border border-zinc-100">
+                          <div>
+                            <span className="text-zinc-400 font-semibold block uppercase tracking-wider text-[9px]">Token Mint</span>
+                            <span className="text-zinc-700 font-mono break-all select-all font-semibold block">{t('partnership_pump_token_mint')}</span>
+                          </div>
+                          <div className="pt-1.5 border-t border-zinc-100">
+                            <span className="text-zinc-400 font-semibold block uppercase tracking-wider text-[9px]">Creator Wallet</span>
+                            <span className="text-zinc-700 font-mono break-all select-all font-semibold block">{t('partnership_pump_creator_wallet')}</span>
+                          </div>
+                        </div>
+                        <div className="text-center pt-0.5">
+                          <a 
+                            href="https://stakepoint.app" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="inline-flex items-center justify-center w-full gap-1 p-2 bg-zinc-100 hover:bg-zinc-200 text-blue-600 hover:text-blue-800 transition-colors rounded-lg border border-zinc-200/80 font-bold text-xs"
+                          >
+                            🔍 {t('partnership_pump_stakepoint_search')}
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
