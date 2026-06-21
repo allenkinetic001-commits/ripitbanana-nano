@@ -472,21 +472,21 @@ const SettingsPage = () => {
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <img src="/x-black.png" className="w-4.5 h-4.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
+                    <img src="/x-black.png" className="w-3 h-3 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
                     <div className="flex flex-col">
                       <span className="font-bold text-zinc-900">{t('partnership_x_label')}</span>
                       <span className="text-zinc-700 font-semibold">{t('partnership_x_value')}</span>
                     </div>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <img src="/instagram-purple.png" className="w-4.5 h-4.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
+                    <img src="/instagram-purple.png" className="w-3 h-3 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
                     <div className="flex flex-col">
                       <span className="font-bold text-zinc-900">{t('partnership_instagram_label')}</span>
                       <span className="text-zinc-700 font-semibold">{t('partnership_instagram_value')}</span>
                     </div>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <img src="/reddit-orange.png" className="w-4.5 h-4.5 object-contain flex-shrink-0 mt-0.5 rounded-full" alt="" />
+                    <img src="/reddit-orange.png" className="w-3 h-3 object-contain flex-shrink-0 mt-0.5 rounded-full" alt="" />
                     <div className="flex flex-col">
                       <span className="font-bold text-zinc-900">{t('partnership_reddit_label')}</span>
                       <span className="text-zinc-700 font-semibold">{t('partnership_reddit_value')}</span>
