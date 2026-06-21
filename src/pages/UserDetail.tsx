@@ -604,7 +604,7 @@ const UserDetail = () => {
           <img 
             src="/your-enemies.png" 
             alt="Your Enemies" 
-            className="h-14 w-auto object-contain"
+            className="h-9 w-auto object-contain"
             style={{ imageRendering: '-webkit-optimize-contrast' }}
           />
           <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-6 py-2 shadow-md min-w-[3.5rem] animate-pulse">
