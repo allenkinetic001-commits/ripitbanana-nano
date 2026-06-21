@@ -149,6 +149,7 @@ const translations: Record<string, Record<string, string>> = {
     'theme': 'Theme',
     'personalization': 'Personalization',
     'about': 'About',
+    'be_part_of_it': 'Be part of it',
     'model': 'Model',
     'terms': 'Terms of Service',
     'privacy': 'Privacy Policy',

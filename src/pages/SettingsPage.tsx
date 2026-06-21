@@ -295,8 +295,9 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* Contact & Logout Section */}
-        <div className="space-y-2 pb-6">
+        {/* BE PART OF IT Section */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest ml-1">{t('be_part_of_it')}</h3>
           <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 shadow-sm">
             <div 
               onClick={() => setShowContactModal(true)}
@@ -330,8 +331,11 @@ const SettingsPage = () => {
               <ChevronRight size={18} className="text-zinc-300 group-hover:text-zinc-400 transition-colors" />
             </div>
           </div>
+        </div>
 
-          <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm mt-4">
+        {/* Logout Section */}
+        <div className="pb-6">
+          <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm">
             <button 
               onClick={handleLogout}
               className="w-full flex items-center gap-3 p-4 hover:bg-red-50 transition-colors text-left group"
