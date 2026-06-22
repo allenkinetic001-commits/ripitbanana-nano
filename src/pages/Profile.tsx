@@ -608,29 +608,7 @@ const Profile = () => {
           </button>
         </div>
 
-        {/* Your Enemies Banner */}
-        <div 
-          onClick={() => {
-            setViewMode('enemies');
-            setEnemiesSubTab('added_me');
-          }}
-          className="flex flex-col items-center justify-center py-4 gap-2 mt-2 cursor-pointer group hover:opacity-80 transition-opacity"
-        >
-          <img 
-            src="/your-enemies.png" 
-            alt="Your Enemies" 
-            className="h-9 w-auto object-contain"
-            style={{ imageRendering: '-webkit-optimize-contrast' }}
-          />
-          <div className="flex items-center justify-center bg-rose-600 text-white rounded-2xl px-6 py-2 shadow-md min-w-[3.5rem] animate-pulse">
-            <span className="text-2xl font-black font-mono">
-              {enemiesOfCount}
-            </span>
-          </div>
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-            Targeted by Survivors
-          </span>
-        </div>
+
       </div>
 
       <div className="flex border-t border-zinc-100 mt-4 items-center">
