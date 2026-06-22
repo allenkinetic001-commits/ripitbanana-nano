@@ -1055,7 +1055,7 @@ const Home = () => {
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
             <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Loading...</p>
           </div>
-        ) : (visiblePosts.length > 0 || unswipedPosts.length > 0) ? (
+        ) : (!isChallengeEnded && (visiblePosts.length > 0 || unswipedPosts.length > 0)) ? (
           /* ── Posts feed ── */
           (visiblePosts.length > 0 ? visiblePosts : unswipedPosts).map((post) => (
             <PostCard 

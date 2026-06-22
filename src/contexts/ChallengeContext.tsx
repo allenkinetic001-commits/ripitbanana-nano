@@ -6091,18 +6091,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           }
         }
 
-        // Only participating users get the "The End" victory screen
-        if (isActive) {
-          setSurvivors(roundSurvivors);
-          const userId = localStorage.getItem('supabaseUserId');
-          if (userId) {
-            localStorage.setItem(`challengeEndedAt_${userId}`, String(Date.now()));
-            localStorage.setItem(`survivors_${userId}`, JSON.stringify(roundSurvivors));
-            localStorage.setItem(`eliminated_${userId}`, JSON.stringify(roundEliminated));
-            localStorage.setItem(`isChallengeEnded_${userId}`, 'true');
-          }
-          setIsChallengeEnded(true);
+        // Results pop up for everyone when the timer expires
+        setSurvivors(roundSurvivors);
+        const userId = localStorage.getItem('supabaseUserId');
+        if (userId) {
+          localStorage.setItem(`challengeEndedAt_${userId}`, String(Date.now()));
+          localStorage.setItem(`survivors_${userId}`, JSON.stringify(roundSurvivors));
+          localStorage.setItem(`eliminated_${userId}`, JSON.stringify(roundEliminated));
+          localStorage.setItem(`isChallengeEnded_${userId}`, 'true');
         }
+        setIsChallengeEnded(true);
     }
   }, [timeLeft, isActive, allPosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
 
