@@ -62,6 +62,7 @@ interface UserProfile {
 
 interface ChallengeContextType {
   timeLeft: number;
+  roundTimeLeft: number;
   isActive: boolean;
   userProfile: UserProfile;
   setUserProfile: (profile: UserProfile) => void;
@@ -109,6 +110,7 @@ interface ChallengeContextType {
   setIsChallengeEnded: (ended: boolean) => void;
   isEliminationRoundActive: boolean;
   setIsEliminationRoundActive: (active: boolean) => void;
+  setRoundTimeLeft: (time: number) => void;
   setSurvivors: React.Dispatch<React.SetStateAction<Survivor[]>>;
   setRoundHistory: React.Dispatch<React.SetStateAction<RoundRecord[]>>;
   updateHistoryVote: (survivorId: number, roundId: string | null, vote: 'up' | 'down' | null) => void;
@@ -5021,6 +5023,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const [timeLeft, setTimeLeft] = useState(calculateUniversalTimeLeft());
+  const [roundTimeLeft, setRoundTimeLeft] = useState<number>(0);
   const [isActive, setIsActive] = useState<boolean>(() => {
     const userId = localStorage.getItem('supabaseUserId');
     if (!userId) return false;
@@ -5082,12 +5085,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const stored = localStorage.getItem(`isChallengeEnded_${userId}`) === 'true';
     return stored;
   });
-  const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(() => {
-    const userId = localStorage.getItem('supabaseUserId');
-    if (!userId) return false;
-    const stored = localStorage.getItem(`isEliminationRoundActive_${userId}`) === 'true';
-    return stored;
-  });
+  const [isEliminationRoundActive, setIsEliminationRoundActive] = useState<boolean>(false);
   const [enemies, setEnemies] = useState<Survivor[]>([]);
   const [allPosts, setAllPosts] = useState<any[]>(() => {
     const saved = localStorage.getItem('allPosts_v2');
@@ -5140,7 +5138,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const savedElimCounts = localStorage.getItem(`eliminationCounts_${userId}`);
     const savedClickCounts = localStorage.getItem(`clickCounts_${userId}`);
     
-    setIsEliminationRoundActive(storedElimActive);
+    setIsEliminationRoundActive(false); // Reset active round state on page load/mount
     setIsChallengeEnded(storedChallengeEnded);
     setIsActive(storedActive);
     setUserSelection(storedSelection);
@@ -5261,7 +5259,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setter(saved ? JSON.parse(saved) : fallback);
     };
 
-    load('userVotes', setUserVotes, {});
+    setUserVotes({}); // Reset userVotes on page load/mount
     load('enemies', setEnemies, []);
     load('followedUsers', setFollowedUsers, []);
     load('wallPosts', setWallPosts, []);
@@ -5971,6 +5969,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
     setIsActive(true);
     setIsEliminationRoundActive(true);
+    setRoundTimeLeft(120); // Initialize 2-minute round timer
     setTimeLeft(calculateUniversalTimeLeft());
     setIsChallengeEnded(false);
     setIsDurationInitialized(false);
@@ -6010,9 +6009,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
-  // Universal Loop: Finalize results for everyone when timer ends
+  // Universal Loop: Finalize results for everyone when round timer ends
   useEffect(() => {
-    if (timeLeft === 0) {
+    if (isEliminationRoundActive && roundTimeLeft === 0) {
         // Round ends: Finalize results for everyone
         const activeMode = userSelection || majorityVariant || 'pley';
         
@@ -6102,7 +6101,26 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         }
         setIsChallengeEnded(true);
     }
-  }, [timeLeft, isActive, allPosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
+  }, [roundTimeLeft, isEliminationRoundActive, isActive, allPosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
+
+  // Round timer countdown
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isEliminationRoundActive && roundTimeLeft > 0) {
+      interval = setInterval(() => {
+        setRoundTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isEliminationRoundActive, roundTimeLeft]);
 
 
 
@@ -6234,7 +6252,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   return (
     <ChallengeContext.Provider value={{
-      timeLeft, isActive, userProfile, setUserProfile, clickCounts, eliminationCounts, madeItCounts,
+      timeLeft, roundTimeLeft, isActive, userProfile, setUserProfile, clickCounts, eliminationCounts, madeItCounts,
       variantDurations, variantFirstClickTime, userSelection, isChallengeEnded,
       isEliminationRoundActive, setIsEliminationRoundActive,
       showPills, setShowPills, activeTab, setActiveTab,
@@ -6248,7 +6266,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setSurvivors, setRoundHistory, updateHistoryVote, clearAllHistory, getVariantDisplayName,
       addEnemy, addSwornEnemy, removeEnemy, addComment, addWallPost, isAuthenticated, authLoading, login, logout, language, setLanguage, theme, setTheme, t,
       userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser,
-      isEliminated, setIsEliminated, eliminateSelf, historyLoading, postsLoading
+      isEliminated, setIsEliminated, eliminateSelf, historyLoading, postsLoading, setRoundTimeLeft
     }}>
       {children}
     </ChallengeContext.Provider>

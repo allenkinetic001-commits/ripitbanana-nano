@@ -224,7 +224,7 @@ const SearchContent = ({ searchQuery, allPosts, navigate }: { searchQuery: strin
 const Home = () => {
   const navigate = useNavigate();
   const {
-    timeLeft, isActive, clickCounts, eliminationCounts, madeItCounts,
+    timeLeft, roundTimeLeft, isActive, clickCounts, eliminationCounts, madeItCounts,
     userSelection, isChallengeEnded, survivors, eliminated,
     isEliminationRoundActive, setIsEliminationRoundActive,
     showPills, setShowPills, activeTab, setActiveTab,
@@ -947,7 +947,7 @@ const Home = () => {
               <div className="h-px w-full bg-zinc-100/80" />
 
               {/* Start Button at Top for Visibility */}
-              <div className="flex justify-center w-full">
+              <div className="flex flex-col items-center justify-center w-full">
                 <button
                   onClick={() => {
                     if (isEliminationRoundActive) return;
@@ -972,6 +972,16 @@ const Home = () => {
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />
                 </button>
+                {isEliminationRoundActive && (
+                  <div className="text-[10px] font-black text-rose-600 font-mono mt-1.5 flex items-center gap-1 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 shadow-sm animate-pulse">
+                    <span>ROUND ENDS IN:</span>
+                    <span>{(() => {
+                      const m = Math.floor(roundTimeLeft / 60);
+                      const s = roundTimeLeft % 60;
+                      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    })()}</span>
+                  </div>
+                )}
               </div>
 
               {/* Automated Cycle UI */}
