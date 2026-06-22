@@ -6134,6 +6134,11 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (wasEliminationRoundActive.current) {
         setUserVotes({});
         setUserSelection(null);
+        setClickCounts({ pley: 0 });
+        setEliminationCounts({ pley: 0 });
+        setVariantFirstClickTime({ pley: 0 });
+        setSurvivors([]);
+        setEliminated([]);
         wasEliminationRoundActive.current = false;
       }
     }
