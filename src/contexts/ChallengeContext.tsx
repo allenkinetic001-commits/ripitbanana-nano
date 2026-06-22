@@ -5094,6 +5094,14 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
     const currentCycleStart = String(getCycleStartTimestamp());
     if (storedCycleStart !== currentCycleStart) {
+      // Check if challenge ended recently (within 20 seconds) to persist across refresh
+      const endedAtStr = localStorage.getItem(`challengeEndedAt_${userId}`);
+      if (endedAtStr) {
+        const endedAt = parseInt(endedAtStr, 10);
+        if (!isNaN(endedAt) && Date.now() - endedAt < 20000) {
+          return true;
+        }
+      }
       localStorage.setItem(`isChallengeEnded_${userId}`, 'false');
       return false;
     }
@@ -5143,6 +5151,15 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
     const currentCycleStart = String(getCycleStartTimestamp());
     if (storedCycleStart !== currentCycleStart) {
+      // Check if challenge ended recently (within 20 seconds) to persist across refresh
+      const endedAtStr = localStorage.getItem(`challengeEndedAt_${userId}`);
+      if (endedAtStr) {
+        const endedAt = parseInt(endedAtStr, 10);
+        if (!isNaN(endedAt) && Date.now() - endedAt < 20000) {
+          const saved = localStorage.getItem(`survivors_${userId}`);
+          return saved ? JSON.parse(saved) : [];
+        }
+      }
       localStorage.removeItem(`survivors_${userId}`);
       return [];
     }
@@ -5163,7 +5180,22 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const currentCycleStart = String(getCycleStartTimestamp());
     const isCycleValid = storedCycleStart === currentCycleStart;
 
-    if (!isCycleValid) {
+    // Check if challenge ended recently (within 20 seconds) to persist across refresh
+    const endedAtStr = localStorage.getItem(`challengeEndedAt_${userId}`);
+    let isRecentlyEnded = false;
+    let remainingTime = 20000;
+    if (endedAtStr) {
+      const endedAt = parseInt(endedAtStr, 10);
+      if (!isNaN(endedAt)) {
+        const diff = Date.now() - endedAt;
+        if (diff < 20000) {
+          isRecentlyEnded = true;
+          remainingTime = 20000 - diff;
+        }
+      }
+    }
+
+    if (!isCycleValid && !isRecentlyEnded) {
       localStorage.setItem(`isEliminationRoundActive_${userId}`, 'false');
       localStorage.setItem(`isChallengeEnded_${userId}`, 'false');
       localStorage.setItem(`isActive_${userId}`, 'false');
@@ -5187,7 +5219,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setIsEliminated(storedIsEliminated);
     } else {
       const storedElimActive = localStorage.getItem(`isEliminationRoundActive_${userId}`) === 'true';
-      const storedChallengeEnded = localStorage.getItem(`isChallengeEnded_${userId}`) === 'true';
+      const storedChallengeEnded = isRecentlyEnded ? true : (localStorage.getItem(`isChallengeEnded_${userId}`) === 'true');
       const storedActive = localStorage.getItem(`isActive_${userId}`) === 'true';
       const storedSelection = localStorage.getItem(`userSelection_${userId}`);
       const storedIsEliminated = localStorage.getItem(`isEliminated_${userId}`) === 'true';
@@ -5944,6 +5976,15 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const storedCycleStart = localStorage.getItem(`challengeCycleStart_${userId}`);
     const currentCycleStart = String(getCycleStartTimestamp());
     if (storedCycleStart !== currentCycleStart) {
+      // Check if challenge ended recently (within 20 seconds) to persist across refresh
+      const endedAtStr = localStorage.getItem(`challengeEndedAt_${userId}`);
+      if (endedAtStr) {
+        const endedAt = parseInt(endedAtStr, 10);
+        if (!isNaN(endedAt) && Date.now() - endedAt < 20000) {
+          const saved = localStorage.getItem(`eliminated_${userId}`);
+          return saved ? JSON.parse(saved) : [];
+        }
+      }
       localStorage.removeItem(`eliminated_${userId}`);
       return [];
     }
@@ -6152,6 +6193,13 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         // Only participating users get the "The End" victory screen
         if (isActive) {
           setSurvivors(roundSurvivors);
+          const userId = localStorage.getItem('supabaseUserId');
+          if (userId) {
+            localStorage.setItem(`challengeEndedAt_${userId}`, String(Date.now()));
+            localStorage.setItem(`survivors_${userId}`, JSON.stringify(roundSurvivors));
+            localStorage.setItem(`eliminated_${userId}`, JSON.stringify(roundEliminated));
+            localStorage.setItem(`isChallengeEnded_${userId}`, 'true');
+          }
           setIsChallengeEnded(true);
         }
     }
@@ -6159,6 +6207,21 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   useEffect(() => {
     if (isChallengeEnded) {
+      const userId = localStorage.getItem('supabaseUserId');
+      let timeoutDuration = 20000;
+      if (userId) {
+        const endedAtStr = localStorage.getItem(`challengeEndedAt_${userId}`);
+        if (endedAtStr) {
+          const endedAt = parseInt(endedAtStr, 10);
+          if (!isNaN(endedAt)) {
+            const diff = Date.now() - endedAt;
+            if (diff > 0 && diff < 20000) {
+              timeoutDuration = 20000 - diff;
+            }
+          }
+        }
+      }
+
       const timeout = setTimeout(() => {
         setIsChallengeEnded(false);
         setIsActive(false);
@@ -6169,6 +6232,13 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         setMadeItCounts({ pley: 0 });
         setUserSelection(null);
         setVariantFirstClickTime({ pley: 0 });
+        if (userId) {
+          localStorage.removeItem(`challengeEndedAt_${userId}`);
+          localStorage.removeItem(`survivors_${userId}`);
+          localStorage.removeItem(`eliminated_${userId}`);
+          localStorage.setItem(`isChallengeEnded_${userId}`, 'false');
+          localStorage.setItem(`isActive_${userId}`, 'false');
+        }
         try {
           const historyIds = new Set([
             ...survivorHistory.map(s => s?.id).filter(Boolean),
@@ -6179,7 +6249,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         } catch (e) {
           setVisiblePosts([]);
         }
-      }, 20000);
+      }, timeoutDuration);
       return () => clearTimeout(timeout);
     }
   }, [isChallengeEnded, allPosts]);
