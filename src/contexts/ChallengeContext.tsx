@@ -6103,29 +6103,35 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   }, [timeLeft, isActive, allPosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
 
-  // Round timer countdown
+  // Round timer countdown interval
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isEliminationRoundActive) {
       interval = setInterval(() => {
         setRoundTimeLeft(prev => {
           if (prev <= 1) {
-            clearInterval(interval);
-            // 2-minute round ended: morph button back to start and reset local voting state
-            setIsEliminationRoundActive(false);
-            setUserVotes({});
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
-    } else {
-      setRoundTimeLeft(0);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [isEliminationRoundActive]);
+
+  // Round active state transitions and resets
+  useEffect(() => {
+    if (isEliminationRoundActive) {
+      if (roundTimeLeft === 0) {
+        setIsEliminationRoundActive(false);
+      }
+    } else {
+      setRoundTimeLeft(0);
+      setUserVotes({});
+    }
+  }, [isEliminationRoundActive, roundTimeLeft]);
 
 
 
