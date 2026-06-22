@@ -6009,9 +6009,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
-  // Universal Loop: Finalize results for everyone when round timer ends
+  // Universal Loop: Finalize results for everyone when 24-hour timer ends
   useEffect(() => {
-    if (isEliminationRoundActive && roundTimeLeft === 0) {
+    if (timeLeft === 0) {
         // Round ends: Finalize results for everyone
         const activeMode = userSelection || majorityVariant || 'pley';
         
@@ -6101,26 +6101,31 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
         }
         setIsChallengeEnded(true);
     }
-  }, [roundTimeLeft, isEliminationRoundActive, isActive, allPosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
+  }, [timeLeft, isActive, allPosts, majorityVariant, userSelection, eliminated, isAuthenticated]);
 
   // Round timer countdown
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isEliminationRoundActive && roundTimeLeft > 0) {
+    if (isEliminationRoundActive) {
       interval = setInterval(() => {
         setRoundTimeLeft(prev => {
           if (prev <= 1) {
             clearInterval(interval);
+            // 2-minute round ended: morph button back to start and reset local voting state
+            setIsEliminationRoundActive(false);
+            setUserVotes({});
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
+    } else {
+      setRoundTimeLeft(0);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isEliminationRoundActive, roundTimeLeft]);
+  }, [isEliminationRoundActive]);
 
 
 

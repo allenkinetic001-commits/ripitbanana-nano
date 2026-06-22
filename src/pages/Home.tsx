@@ -1065,36 +1065,7 @@ const Home = () => {
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
             <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Loading...</p>
           </div>
-        ) : (!isChallengeEnded && (visiblePosts.length > 0 || unswipedPosts.length > 0)) ? (
-          /* ── Posts feed ── */
-          (visiblePosts.length > 0 ? visiblePosts : unswipedPosts).map((post) => (
-            <PostCard 
-              key={post.id} 
-              {...post} 
-              gameMode={userSelection || majorityVariant}
-              onDelete={() => handleDeletePost(post.id)}
-              onPass={() => handlePassPost(post.id)}
-            />
-          ))
-        ) : allPosts.length === 0 ? (
-          /* ── Empty feed ── */
-          <EmptyFeed 
-            className="min-h-[60vh]"
-            actionButton={
-              <button
-                onClick={() => setUploadModalOpen(true)}
-                className="transition-all active:scale-95 hover:scale-105"
-              >
-                <img 
-                  src="/btn-post-first.png" 
-                  alt="Post First" 
-                  className="h-14 w-auto object-contain drop-shadow-md" 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }}
-                />
-              </button>
-            }
-          />
-        ) : (
+        ) : isChallengeEnded ? (
           /* ── Universal Selection Ended / Victory Screen ── */
           <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20 relative overflow-hidden">
             {/* Background Glow */}
@@ -1208,6 +1179,39 @@ const Home = () => {
               </button>
             </div>
           </div>
+        ) : (visiblePosts.length > 0 || unswipedPosts.length > 0) ? (
+          /* ── Posts feed ── */
+          (visiblePosts.length > 0 ? visiblePosts : unswipedPosts).map((post) => (
+            <PostCard 
+              key={post.id} 
+              {...post} 
+              gameMode={userSelection || majorityVariant}
+              onDelete={() => handleDeletePost(post.id)}
+              onPass={() => handlePassPost(post.id)}
+            />
+          ))
+        ) : (
+          /* ── Empty feed ── */
+          <EmptyFeed 
+            className="min-h-[60vh]"
+            title={allPosts.length === 0 ? "It's Quiet Here" : "All Caught Up"}
+            subtitle={allPosts.length === 0 ? "No posts have been made yet" : "You have swiped all available posts"}
+            actionButton={
+              allPosts.length === 0 ? (
+                <button
+                  onClick={() => setUploadModalOpen(true)}
+                  className="transition-all active:scale-95 hover:scale-105"
+                >
+                  <img 
+                    src="/btn-post-first.png" 
+                    alt="Post First" 
+                    className="h-14 w-auto object-contain drop-shadow-md" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                </button>
+              ) : undefined
+            }
+          />
         )}
       </main>
     </div>
