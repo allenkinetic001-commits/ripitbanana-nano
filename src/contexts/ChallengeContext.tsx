@@ -5024,6 +5024,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const [timeLeft, setTimeLeft] = useState(calculateUniversalTimeLeft());
   const [roundTimeLeft, setRoundTimeLeft] = useState<number>(0);
+  const wasEliminationRoundActive = React.useRef(false);
   const [isActive, setIsActive] = useState<boolean>(() => {
     const userId = localStorage.getItem('supabaseUserId');
     if (!userId) return false;
@@ -6124,12 +6125,17 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   // Round active state transitions and resets
   useEffect(() => {
     if (isEliminationRoundActive) {
+      wasEliminationRoundActive.current = true;
       if (roundTimeLeft === 0) {
         setIsEliminationRoundActive(false);
       }
     } else {
       setRoundTimeLeft(0);
-      setUserVotes({});
+      if (wasEliminationRoundActive.current) {
+        setUserVotes({});
+        setUserSelection(null);
+        wasEliminationRoundActive.current = false;
+      }
     }
   }, [isEliminationRoundActive, roundTimeLeft]);
 
