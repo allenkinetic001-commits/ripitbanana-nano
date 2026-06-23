@@ -367,9 +367,14 @@ const SearchPage = () => {
     });
     // Sort by most recent rounds first
     return result.sort((a, b) => {
-      const dateA = new Date(`${a.roundDate} ${a.roundTime}`).getTime();
-      const dateB = new Date(`${b.roundDate} ${b.roundTime}`).getTime();
-      return dateB - dateA;
+      const parseDate = (dStr: string, tStr: string) => {
+        const cleaned = dStr.replace(/(\d+)(st|nd|rd|th)/i, '$1');
+        const parsed = new Date(`${cleaned} ${tStr}`).getTime();
+        return isNaN(parsed) ? 0 : parsed;
+      };
+      const timeA = parseDate(a.roundDate, a.roundTime);
+      const timeB = parseDate(b.roundDate, b.roundTime);
+      return timeB - timeA;
     });
   }, [mergedRounds, viewMode]);
 

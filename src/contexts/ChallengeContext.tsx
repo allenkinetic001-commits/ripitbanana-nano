@@ -5931,7 +5931,17 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       setRoundHistory(prev => {
         const dbTimestamps = new Set(formatted.map(r => r.timestamp).filter(Boolean));
         const localOnly = prev.filter(r => String(r.id).startsWith('temp-') && !dbTimestamps.has(r.timestamp));
-        return [...localOnly, ...formatted];
+        const combined = [...localOnly, ...formatted];
+        return combined.sort((a, b) => {
+          const parseDate = (dStr: string, tStr: string) => {
+            const cleaned = dStr.replace(/(\d+)(st|nd|rd|th)/i, '$1');
+            const parsed = new Date(`${cleaned} ${tStr}`).getTime();
+            return isNaN(parsed) ? 0 : parsed;
+          };
+          const timeA = parseDate(a.date, a.time);
+          const timeB = parseDate(b.date, b.time);
+          return timeB - timeA;
+        });
       });
     }
     setHistoryLoading(false);
@@ -6064,7 +6074,17 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
           setRoundHistory(prev => {
             if (prev.some(r => r.timestamp === roundTimestamp)) return prev;
-            return [newRoundRecord, ...prev];
+            const combined = [newRoundRecord, ...prev];
+            return combined.sort((a, b) => {
+              const parseDate = (dStr: string, tStr: string) => {
+                const cleaned = dStr.replace(/(\d+)(st|nd|rd|th)/i, '$1');
+                const parsed = new Date(`${cleaned} ${tStr}`).getTime();
+                return isNaN(parsed) ? 0 : parsed;
+              };
+              const timeA = parseDate(a.date, a.time);
+              const timeB = parseDate(b.date, b.time);
+              return timeB - timeA;
+            });
           });
 
           // Only the active/participating user pushes to Supabase

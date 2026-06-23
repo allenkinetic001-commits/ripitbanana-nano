@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import PostCard from '../components/PostCard';
-import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, Calendar, ChevronRight, Trophy } from 'lucide-react';
+import { Camera, Search, Info, Sparkles, Users, Skull, Plus, Flame, Clock, X, Calendar, ChevronRight, Trophy, ArrowBigUp, ArrowBigDown } from 'lucide-react';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { useSupabasePosts, createPost, uploadPostMedia, formatPostForUI } from '../hooks/useSupabase';
 import { supabase } from '../lib/supabase';
@@ -134,6 +134,172 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
   );
 });
 
+const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUsers, navigate, handleVote, selectedRoundId, isHistoryView, isChallengeEnded }: any) => {
+  const [showHearts, setShowHearts] = useState(false);
+  const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
+
+  const isVideo = survivor.type === 'video' || 
+    survivor.image?.startsWith('data:video/') || 
+    /\.(mp4|mov|webm|ogg)(\?|$)/i.test(survivor.image || '');
+
+  return (
+    <div className="mx-4 mb-4 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-2xl transition-all text-left">
+      {/* Header Info */}
+      <div className="flex items-center justify-between p-4" {...heartsHandlers}>
+        <div 
+          className="flex items-center space-x-3 cursor-pointer group"
+          onClick={() => navigate(`/user/${survivor.username}`)}
+        >
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden shadow-lg group-hover:scale-105 transition-transform">
+              <img src={survivor.avatar || "/custom-empty-profile.png"} alt={survivor.username} className="w-full h-full object-cover" />
+            </div>
+            <div className="absolute -bottom-2 -right-2">
+              <img 
+                src="/pley-badge.png" 
+                alt="Status" 
+                className="w-8 h-8 object-contain drop-shadow-md" 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-black text-zinc-900 italic tracking-tight">@{survivor.username}</span>
+              <ProfileHeartsToggle isVisible={showHearts} heartClassName="w-7 h-7" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">
+                {survivor.roundDate ? `${survivor.roundDate} at ${survivor.roundTime}` : survivor.time}
+              </span>
+              {survivor.roundDurationLabel && (
+                <div className="flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
+                  <img src="/duration-alarm.png" alt="" className="h-3 w-auto object-contain" />
+                  <span className="text-[8px] text-purple-600 font-black uppercase tracking-tighter">
+                    {survivor.roundDurationLabel === '2 min' || survivor.roundDurationLabel === '2 mins' ? '24hrs' : survivor.roundDurationLabel}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <button 
+          onClick={() => toggleFollow(survivor.username)}
+          className="transition-all active:scale-90 hover:scale-110"
+        >
+          <img 
+            src={followedUsers.includes(survivor.username) ? "/btn-following.png" : "/btn-follow.png"} 
+            alt="Follow Action" 
+            className="h-8 w-auto object-contain" 
+            style={{ imageRendering: '-webkit-optimize-contrast' }}
+          />
+        </button>
+      </div>
+
+      {/* Main Visual */}
+      <div className="aspect-[4/5] bg-zinc-50 overflow-hidden relative group mx-2 rounded-[1.8rem]">
+        {isVideo ? (
+          <video 
+            src={survivor.image} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 bg-zinc-50" 
+            controls 
+            loop 
+            muted 
+            playsInline
+            autoPlay
+          />
+        ) : (
+          <img src={survivor.image} alt="Survival Proof" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        )}
+        
+        {/* Status Badge Overlays */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
+           <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full shadow-lg border border-white/50 flex items-center gap-2">
+              <img src="/duration-alarm.png" alt="" className="h-4 w-auto object-contain" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-900">
+                {isHistoryView ? "Legacy Record" : "Live Survivor"}
+              </span>
+           </div>
+        </div>
+
+        <div className="absolute bottom-4 right-4 z-50">
+          {isHistoryView && survivor.madeIt === false ? (
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-2xl shadow-xl border-2 backdrop-blur-md bg-rose-500/90 text-white border-rose-400">
+              Terminated
+            </span>
+          ) : (
+            <img 
+              src="/survived_btn.png" 
+              alt="Survived" 
+              className="h-8 w-auto object-contain drop-shadow-md hover:scale-110 transition-transform active:scale-95 cursor-pointer" 
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Actions & Insights */}
+      <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {handleVote && (
+              <div className="flex items-center gap-1 bg-zinc-100/80 p-1 rounded-full border border-zinc-200/50">
+                <button 
+                  onClick={() => handleVote(survivor.id, null, 'up')}
+                  className={cn("p-1.5 rounded-full transition-all", survivor.userVote === 'up' ? "bg-white shadow-sm scale-110" : "opacity-40 hover:opacity-100")}
+                >
+                  <ArrowBigUp size={20} fill={survivor.userVote === 'up' ? "#22c55e" : "black"} stroke="none" />
+                </button>
+                <button 
+                  onClick={() => handleVote(survivor.id, null, 'down')}
+                  className={cn("p-1.5 rounded-full transition-all", survivor.userVote === 'down' ? "bg-white shadow-sm scale-110" : "opacity-40 hover:opacity-100")}
+                >
+                  <ArrowBigDown size={20} fill={survivor.userVote === 'down' ? "#ef4444" : "black"} stroke="none" />
+                </button>
+              </div>
+            )}
+
+            <button 
+              onClick={() => navigate(`/post/${survivor.id}`)}
+              className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-10 w-10 rounded-full transition-all active:scale-90"
+            >
+              <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+            </button>
+            
+            <button 
+              onClick={() => navigate(`/chat/${survivor.username}`)}
+              className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-10 w-10 rounded-full transition-all active:scale-90"
+            >
+              <img src="/nav-chat-v3.png" alt="Message" className="h-6 w-6 object-contain" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-right">
+              <p className="text-[7px] font-black text-zinc-300 uppercase tracking-widest leading-none">Vibe Check</p>
+              <p className="text-[10px] font-black text-zinc-900 mt-0.5">ELITE STATUS</p>
+            </div>
+            <img 
+              src="/elite_status_icon.png" 
+              alt="Elite" 
+              className="w-10 h-10 object-contain drop-shadow-sm" 
+            />
+          </div>
+        </div>
+
+        {/* Caption */}
+        <div className="bg-zinc-50/50 rounded-[1.5rem] p-3 border border-zinc-100/50">
+          <p className="text-[12px] leading-relaxed">
+            <span className="font-black italic text-zinc-900 mr-2 hover:text-purple-600 cursor-pointer">@{survivor.username}</span>
+            <span className="text-zinc-600">{survivor.caption}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 const SearchContent = ({ searchQuery, allPosts, navigate }: { searchQuery: string, allPosts: any[], navigate: any }) => {
   const [remoteUsers, setRemoteUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -236,9 +402,17 @@ const Home = () => {
     setSurvivors, addEliminated, startNewChallenge, getVariantDisplayName, userProfile, eliminateSelf,
     allPosts, setAllPosts, wallPosts, addWallPost,
     visiblePosts, setVisiblePosts,
+    followedUsers, toggleFollow, isSurvivor, updateHistoryVote,
     language,
     t, postsLoading
   } = useChallenge();
+
+  const handleVote = (survivorId: string | number, roundId: string | null, vote: 'up' | 'down') => {
+    const idNum = typeof survivorId === 'number' ? survivorId : parseInt(survivorId, 10);
+    if (!isNaN(idNum)) {
+      updateHistoryVote(idNum, roundId, vote);
+    }
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -1110,27 +1284,31 @@ const Home = () => {
                   </span>
                 </div>
                 
-                <div className="bg-white/80 backdrop-blur-md rounded-[2.5rem] border border-zinc-100 shadow-2xl overflow-hidden group">
-                  <div className="max-h-[280px] overflow-y-auto divide-y divide-zinc-50 p-2">
-                    {survivors.slice(0, 10).map((survivor, index) => (
-                      <HomeUserItem 
-                        key={survivor.id} 
-                        user={survivor} 
-                        index={index} 
-                        navigate={navigate} 
-                      />
-                    ))}
-                    {survivors.length > 10 && (
-                      <div className="p-4 text-center">
-                        <button 
-                          onClick={() => navigate('/search')}
-                          className="text-[10px] font-black text-purple-600 uppercase tracking-widest hover:underline"
-                        >
-                          View All {survivors.length} in Public Gallery
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                <div className="max-h-[500px] overflow-y-auto w-full pr-1 scrollbar-thin">
+                  {survivors.slice(0, 10).map((survivor) => (
+                    <SurvivorRow 
+                      key={`survivor-${survivor.id}`} 
+                      survivor={{ ...survivor, madeIt: true }} 
+                      isSurvivor={isSurvivor}
+                      toggleFollow={toggleFollow}
+                      followedUsers={followedUsers}
+                      navigate={navigate}
+                      handleVote={handleVote}
+                      selectedRoundId={null}
+                      isHistoryView={true}
+                      isChallengeEnded={false}
+                    />
+                  ))}
+                  {survivors.length > 10 && (
+                    <div className="p-4 text-center">
+                      <button 
+                        onClick={() => navigate('/search')}
+                        className="text-[10px] font-black text-purple-600 uppercase tracking-widest hover:underline"
+                      >
+                        View All {survivors.length} in Public Gallery
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : eliminated.length > 0 && (
