@@ -1363,7 +1363,7 @@ const Home = () => {
             <PostCard 
               key={post.id} 
               {...post} 
-              gameMode={userSelection || majorityVariant}
+              gameMode={isEliminationRoundActive ? (userSelection || majorityVariant || 'pley') : null}
               onDelete={() => handleDeletePost(post.id)}
               onPass={() => handlePassPost(post.id)}
             />

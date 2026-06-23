@@ -5139,15 +5139,50 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const savedElimCounts = localStorage.getItem(`eliminationCounts_${userId}`);
     const savedClickCounts = localStorage.getItem(`clickCounts_${userId}`);
     
-    setIsEliminationRoundActive(false); // Reset active round state on page load/mount
+    // Check if the elimination round cycle is still active
+    let active = false;
+    let timeLeft = 0;
+    if (storedElimActive) {
+      const cycleStartStr = localStorage.getItem(`challengeCycleStart_${userId}`);
+      if (cycleStartStr) {
+        const cycleStart = parseInt(cycleStartStr, 10);
+        const elapsed = Math.floor(Date.now() / 1000) - cycleStart;
+        if (elapsed >= 0 && elapsed < 120) {
+          active = true;
+          timeLeft = 120 - elapsed;
+        }
+      }
+    }
+
+    setIsEliminationRoundActive(active);
+    setRoundTimeLeft(timeLeft);
     setIsChallengeEnded(storedChallengeEnded);
     setIsActive(storedActive);
-    setUserSelection(storedSelection);
     setIsEliminated(storedIsEliminated);
-    setSurvivors(savedSurvivors ? JSON.parse(savedSurvivors) : []);
-    setEliminated(savedEliminated ? JSON.parse(savedEliminated) : []);
-    setEliminationCounts(savedElimCounts ? JSON.parse(savedElimCounts) : { pley: 0 });
-    setClickCounts(savedClickCounts ? JSON.parse(savedClickCounts) : { pley: 0 });
+    
+    const u = userProfile.username;
+    if (active) {
+      setUserSelection(storedSelection);
+      setSurvivors(savedSurvivors ? JSON.parse(savedSurvivors) : []);
+      setEliminated(savedEliminated ? JSON.parse(savedEliminated) : []);
+      setEliminationCounts(savedElimCounts ? JSON.parse(savedElimCounts) : { pley: 0 });
+      setClickCounts(savedClickCounts ? JSON.parse(savedClickCounts) : { pley: 0 });
+      if (u) {
+        const savedVotes = localStorage.getItem(`userVotes_v7_${u}`);
+        setUserVotes(savedVotes ? JSON.parse(savedVotes) : {});
+      }
+    } else {
+      setUserSelection(null);
+      setUserVotes({});
+      setClickCounts({ pley: 0 });
+      setEliminationCounts({ pley: 0 });
+      setVariantFirstClickTime({ pley: 0 });
+      setSurvivors([]);
+      setEliminated([]);
+      if (u) {
+        localStorage.removeItem(`userVotes_v7_${u}`);
+      }
+    }
   };
 
   useEffect(() => {
@@ -6184,7 +6219,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   // Simulation logic
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isActive && timeLeft > 0) {
+    if (isActive && timeLeft > 0 && isEliminationRoundActive) {
       interval = setInterval(() => {
         const variants = ['pley'];
         const randomVariant = variants[Math.floor(Math.random() * variants.length)];
@@ -6213,7 +6248,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       }, 4000);
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, majorityVariant]);
+  }, [isActive, timeLeft, isEliminationRoundActive]);
 
   const eliminateSelf = async () => {
     const userId = localStorage.getItem('supabaseUserId');
