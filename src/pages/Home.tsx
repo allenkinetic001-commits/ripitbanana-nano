@@ -1272,7 +1272,7 @@ const Home = () => {
                 <div className="flex items-center justify-between mb-4 px-4">
                   <div className="flex items-center gap-2">
                     <img 
-                      src="/guacamole-trophy.png" 
+                      src="/trophy.png" 
                       alt="Survival" 
                       className="h-6 w-auto object-contain" 
                       style={{ imageRendering: '-webkit-optimize-contrast' }} 
@@ -1334,7 +1334,7 @@ const Home = () => {
                 onClick={() => navigate('/search')}
                 className="group relative transition-all active:scale-95 px-5 py-2.5 bg-white border border-zinc-100 rounded-full flex items-center gap-2 shadow-sm hover:bg-zinc-50 hover:border-zinc-200"
               >
-                <Trophy size={14} className="text-zinc-400 group-hover:text-yellow-500 transition-colors" />
+                <img src="/trophy.png" alt="Trophy" className="h-4 w-4 object-contain group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-black text-zinc-900 uppercase tracking-[0.2em]">View Results</span>
                 <ChevronRight size={14} className="text-zinc-300 group-hover:translate-x-1 transition-transform" />
               </button>

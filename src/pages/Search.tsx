@@ -263,7 +263,9 @@ const SearchPage = () => {
     setRoundHistory, isAuthenticated, historyLoading
   } = useChallenge();
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all');
-  const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>('round_logs');
+  const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>(() => 
+    isChallengeEnded ? 'hall_of_fame' : 'round_logs'
+  );
   const [selectedRoundId, setSelectedRoundId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -272,14 +274,6 @@ const SearchPage = () => {
   // Use context data directly since it is now optimistically updated
   const mergedRounds = roundHistory;
 
-  // Auto-navigate to home when the 10-second results display ends
-  const previousIsChallengeEnded = React.useRef(isChallengeEnded);
-  useEffect(() => {
-    if (previousIsChallengeEnded.current && !isChallengeEnded) {
-      navigate('/');
-    }
-    previousIsChallengeEnded.current = isChallengeEnded;
-  }, [isChallengeEnded, navigate]);
 
   const handleJoinNextTask = () => {
     startNewChallenge();
