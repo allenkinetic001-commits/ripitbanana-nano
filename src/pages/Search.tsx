@@ -373,7 +373,15 @@ const SearchPage = () => {
   }, [mergedRounds, viewMode]);
 
   const allAvailableSurvivors = useMemo(() => {
-    return isChallengeEnded ? survivors : localSurvivorHistory;
+    if (isChallengeEnded && survivors.length > 0) {
+      // Merge current round survivors with ALL historical data so past results remain visible
+      const historyUsernames = new Set(localSurvivorHistory.map((s: any) => s.username));
+      const currentNotInHistory = survivors
+        .filter((s: any) => s.username && !historyUsernames.has(s.username))
+        .map((s: any) => ({ ...s, madeIt: true }));
+      return [...currentNotInHistory, ...localSurvivorHistory];
+    }
+    return localSurvivorHistory;
   }, [isChallengeEnded, survivors, localSurvivorHistory]);
 
   const displaySurvivors = useMemo(() => {
