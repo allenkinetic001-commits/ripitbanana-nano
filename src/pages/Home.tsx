@@ -926,9 +926,21 @@ const Home = () => {
               </button>
             </div>
             <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto relative z-10">
-              <div className="flex flex-col gap-4">
-                <p className="text-base text-zinc-800 leading-relaxed font-bold italic border-l-4 border-red-600 pl-4 py-4 bg-zinc-50 rounded-r-2xl">
-                  RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.
+              <div className="flex flex-col gap-4 text-left">
+                <p className="text-base text-zinc-900 leading-relaxed font-bold italic border-l-4 border-red-600 pl-4 py-2 bg-zinc-50 rounded-r-2xl">
+                  Ripit — the social battlefield where every rivalry has consequences.
+                </p>
+                <p className="text-sm text-zinc-700 leading-relaxed font-medium">
+                  Make enemies. Hunt profiles. Drain their three hearts. When the final heart falls, that account is permanently wiped from the world of Ripit.
+                </p>
+                <p className="text-sm text-zinc-700 leading-relaxed font-medium">
+                  No revives. No resets. No second chances.
+                </p>
+                <p className="text-sm text-zinc-700 leading-relaxed font-bold mt-1">
+                  You don't just unfollow your rivals.
+                </p>
+                <p className="text-base text-red-600 leading-relaxed font-black uppercase tracking-wider">
+                  You Ripit.
                 </p>
               </div>
             </div>

@@ -284,7 +284,7 @@ const translations: Record<string, Record<string, string>> = {
     // About Modal
     'about_title': 'About Rip It',
     'about_tagline': 'Tagline: Survive. Reset. Evolve.',
-    'about_desc1': 'RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.',
+    'about_desc1': 'Ripit — the social battlefield where every rivalry has consequences. Make enemies. Hunt profiles. Drain their three hearts. When the final heart falls, that account is permanently wiped from the world of Ripit. No revives. No resets. No second chances. You don\'t just unfollow your rivals. You Ripit.',
     'about_pley_title': 'Pley',
     'about_pley_desc': 'Survival mode with high-risk elimination.',
     'about_desc2': 'Rip It combines social interaction, competition, and dynamic personalization to create a unique, viral, and adrenaline-pumping experience.',
@@ -324,7 +324,7 @@ const translations: Record<string, Record<string, string>> = {
     // Model Modal
     'model_title': 'Rip It – App Model',
     'model_concept_title': '1️⃣ Core Concept',
-    'model_concept_desc': 'RIPIT is a global social media platform where users post any content and compete to survive for 24 hours based on audience reactions, where higher support keeps them in the network, lower performance leads to elimination for that round, and survivors gain survival, visibility, and importantly status as they continue competing daily.',
+    'model_concept_desc': 'Ripit — the social battlefield where every rivalry has consequences. Make enemies. Hunt profiles. Drain their three hearts. When the final heart falls, that account is permanently wiped from the world of Ripit. No revives. No resets. No second chances. You don\'t just unfollow your rivals. You Ripit.',
     'model_modes_title': '2️⃣ Modes',
     'model_pley_title': 'Pley',
     'model_pley_item1': 'Survival-focused',
