@@ -472,7 +472,7 @@ const SettingsPage = () => {
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <img src="/x-black.png" className="w-3.5 h-3.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
+                    <img src="/threads.png" className="w-3.5 h-3.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
                     <div className="flex flex-col min-w-0 flex-1">
                       <span className="font-bold text-zinc-900">{t('partnership_x_label')}</span>
                       <span className="text-zinc-700 font-semibold break-all">{t('partnership_x_value')}</span>
