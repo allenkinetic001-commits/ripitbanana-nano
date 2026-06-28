@@ -303,7 +303,7 @@ const translations: Record<string, Record<string, string>> = {
     'partnership_x_label': '1. Threads handle',
     'partnership_x_value': '@ripit_app',
     'partnership_instagram_label': '2. instagram',
-    'partnership_instagram_value': 'ripit.ai and redyeti_ripit',
+    'partnership_instagram_value': 'ripit_app and redyeti_ripit',
     'partnership_reddit_label': '3. reddit',
     'partnership_reddit_value': 'ripit_ai',
     'partnership_pump_label': '4. pump.fun',
