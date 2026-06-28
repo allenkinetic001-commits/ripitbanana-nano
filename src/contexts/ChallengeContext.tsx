@@ -369,7 +369,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Tagline: Survive. Reset. Evolve.',
-    'terms_effective': 'Effective Date: 02/23/26',
+    'terms_effective': 'Effective Date: 28/06/2026',
     'terms_intro': 'By using Rip It, you agree to these Terms. If you do not agree, please do not use the app.',
     'terms_s1_title': '1. What Rip It Is',
     'terms_s1_desc': 'Rip It is a high-stakes social survival app where users participate in timed challenges, public voting, and competitive modes.',
@@ -628,7 +628,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': '슬로건: 생존. 리셋. 진화.',
-    'terms_effective': '시행일: 2026년 2월 23일',
+    'terms_effective': '시행일: 2026년 6월 28일',
     'terms_intro': 'Rip It을 사용함으로써 당신은 이 약관에 동의하게 됩니다. 동의하지 않는 경우 앱을 사용하지 마십시오.',
     'terms_s1_title': '1. Rip It이란 무엇인가',
     'terms_s1_desc': 'Rip It은 사용자가 시간 제한 챌린지, 공개 투표 및 경쟁 모드에 참여하는 고위험 사회적 생존 앱입니다.',
@@ -889,7 +889,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'スローガン: 生存. リセット. 進化.',
-    'terms_effective': '施行日: 2026年2月23日',
+    'terms_effective': '施行日: 2026年6月28日',
     'terms_intro': 'Rip Itを使用することで、これらの規約に同意したものとみなされます。同意しない場合は、アプリを使用しないでください。',
     'terms_s1_title': '1. Rip Itとは何か',
     'terms_s1_desc': 'Rip Itは、ユーザーが時間制限のあるチャレンジ、公開投票、競争モードに参加するハイリスクなソーシャルサバイバルアプリです。',
@@ -1157,7 +1157,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Slogan : Survivre. Réinitialiser. Évoluer.',
-    'terms_effective': 'Date d\'entrée en vigueur : 23/02/26',
+    'terms_effective': 'Date d\'entrée en vigueur : 28/06/2026',
     'terms_intro': 'En utilisant Rip It, vous acceptez ces conditions. Si vous n\'êtes pas d\'accord, veuillez ne pas utiliser l\'application.',
     'terms_s1_title': '1. Ce qu\'est Rip It',
     'terms_s1_desc': 'Rip It est une application de survie sociale à enjeux élevés où les utilisateurs participent à des défis chronométrés, des votes publics et des modes compétitifs.',
@@ -1410,7 +1410,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'टैगलाइन: जीवित रहें। रीसेट करें। विकसित हों।',
-    'terms_effective': 'प्रभावी तिथि: 23/02/26',
+    'terms_effective': 'प्रभावी तिथि: 28/06/2026',
     'terms_intro': 'Rip It का उपयोग करके, आप इन शर्तों से सहमत होते हैं। यदि आप सहमत नहीं हैं, तो कृपया ऐप का उपयोग न करें।',
     'terms_s1_title': '1. Rip It क्या है',
     'terms_s1_desc': 'Rip It एक उच्च-दांव वाला सामाजिक अस्तित्व ऐप है जहां उपयोगकर्ता समयबद्ध चुनौतियों, सार्वजनिक मतदान और प्रतिस्पर्धी मोड में भाग लेते हैं।',
@@ -1660,7 +1660,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': '口号：生存。重置。进化。',
-    'terms_effective': '生效日期：26/02/23',
+    'terms_effective': '生效日期：2026/06/28',
     'terms_intro': '使用 Rip It，即表示你同意这些条款。如果你不同意，请不要使用该应用。',
     'terms_s1_title': '1. 什么是 Rip It',
     'terms_s1_desc': 'Rip It 是一款高风险社交生存应用，用户参与计时挑战、公开投票和竞争模式。',
@@ -1918,7 +1918,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Slogan: Überleben. Zurücksetzen. Entwickeln.',
-    'terms_effective': 'Gültig ab: 23.02.26',
+    'terms_effective': 'Gültig ab: 28.06.2026',
     'terms_intro': 'Durch die Nutzung von Rip It stimmst du diesen Bedingungen zu. Wenn du nicht einverstanden bist, nutze die App bitte nicht.',
     'terms_s1_title': '1. Was Rip It ist',
     'terms_s1_desc': 'Rip It ist eine hochriskante soziale Überlebens-App, bei der Nutzer an zeitgesteuerten Herausforderungen, öffentlichen Abstimmungen und Wettbewerbsmodi teilnehmen.',
@@ -2177,7 +2177,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Слоган: Виживай. Скидай. Еволюціонуй.',
-    'terms_effective': 'Дата набрання чинності: 23.02.26',
+    'terms_effective': 'Дата набрання чинності: 28.06.2026',
     'terms_intro': 'Використовуючи Rip It, ви погоджуєтеся з цими Умовами. Якщо ви не згодні, будь ласка, не використовуйте додаток.',
     'terms_s1_title': '1. Що таке Rip It',
     'terms_s1_desc': 'Rip It — це соціальний додаток для виживання з високими ставками, де користувачі беруть участь у викликах на час, публічних голосуваннях та конкурентних режимах.',
@@ -2436,7 +2436,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Слоган: Выживай. Сбрасывай. Эволюционируй.',
-    'terms_effective': 'Дата вступления в силу: 23.02.26',
+    'terms_effective': 'Дата вступления в силу: 28.06.2026',
     'terms_intro': 'Используя Rip It, вы соглашаетесь с этими Условиями. Если вы не согласны, пожалуйста, не используйте приложение.',
     'terms_s1_title': '1. Что такое Rip It',
     'terms_s1_desc': 'Rip It — это социальное приложение для выживания с высокими ставками, где пользователи участвуют в испытаниях на время, публичных голосованиях и конкурентных режимах.',
@@ -2674,7 +2674,7 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s7_i1': 'Potrebbero verificarsi aggiornamenti man mano che l\'app si evolve.',
     'priv_s7_i2': 'Le modifiche principali saranno annunciate nell\'app.',
     'terms_tagline': 'Tagline: Sopravvivi. Resetta. Evolvi.',
-    'terms_effective': 'Data di decorrenza: 23/02/26',
+    'terms_effective': 'Data di decorrenza: 28/06/2026',
     'terms_intro': 'Utilizzando Rip It, accetti questi Termini. Se non accetti, ti preghiamo di non utilizzare l\'app.',
     'terms_s1_title': '1. Cos\'è Rip It',
     'terms_s1_desc': 'Rip It è un\'app di sopravvivenza sociale ad alta posta in gioco dove gli utenti partecipano a sfide a tempo, votazioni pubbliche e modalità competitive.',
@@ -2912,7 +2912,7 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s7_i1': 'Atualizações podem ocorrer conforme o app evolui.',
     'priv_s7_i2': 'Alterações importantes serão anunciadas no app.',
     'terms_tagline': 'Tagline: Sobreviva. Resete. Evolua.',
-    'terms_effective': 'Data de Vigência: 23/02/26',
+    'terms_effective': 'Data de Vigência: 28/06/2026',
     'terms_intro': 'Ao usar o Rip It, você concorda com estes Termos. Se você não concordar, por favor não use o app.',
     'terms_s1_title': '1. O que é o Rip It',
     'terms_s1_desc': 'Rip It é um app de sobrevivência social de alto risco onde os usuários participam de desafios cronometrados, votação pública e modos competitivos.',
@@ -3150,7 +3150,7 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s7_i1': 'Các bản cập nhật có thể xảy ra khi ứng dụng phát triển.',
     'priv_s7_i2': 'Các thay đổi lớn sẽ được thông báo trong ứng dụng.',
     'terms_tagline': 'Slogan: Sống sót. Đặt lại. Tiến hóa.',
-    'terms_effective': 'Ngày có hiệu lực: 23/02/26',
+    'terms_effective': 'Ngày có hiệu lực: 28/06/2026',
     'terms_intro': 'Bằng việc sử dụng Rip It, bạn đồng ý với các Điều khoản này. Nếu bạn không đồng ý, vui lòng không sử dụng ứng dụng.',
     'terms_s1_title': '1. Rip It là gì',
     'terms_s1_desc': 'Rip It là một ứng dụng sống sót xã hội với rủi ro cao, nơi người dùng tham gia vào các thử thách có thời gian, bình chọn công khai và các chế độ cạnh tranh.',
@@ -3388,7 +3388,7 @@ const translations: Record<string, Record<string, string>> = {
     'priv_s7_i1': 'อาจมีการอัปเดตเมื่อแอปพัฒนาขึ้น',
     'priv_s7_i2': 'การเปลี่ยนแปลงสำคัญจะได้รับการประกาศภายในแอป',
     'terms_tagline': 'สโลแกน: อยู่รอด. รีเซ็ต. พัฒนา.',
-    'terms_effective': 'วันที่มีผลบังคับใช้: 23/02/26',
+    'terms_effective': 'วันที่มีผลบังคับใช้: 28/06/2026',
     'terms_intro': 'ในการใช้ Rip It คุณตกลงตามข้อกำหนดเหล่านี้ หากคุณไม่ตกลง โปรดอย่าใช้แอป',
     'terms_s1_title': '1. Rip It คืออะไร',
     'terms_s1_desc': 'Rip It เป็นแอปเอาชีวิตรอดทางสังคมที่มีความเสี่ยงสูง ซึ่งผู้ใช้จะมีส่วนร่วมในชาเลนจ์ที่มีกำหนดเวลา การโหวตสาธารณะ และโหมดการแข่งขัน',
@@ -3647,7 +3647,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'الشعار: انجُ. أعد الضبط. تطور.',
-    'terms_effective': 'تاريخ السريان: 23/02/26',
+    'terms_effective': 'تاريخ السريان: 28/06/2026',
     'terms_intro': 'باستخدام Rip It، فإنك توافق على هذه الشروط. إذا كنت لا توافق، يرجى عدم استخدام التطبيق.',
     'terms_s1_title': '1. ما هو Rip It',
     'terms_s1_desc': 'Rip It هو تطبيق تواصل اجتماعي للبقاء على قيد الحياة حيث يشارك المستخدمون في تحديات موقوتة، وتصويت عام، وأوضاع تنافسية.',
@@ -3906,7 +3906,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Tagline: Bertahan. Reset. Evolusi.',
-    'terms_effective': 'Tanggal Efektif: 23/02/26',
+    'terms_effective': 'Tanggal Efektif: 28/06/2026',
     'terms_intro': 'Dengan menggunakan Rip It, Anda menyetujui Ketentuan ini. Jika Anda tidak setuju, mohon jangan gunakan aplikasi.',
     'terms_s1_title': '1. Apa Itu Rip It',
     'terms_s1_desc': 'Rip It adalah aplikasi bertahan hidup sosial berisiko tinggi di mana pengguna berpartisipasi dalam tantangan berwaktu, voting publik, dan mode kompetitif.',
@@ -4162,7 +4162,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'ٹیگ لائن: بچیں۔ ری سیٹ کریں۔ تیار ہوں۔',
-    'terms_effective': 'مؤثر تاریخ: 02/23/26',
+    'terms_effective': 'مؤثر تاریخ: 28/06/2026',
     'terms_intro': 'Rip It استعمال کر کے، آپ ان شرائط سے اتفاق کرتے ہیں۔ اگر آپ اتفاق نہیں کرتے ہیں، تو براہ کرم ایپ استعمال نہ کریں۔',
     'terms_s1_title': '1. Rip It کیا ہے',
     'terms_s1_desc': 'Rip It ایک اعلی داؤ والا سماجی بقا کا ایپ ہے جہاں صارف وقتی چیلنجوں، عوامی ووٹنگ اور مسابقتی طریقوں میں حصہ لیتے ہیں۔',
@@ -4419,7 +4419,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'شعار: زنده بمان. ری‌ست شو. تکامل یاب.',
-    'terms_effective': 'تاریخ اجرا: ۰۲/۲۳/۲۶',
+    'terms_effective': 'تاریخ اجرا: ۲۸/۰۶/۲۰۲۶',
     'terms_intro': 'با استفاده از Rip It، شما با این شرایط موافقت می‌کنید. اگر موافق نیستید، لطفا از اپلیکیشن استفاده نکنید.',
     'terms_s1_title': '۱. Rip It چیست',
     'terms_s1_desc': 'Rip It یک اپلیکیشن بقای اجتماعی با ریسک بالاست که در آن کاربران در چالش‌های زمان‌دار، رای‌گیری عمومی و حالت‌های رقابتی شرکت می‌کنند.',
@@ -4678,7 +4678,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Eslogan: Sobrevive. Reinicia. Evoluciona.',
-    'terms_effective': 'Fecha de entrada en vigor: 23/02/26',
+    'terms_effective': 'Fecha de entrada en vigor: 28/06/2026',
     'terms_intro': 'Al usar Rip It, aceptas estos Términos. Si no estás de acuerdo, no uses la aplicación.',
     'terms_s1_title': '1. Qué es Rip It',
     'terms_s1_desc': 'Rip It es una aplicación de supervivencia social de alto riesgo donde los usuarios participan en desafíos cronometrados, votaciones públicas y modos competitivos.',
@@ -4938,7 +4938,7 @@ const translations: Record<string, Record<string, string>> = {
 
     // Terms Modal
     'terms_tagline': 'Tagline: Mabuhay. Mag-reset. Mag-evolve.',
-    'terms_effective': 'Petsa ng Pagpapatupad: 02/23/26',
+    'terms_effective': 'Petsa ng Pagpapatupad: 28/06/2026',
     'terms_intro': 'Sa paggamit ng Rip It, sumasang-ayon ka sa mga Kasunduang ito. Kung hindi ka sumasang-ayon, mangyaring huwag gamitin ang app.',
     'terms_s1_title': '1. Ano ang Rip It',
     'terms_s1_desc': 'Ang Rip It ay isang high-stakes social survival app kung saan ang mga user ay lumalahok sa mga timed challenge, pampublikong pagboto, at mga competitive mode.',
