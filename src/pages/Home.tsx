@@ -939,9 +939,22 @@ const Home = () => {
                 <p className="text-sm text-zinc-700 leading-relaxed font-bold mt-1">
                   You don't just unfollow your rivals.
                 </p>
-                <p className="text-base text-red-600 leading-relaxed font-black uppercase tracking-wider">
-                  You Ripit.
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-base text-red-600 font-black uppercase tracking-wider">
+                    You
+                  </span>
+                  <img 
+                    src="/header-logo-hydrant.png" 
+                    alt="Hydrant" 
+                    className="h-11 w-auto object-contain" 
+                  />
+                  <img 
+                    src="/header-logo-text.png" 
+                    alt="RipIt" 
+                    className="h-6 w-auto object-contain mt-0.5" 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                </div>
               </div>
             </div>
 
