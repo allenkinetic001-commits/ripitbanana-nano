@@ -556,8 +556,8 @@ const SettingsPage = () => {
                   {t('contact_title')}
                 </h4>
                 <p className="font-medium text-zinc-800">{t('contact_desc')}</p>
-                <div className="flex items-center gap-2 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                  <span className="text-xl">📧</span>
+                <div className="flex items-center gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                  <img src="/gmail.png" className="w-5 h-5 object-contain flex-shrink-0" alt="" />
                   <div className="flex flex-col">
                     <span className="font-bold text-zinc-900">{t('contact_email_label')}</span>
                     <a href="mailto:ripit90210@gmail.com" className="text-blue-600 hover:underline break-all">ripit90210@gmail.com</a>
