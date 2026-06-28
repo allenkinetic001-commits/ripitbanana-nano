@@ -471,6 +471,9 @@ const SettingsPage = () => {
                   {t('partnership_desc')}
                 </p>
                 <div className="space-y-2">
+                  <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider block pt-1.5">
+                    {t('partnership_check_us_out')}
+                  </span>
                   <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
                     <img src="/threads.png" className="w-3.5 h-3.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
                     <div className="flex flex-col min-w-0 flex-1">

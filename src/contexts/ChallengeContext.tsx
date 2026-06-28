@@ -300,6 +300,7 @@ const translations: Record<string, Record<string, string>> = {
     'contact_close': 'Close',
     'partnership_title': 'Partnership',
     'partnership_desc': 'We ripit team have officially decided to partner with Mayor of $67DOGE and $67DOGE will serve as the future crypto payment for our app and other future projects in Perpetuity under ripit company no matter what official handle of ripit and co partners and friend',
+    'partnership_check_us_out': 'Check us out',
     'partnership_x_label': '1. Threads handle',
     'partnership_x_value': '@ripit_app',
     'partnership_instagram_label': '2. instagram',
