@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowBigUp, ArrowBigDown, Bookmark } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils';
@@ -36,6 +36,13 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
   const [isTraitor, setIsTraitor] = useState(false);
   const navigate = useNavigate();
   const hasActed = enemies.some(e => e.username === username);
+
+  // Track mounted state to prevent state updates after unmount (e.g. last post eliminated)
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => { isMountedRef.current = false; };
+  }, []);
 
   // Track downvote per TARGET USERNAME (not per post) — 1 click per voter per person
   const userVote = userVotes[`user_${username}`] !== undefined ? userVotes[`user_${username}`] : 0;
@@ -133,13 +140,23 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
         } else {
           // Apply downvote: keyed by TARGET USERNAME so 1 click = 1 heart across all their posts
           setUserVoteForPost(`user_${username}`, -1);
-          setOptimisticLives(prev => Math.max(0, prev - 1));
+          if (isMountedRef.current) {
+            setOptimisticLives(prev => Math.max(0, prev - 1));
+          }
           
           // Sync to global database
-          await decrementUserLives(username);
+          try {
+            await decrementUserLives(username);
+          } catch (err) {
+            console.error('Failed to decrement lives:', err);
+          }
           
           if (globalLives <= 1) {
-            if (onDelete) onDelete();
+            // Defer deletion to next tick so current render cycle completes
+            // before parent removes this component from the DOM
+            setTimeout(() => {
+              if (onDelete) onDelete();
+            }, 0);
           }
         }
         return;

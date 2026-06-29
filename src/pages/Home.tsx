@@ -713,38 +713,44 @@ const Home = () => {
 
 
   const handleDeletePost = (postId: number) => {
-    const activeMode = userSelection || majorityVariant;
-    
-    const eliminatedPost = visiblePosts.find(post => post.id === postId);
-    if (eliminatedPost) {
-      if (eliminatedPost.username === userProfile?.username) {
-        eliminateSelf();
-        return;
-      }
-
-      addEliminated({
-        id: eliminatedPost.id,
-        username: eliminatedPost.username,
-        avatar: eliminatedPost.avatar,
-        image: eliminatedPost.image,
-        caption: eliminatedPost.caption,
-        time: eliminatedPost.time,
-        comments: eliminatedPost.comments,
-        madeIt: false
-      });
+    try {
+      const activeMode = userSelection || majorityVariant;
       
-      // Wipe out all posts from this user immediately
-      setVisiblePosts(prev => prev.filter(post => post.username !== eliminatedPost.username));
-    } else {
+      const eliminatedPost = visiblePosts.find(post => post.id === postId);
+      if (eliminatedPost) {
+        if (eliminatedPost.username === userProfile?.username) {
+          eliminateSelf();
+          return;
+        }
+
+        addEliminated({
+          id: eliminatedPost.id,
+          username: eliminatedPost.username || 'unknown',
+          avatar: eliminatedPost.avatar || '/custom-empty-profile.png',
+          image: eliminatedPost.image || '',
+          caption: eliminatedPost.caption || '',
+          time: eliminatedPost.time || '',
+          comments: eliminatedPost.comments || [],
+          madeIt: false
+        });
+        
+        // Wipe out all posts from this user immediately
+        setVisiblePosts(prev => prev.filter(post => post.username !== eliminatedPost.username));
+      } else {
+        setVisiblePosts(prev => prev.filter(post => post.id !== postId));
+      }
+      
+      // Track eliminations for the current active mode
+      if (activeMode && Object.prototype.hasOwnProperty.call(eliminationCounts, activeMode)) {
+        setEliminationCounts(prev => ({
+          ...prev,
+          [activeMode]: (prev[activeMode] || 0) + 1
+        }));
+      }
+    } catch (err) {
+      console.error('Error in handleDeletePost:', err);
+      // Fail-safe: remove the post by id to prevent stuck state
       setVisiblePosts(prev => prev.filter(post => post.id !== postId));
-    }
-    
-    // Track eliminations for the current active mode
-    if (activeMode && Object.prototype.hasOwnProperty.call(eliminationCounts, activeMode)) {
-      setEliminationCounts(prev => ({
-        ...prev,
-        [activeMode]: (prev[activeMode] || 0) + 1
-      }));
     }
   };
 
