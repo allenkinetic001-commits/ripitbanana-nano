@@ -5999,11 +5999,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Fetch history once when the user is confirmed authenticated
+  // Fetch history once on mount and when authentication status updates
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchHistory();
-    }
+    fetchHistory();
   }, [isAuthenticated]);
 
 
