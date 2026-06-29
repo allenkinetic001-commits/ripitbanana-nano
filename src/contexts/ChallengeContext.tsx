@@ -311,6 +311,8 @@ const translations: Record<string, Record<string, string>> = {
     'partnership_reddit_value': 'ripit_ai',
     'partnership_pump_label': '5. pump.fun',
     'partnership_pump_value': 'G59uYtk9rbVroVV5dn4FUsYqDuCZDz8qYNwdTuCupump',
+    'partnership_youtube_label': '6. YouTube',
+    'partnership_youtube_value': '@ripit_app',
     'partnership_pump_lock_desc': '91.37% of total supply based on Solscan for the token of $67DOGE is fully locked in Stakepoint for the next 6 years',
     'partnership_pump_lock_id': '#1779950463162',
     'partnership_pump_pool_id': '#1000',
