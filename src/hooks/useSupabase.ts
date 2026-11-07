@@ -24,7 +24,7 @@ export function useSupabasePosts() {
     if (!saved) return [];
     try {
       const parsed: SupabasePost[] = JSON.parse(saved);
-      // Strip any stale base64 or blob: URLs — they are broken after a page reload
+      // Strip any stale base64 or blob: URLs - they are broken after a page reload
       const clean = parsed.filter(p => {
         const url = p.image_url || '';
         return !url.startsWith('data:') && !url.startsWith('blob:');
@@ -246,7 +246,7 @@ export async function uploadPostMedia(userId: string, file: File): Promise<{ url
   return { url: publicUrl, error: null };
 }
 
-// Create a new post — imageUrl should be a public storage URL (not base64)
+// Create a new post - imageUrl should be a public storage URL (not base64)
 export async function createPost(userId: string, caption: string, imageUrl: string, id?: string) {
   const payload: any = {
     user_id: userId,
@@ -370,9 +370,11 @@ export function formatPostForUI(post: any) {
   };
 }
 
-export function getTimeAgo(dateStr: string): string {
+export function getTimeAgo(dateStr?: string): string {
+  if (!dateStr) return 'Just now';
   const now = new Date();
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return 'Just now';
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   

@@ -18,7 +18,7 @@ const Profile = () => {
   const { 
     enemies, removeEnemy, userProfile, setUserProfile, 
     followedUsers, toggleFollow, isLegend, survivorHistory,
-    wallPosts, addWallPost, allPosts,
+    wallPosts, addWallPost, allPosts, userLives,
     t
   } = useChallenge();
 
@@ -36,7 +36,7 @@ const Profile = () => {
     if (userProfile.username) return { 
       username: userProfile.username,
       avatar_url: userProfile.avatar,
-      bio: userProfile.bio || 'Surviving the round ⚡',
+      bio: userProfile.bio || 'Surviving the round ?',
       lives: 3 // Default
     };
     return null;
@@ -571,7 +571,7 @@ const Profile = () => {
               {userProfile.fullName || (userProfile.username ? `@${userProfile.username}` : 'Loading...')}
             </h2>
             <div className="flex items-center gap-0.5">
-              <ProfileHeartsToggle isVisible={showHearts} lives={profileData?.lives ?? 3} />
+              <ProfileHeartsToggle isVisible={true} lives={userLives[userProfile.username] ?? profileData?.lives ?? 3} />
             </div>
           </div>
           <p className="text-sm text-zinc-600">{userProfile.bio}</p>

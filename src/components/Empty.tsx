@@ -23,14 +23,14 @@ const EmptyFeed: React.FC<EmptyFeedProps> = ({
       "flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-700 min-h-[40vh]",
       className
     )}>
-      <div className={cn("relative mb-6 mt-32", imageClassName)}>
+      <div className={cn("relative mb-4 mt-6", imageClassName)}>
         <img 
           src={icon} 
           alt="Empty" 
           className="w-48 h-auto object-contain mx-auto" 
         />
       </div>
-      <h2 className="text-2xl font-black text-zinc-900 tracking-tighter uppercase mb-12">
+      <h2 className="text-2xl font-black text-zinc-900 tracking-tighter uppercase mb-2">
         {title}
       </h2>
       <p className="text-zinc-400 text-[10px] font-bold tracking-[0.3em] uppercase max-w-[200px] leading-relaxed mx-auto">

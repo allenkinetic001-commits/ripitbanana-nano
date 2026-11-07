@@ -20,7 +20,7 @@ import { useChallenge } from "./contexts/ChallengeContext";
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, authLoading, isEliminated } = useChallenge();
   
-  if (authLoading && !isAuthenticated) {
+  if (authLoading && !isAuthenticated && !window.location.search.includes('preview') && localStorage.getItem('isAuthenticated') !== 'true') {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-zinc-50">
         <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin"></div>
@@ -29,8 +29,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  // For local preview, we can bypass the redirect if a special flag is set or if we just want to allow viewing
-  if (!isAuthenticated && !window.location.search.includes('preview')) {
+  // Allow viewing if authenticated, or in preview mode, or if guest preview flag is present
+  const isGuestOrPreview = window.location.search.includes('preview') || localStorage.getItem('isAuthenticated') === 'true';
+  if (!isAuthenticated && !isGuestOrPreview) {
     return <Navigate to="/login" replace />;
   }
   
@@ -50,10 +51,6 @@ const ImagePreloader = () => (
     <img src="/personalization-icon.png" alt="" />
     <img src="/personalization-header.png" alt="" />
     <img src="/be-part.png" alt="" />
-    <img src="/instagram-purple.png" alt="" />
-    <img src="/x-black.png" alt="" />
-    <img src="/reddit-orange.png" alt="" />
-    <img src="/pump-icon.png" alt="" />
     <img src="/model-icon.png" alt="" />
     <img src="/model-header.png" alt="" />
     <img src="/terms-icon.png" alt="" />

@@ -404,7 +404,8 @@ const Home = () => {
     visiblePosts, setVisiblePosts,
     followedUsers, toggleFollow, isSurvivor, updateHistoryVote,
     language,
-    t, postsLoading
+    t, postsLoading,
+    setUserLivesForUser, userLives
   } = useChallenge();
 
   const handleVote = (survivorId: string | number, roundId: string | null, vote: 'up' | 'down') => {
@@ -424,7 +425,7 @@ const Home = () => {
 
   // Auto-populate visiblePosts from allPosts when the feed is empty but posts exist.
   // This fixes the bug where a new user logging in sees an empty feed even though
-  // other users have posted content — visiblePosts gets reset on login but allPosts
+  // other users have posted content - visiblePosts gets reset on login but allPosts
   // is correctly loaded from Supabase.
   useEffect(() => {
     if (visiblePosts.length === 0 && allPosts.length > 0) {
@@ -473,7 +474,7 @@ const Home = () => {
     if (!selectedFile || !rawFile) return;
     setIsUploading(true);
 
-    const caption = captionText || (fileType === 'video' ? 'Just uploaded a video! 🎥' : 'Just uploaded a photo! 📸');
+    const caption = captionText || (fileType === 'video' ? 'Just uploaded a video! ??' : 'Just uploaded a photo! ??');
 
     // Save the raw File and local preview before clearing modal state
     const currentRawFile = rawFile;
@@ -605,9 +606,10 @@ const Home = () => {
     ...eliminated.map((e: any) => e.id)
   ]), [survivors, eliminated]);
 
-  const eliminatedUsernames = useMemo(() => new Set(
-    eliminated.map((e: any) => e.username)
-  ), [eliminated]);
+  const eliminatedUsernames = useMemo(() => new Set([
+    ...eliminated.map((e: any) => e.username),
+    ...Object.keys(userLives).filter(uname => userLives[uname] <= 0)
+  ]), [eliminated, userLives]);
 
   const unswipedPosts = useMemo(() => 
     allPosts.filter(p => !swipedIds.has(p.id) && !eliminatedUsernames.has(p.username)),
@@ -712,12 +714,19 @@ const Home = () => {
 
 
 
-  const handleDeletePost = (postId: number) => {
+  const handleDeletePost = (postId: number | string) => {
     try {
       const activeMode = userSelection || majorityVariant;
       
-      const eliminatedPost = visiblePosts.find(post => post.id === postId);
+      const eliminatedPost = visiblePosts.find(post => String(post.id) === String(postId)) 
+        || allPosts.find(post => String(post.id) === String(postId));
+
       if (eliminatedPost) {
+        // Zero out lives and flag as eliminated
+        setUserLivesForUser(eliminatedPost.username, 0);
+        localStorage.setItem(`user_eliminated_${eliminatedPost.username}`, 'true');
+        localStorage.setItem(`isEliminated_${eliminatedPost.username}`, 'true');
+
         if (eliminatedPost.username === userProfile?.username) {
           eliminateSelf();
           return;
@@ -734,10 +743,12 @@ const Home = () => {
           madeIt: false
         });
         
-        // Wipe out all posts from this user immediately
+        // Wipe out all posts from this eliminated user completely
         setVisiblePosts(prev => prev.filter(post => post.username !== eliminatedPost.username));
+        setAllPosts(prev => prev.filter(post => post.username !== eliminatedPost.username));
       } else {
-        setVisiblePosts(prev => prev.filter(post => post.id !== postId));
+        setVisiblePosts(prev => prev.filter(post => String(post.id) !== String(postId)));
+        setAllPosts(prev => prev.filter(post => String(post.id) !== String(postId)));
       }
       
       // Track eliminations for the current active mode
@@ -750,7 +761,8 @@ const Home = () => {
     } catch (err) {
       console.error('Error in handleDeletePost:', err);
       // Fail-safe: remove the post by id to prevent stuck state
-      setVisiblePosts(prev => prev.filter(post => post.id !== postId));
+      setVisiblePosts(prev => prev.filter(post => String(post.id) !== String(postId)));
+      setAllPosts(prev => prev.filter(post => String(post.id) !== String(postId)));
     }
   };
 
@@ -898,7 +910,7 @@ const Home = () => {
             onClick={() => setShowPillsInfo(false)}
           />
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            {/* Decorative doodle background pattern — ultra-faint, WhatsApp-style */}
+            {/* Decorative doodle background pattern - ultra-faint, WhatsApp-style */}
             <div 
               className="absolute inset-0 pointer-events-none z-0"
               style={{
@@ -928,13 +940,13 @@ const Home = () => {
                 onClick={() => setShowPillsInfo(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 text-zinc-400 hover:text-zinc-900 transition-all"
               >
-                ✕
+                ?
               </button>
             </div>
             <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto relative z-10">
               <div className="flex flex-col gap-4 text-left">
                 <p className="text-base text-zinc-900 leading-relaxed font-bold italic border-l-4 border-red-600 pl-4 py-2 bg-zinc-50 rounded-r-2xl">
-                  Ripit — the social battlefield where every rivalry has consequences.
+                  Ripit - the social battlefield where every rivalry has consequences.
                 </p>
                 <p className="text-sm text-zinc-700 leading-relaxed font-medium">
                   Make enemies. Hunt profiles. Drain their three hearts. When the final heart falls, that account is permanently wiped from the world of Ripit.
@@ -1265,13 +1277,13 @@ const Home = () => {
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${showBottomNav ? 'pb-20' : 'pb-0'}`}>
         {postsLoading && allPosts.length === 0 ? (
-          /* ── Loading state ── */
+          /* ?? Loading state ?? */
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
             <div className="w-8 h-8 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin" />
             <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Loading...</p>
           </div>
         ) : isChallengeEnded ? (
-          /* ── Universal Selection Ended / Victory Screen ── */
+          /* ?? Universal Selection Ended / Victory Screen ?? */
           <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20 relative overflow-hidden">
             {/* Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-purple-100/30 blur-[100px] rounded-full -z-10" />
@@ -1303,7 +1315,7 @@ const Home = () => {
                 <div className="flex items-center justify-between mb-4 px-4">
                   <div className="flex items-center gap-2">
                     <img 
-                      src="/trophy.png" 
+                      src="/round-trophy.png" 
                       alt="Survival" 
                       className="h-6 w-auto object-contain" 
                       style={{ imageRendering: '-webkit-optimize-contrast' }} 
@@ -1343,7 +1355,7 @@ const Home = () => {
                 </div>
               </div>
             ) : eliminated.length > 0 && (
-              /* ── TOTAL TERMINATION STATE ── */
+              /* ?? TOTAL TERMINATION STATE ?? */
               <div className="w-full max-w-sm mb-12 animate-in slide-in-from-bottom-12 duration-1000 delay-300">
                 <div className="bg-rose-50/80 backdrop-blur-md rounded-[2.5rem] border border-rose-100 p-8 shadow-2xl overflow-hidden group text-center">
                   <div className="relative mb-6">
@@ -1365,7 +1377,7 @@ const Home = () => {
                 onClick={() => navigate('/search')}
                 className="group relative transition-all active:scale-95 px-5 py-2.5 bg-white border border-zinc-100 rounded-full flex items-center gap-2 shadow-sm hover:bg-zinc-50 hover:border-zinc-200"
               >
-                <img src="/trophy.png" alt="Trophy" className="h-4 w-4 object-contain group-hover:scale-110 transition-transform" />
+                <img src="/round-trophy.png" alt="Trophy" className="h-4 w-4 object-contain group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-black text-zinc-900 uppercase tracking-[0.2em]">View Results</span>
                 <ChevronRight size={14} className="text-zinc-300 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -1389,7 +1401,7 @@ const Home = () => {
             </div>
           </div>
         ) : (visiblePosts.length > 0 || unswipedPosts.length > 0) ? (
-          /* ── Posts feed ── */
+          /* ?? Posts feed ?? */
           (visiblePosts.length > 0 ? visiblePosts : unswipedPosts).map((post) => (
             <PostCard 
               key={post.id} 
@@ -1400,7 +1412,7 @@ const Home = () => {
             />
           ))
         ) : (
-          /* ── Empty feed ── */
+          /* ?? Empty feed ?? */
           <EmptyFeed 
             className="min-h-[60vh]"
             title={allPosts.length === 0 ? "It's Quiet Here" : "All Caught Up"}

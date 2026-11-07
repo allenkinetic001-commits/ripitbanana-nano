@@ -27,7 +27,12 @@ interface PostProps {
 }
 
 const PostCard = React.memo(({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments, isTraitorGlobal, globalLives = 3 }: PostProps) => {
-  const { addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t, userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, setUserLivesForUser } = useChallenge();
+  const { 
+    addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, 
+    postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t, 
+    userVotes, postLives, userLives, setUserVoteForPost, setPostLivesForPost, 
+    setUserLivesForUser, setVisiblePosts, setAllPosts, eliminateSelf 
+  } = useChallenge();
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   // Derived state from context
   const [isSwornLocal, setIsSwornLocal] = useState(false);
@@ -44,16 +49,20 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
     return () => { isMountedRef.current = false; };
   }, []);
 
-  // Track downvote per TARGET USERNAME (not per post) — 1 click per voter per person
-  const userVote = userVotes[`user_${username}`] !== undefined ? userVotes[`user_${username}`] : 0;
+  // Post vote state
+  const userVote = userVotes[id] !== undefined ? userVotes[id] : 0;
   
-  // Optimistic lives: Use global value as base, but allow instant local decrements
-  const [optimisticLives, setOptimisticLives] = useState(globalLives);
+  // Current active lives for this user: Context userLives > optimisticLives > globalLives > 3
+  const currentLives = userLives[username] !== undefined 
+    ? userLives[username] 
+    : (typeof globalLives === 'number' && globalLives > 0 ? globalLives : 3);
+
+  const [optimisticLives, setOptimisticLives] = useState(currentLives);
   
-  // Sync with database when global values change
+  // Sync with context/database when lives change
   React.useEffect(() => {
-    setOptimisticLives(globalLives);
-  }, [globalLives]);
+    setOptimisticLives(currentLives);
+  }, [currentLives]);
 
   const { handlers: heartsHandlers } = useLongPress(() => {
     setShowHearts(prev => !prev);
@@ -112,61 +121,67 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
 
   const handleVote = async (vote: 1 | -1) => {
     if (String(id).startsWith('opt-')) return;
-    if (!userProfile.username) {
-      alert("Please log in to participate in the elimination rounds.");
-      navigate('/login');
-      return;
-    }
 
-    // Self-elimination: if I downvote my own post, eliminate myself immediately!
-    if (vote === -1 && username === userProfile.username) {
-      if (onDelete) onDelete();
-      return;
-    }
-
-    if (!gameMode) {
-      alert("Click on the mustache icon to pley");
-      return;
-    }
-
-    if (gameMode === 'pley') {
-      if (vote === 1) {
-        return; // Downvotes only in Pley
+    if (vote === 1) {
+      // Toggle upvote
+      if (userVote === 1) {
+        setUserVoteForPost(id, 0);
+      } else {
+        setUserVoteForPost(id, 1);
       }
-      if (vote === -1) {
-        if (userVote === -1) {
-          // Already downvoted this USER — blocked regardless of which post
-          return;
-        } else {
-          // Apply downvote: keyed by TARGET USERNAME so 1 click = 1 heart across all their posts
-          setUserVoteForPost(`user_${username}`, -1);
-          if (isMountedRef.current) {
-            setOptimisticLives(prev => Math.max(0, prev - 1));
-          }
-          
-          // Sync to global database
-          try {
-            await decrementUserLives(username);
-          } catch (err) {
-            console.error('Failed to decrement lives:', err);
-          }
-          
-          if (globalLives <= 1) {
-            // Defer deletion to next tick so current render cycle completes
-            // before parent removes this component from the DOM
-            setTimeout(() => {
-              if (onDelete) onDelete();
-            }, 0);
-          }
-        }
+      return;
+    }
+
+    if (vote === -1) {
+      // Fetch active lives (prioritizing context, fallback to optimistic or global)
+      const activeLives = userLives[username] !== undefined 
+        ? userLives[username] 
+        : (typeof optimisticLives === 'number' && optimisticLives >= 0 ? optimisticLives : (globalLives ?? 3));
+
+      if (activeLives <= 0) {
+        // User has already lost all 3 lives
         return;
       }
-    }
 
-    if (userVote === vote) {
-      setUserVoteForPost(id, 0);
-    } else {
-      setUserVoteForPost(id, vote);
+      // Exactly 1 life removed per click down
+      const nextLives = Math.max(0, activeLives - 1);
+
+      // 1. Immediately update context & local state for instant UI reaction
+      setUserLivesForUser(username, nextLives);
+      setOptimisticLives(nextLives);
+      setShowHearts(true);
+      setUserVoteForPost(id, -1);
+
+      // 2. Sync all posts from this user in both feeds so lives stay consistent
+      setVisiblePosts(prev => prev.map(p => p.username === username ? { ...p, globalLives: nextLives } : p));
+      setAllPosts(prev => prev.map(p => p.username === username ? { ...p, globalLives: nextLives } : p));
+
+      // 3. Persist remaining lives in localStorage for this user
+      localStorage.setItem(`lives_${username}`, String(nextLives));
+
+      // 4. Background sync with backend
+      try {
+        await decrementUserLives(username);
+      } catch (err) {
+        console.error('Failed to decrement lives in Supabase:', err);
+      }
+
+      // 5. If all 3 lives are clicked down (nextLives === 0), the user ceases to exist on the platform
+      if (nextLives <= 0) {
+        localStorage.setItem(`user_eliminated_${username}`, 'true');
+        localStorage.setItem(`isEliminated_${username}`, 'true');
+
+        if (username === userProfile?.username) {
+          // Logged-in user self-elimination
+          await eliminateSelf();
+        } else {
+          // Target user elimination: remove posts from feed
+          setTimeout(() => {
+            if (onDelete) onDelete();
+          }, 150);
+        }
+      }
+      return;
     }
   };
 
@@ -197,11 +212,14 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
                 </div>
               )}
             </div>
-            <span className="text-sm font-black italic transition-colors">@{username}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-black italic transition-colors">@{username}</span>
+              <ProfileHeartsToggle isVisible={true} lives={currentLives} heartClassName="w-5 h-5" />
+            </div>
           </div>
           {showHearts && (
             <div className="flex items-center gap-0.5 mt-2 ml-11">
-              <ProfileHeartsToggle isVisible={showHearts} lives={optimisticLives} heartClassName="w-8 h-8" />
+              <ProfileHeartsToggle isVisible={showHearts} lives={currentLives} heartClassName="w-8 h-8" />
             </div>
           )}
         </div>
@@ -324,33 +342,32 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
             <div className={cn(
               "flex items-center space-x-1 rounded-full px-1.5 py-0.5 transition-all duration-300 shadow-sm bg-zinc-100 border border-zinc-200"
             )}>
-              {!gameMode && (
-                <button 
-                  onClick={() => handleVote(1)}
-                  className={cn(
-                    "p-1 transition-all duration-300",
-                    userVote === 0 && "hover:scale-110"
-                  )}
-                >
-                  <ArrowBigUp 
-                    size={22} 
-                    fill={userVote === 1 ? "#16a34a" : "transparent"} 
-                    stroke={userVote === 1 ? "#16a34a" : "black"}
-                    strokeWidth={2}
-                  />
-                </button>
-              )}
               <button 
-                onClick={() => handleVote(-1)}
+                onClick={() => handleVote(1)}
                 className={cn(
                   "p-1 transition-all duration-300",
                   userVote === 0 && "hover:scale-110"
                 )}
+                title="Upvote"
+              >
+                <ArrowBigUp 
+                  size={22} 
+                  fill={userVote === 1 ? "#16a34a" : "transparent"} 
+                  stroke={userVote === 1 ? "#16a34a" : "black"}
+                  strokeWidth={2}
+                />
+              </button>
+              <button 
+                onClick={() => handleVote(-1)}
+                className={cn(
+                  "p-1 transition-all duration-300 hover:scale-110 active:scale-90"
+                )}
+                title="Downvote (-1 Life)"
               >
                 <ArrowBigDown 
                   size={22} 
-                  fill={userVote === -1 ? "#DC143C" : "transparent"} 
-                  stroke={userVote === -1 ? "#DC143C" : "black"}
+                  fill={currentLives < 3 ? "#DC143C" : "transparent"} 
+                  stroke={currentLives < 3 ? "#DC143C" : "black"}
                   strokeWidth={2}
                 />
               </button>

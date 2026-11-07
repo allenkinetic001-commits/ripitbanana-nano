@@ -47,14 +47,14 @@ export default function Login() {
           // Profile missing or 0 lives = Eliminated
           localStorage.setItem(`isEliminated_${data.user.id}`, 'true');
           await supabase.auth.signOut();
-          setError("Oops… you don’t exist here anymore.");
+          setError("Oops. you don't exist here anymore.");
           return;
         }
 
         // Double check local storage block flag for safety
         if (localStorage.getItem(`isEliminated_${data.user.id}`) === 'true') {
           await supabase.auth.signOut();
-          setError("Oops… you don’t exist here anymore.");
+          setError("Oops. you don't exist here anymore.");
           return;
         }
 
@@ -173,7 +173,7 @@ export default function Login() {
             {loading ? (
               <div className="h-16 flex items-center justify-center gap-3 bg-zinc-100 rounded-2xl w-full">
                 <Loader2 size={20} className="animate-spin text-zinc-500" />
-                <span className="text-zinc-500 font-bold text-sm">Signing in…</span>
+                <span className="text-zinc-500 font-bold text-sm">Signing in.</span>
               </div>
             ) : (
               <img
@@ -186,13 +186,36 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center space-y-4">
           <p className="text-zinc-500 font-medium">
             Don't have an account?{' '}
             <Link to="/signup" className="text-red-600 font-bold hover:text-red-700 transition-colors">
               Create Account
             </Link>
           </p>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('supabaseUserId', 'guest-user');
+                const guestProfile = {
+                  username: 'guest_survivor',
+                  fullName: 'Guest Survivor',
+                  bio: 'Exploring RipIt ?',
+                  avatar: '/custom-empty-profile.png',
+                  website: ''
+                };
+                localStorage.setItem('userProfile', JSON.stringify(guestProfile));
+                localStorage.setItem('profile_v2_guest-user', JSON.stringify(guestProfile));
+                window.location.href = '/?preview=true';
+              }}
+              className="text-xs font-bold text-zinc-600 hover:text-zinc-900 uppercase tracking-widest px-5 py-2.5 rounded-full border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 transition-all shadow-sm active:scale-95"
+            >
+              ?? Explore App (Guest Mode)
+            </button>
+          </div>
         </div>
       </div>
     </div>
