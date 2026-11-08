@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useRef } from 'react';
 import { posts } from '../data/posts';
 import { formatDate } from '../lib/utils';
 import { useSupabasePosts, formatPostForUI, addCommentToPost } from '../hooks/useSupabase';
@@ -5952,48 +5952,67 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isDurationInitialized, setIsDurationInitialized] = useState(false);
 
   // Universal History Fetching — fetch once on mount, re-fetch on new inserts
+  // Debounced to prevent redundant Supabase calls on rapid triggers
+  const fetchHistoryRef = useRef(false);
   const fetchHistory = async () => {
+    // Prevent concurrent fetches
+    if (fetchHistoryRef.current) return;
+    fetchHistoryRef.current = true;
     setHistoryLoading(true);
-    const { data, error } = await supabase
-      .from('challenge_rounds')
-      .select('*')
-      .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('❌ Failed to fetch round history:', error);
-      setHistoryLoading(false);
-      return;
-    }
+    try {
+      const fetchPromise = supabase
+        .from('challenge_rounds')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      // 4-second timeout to prevent indefinite loading when Supabase is slow
+      const timeoutPromise = new Promise<{ data: null; error: { message: string } }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), 4000)
+      );
 
-    if (data) {
-      const formatted: RoundRecord[] = data.map(r => ({
-        id: r.id,
-        date: r.date,
-        time: r.time,
-        variant: r.variant,
-        durationLabel: r.duration_label,
-        survivors: Array.isArray(r.survivors) ? r.survivors.filter(Boolean) : [],
-        eliminated: Array.isArray(r.eliminated) ? r.eliminated.filter(Boolean) : [],
-        timestamp: r.round_timestamp
-      }));
-      console.log('📥 Fetched', formatted.length, 'rounds from Supabase');
-      setRoundHistory(prev => {
-        const dbTimestamps = new Set(formatted.map(r => r.timestamp).filter(Boolean));
-        const localOnly = prev.filter(r => String(r.id).startsWith('temp-') && !dbTimestamps.has(r.timestamp));
-        const combined = [...localOnly, ...formatted];
-        return combined.sort((a, b) => {
-          const parseDate = (dStr: string, tStr: string) => {
-            const cleaned = dStr.replace(/(\d+)(st|nd|rd|th)/i, '$1');
-            const parsed = new Date(`${cleaned} ${tStr}`).getTime();
-            return isNaN(parsed) ? 0 : parsed;
-          };
-          const timeA = parseDate(a.date, a.time);
-          const timeB = parseDate(b.date, b.time);
-          return timeB - timeA;
+      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
+
+      if (error) {
+        console.error('❌ Failed to fetch round history:', error);
+        setHistoryLoading(false);
+        fetchHistoryRef.current = false;
+        return;
+      }
+
+      if (data) {
+        const formatted: RoundRecord[] = data.map(r => ({
+          id: r.id,
+          date: r.date,
+          time: r.time,
+          variant: r.variant,
+          durationLabel: r.duration_label,
+          survivors: Array.isArray(r.survivors) ? r.survivors.filter(Boolean) : [],
+          eliminated: Array.isArray(r.eliminated) ? r.eliminated.filter(Boolean) : [],
+          timestamp: r.round_timestamp
+        }));
+        console.log('📥 Fetched', formatted.length, 'rounds from Supabase');
+        setRoundHistory(prev => {
+          const dbTimestamps = new Set(formatted.map(r => r.timestamp).filter(Boolean));
+          const localOnly = prev.filter(r => String(r.id).startsWith('temp-') && !dbTimestamps.has(r.timestamp));
+          const combined = [...localOnly, ...formatted];
+          return combined.sort((a, b) => {
+            const parseDate = (dStr: string, tStr: string) => {
+              const cleaned = dStr.replace(/(\d+)(st|nd|rd|th)/i, '$1');
+              const parsed = new Date(`${cleaned} ${tStr}`).getTime();
+              return isNaN(parsed) ? 0 : parsed;
+            };
+            const timeA = parseDate(a.date, a.time);
+            const timeB = parseDate(b.date, b.time);
+            return timeB - timeA;
+          });
         });
-      });
+      }
+    } catch (err) {
+      console.error('❌ fetchHistory error:', err);
     }
     setHistoryLoading(false);
+    fetchHistoryRef.current = false;
   };
 
   useEffect(() => {

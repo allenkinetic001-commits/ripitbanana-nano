@@ -46,37 +46,49 @@ export function useSupabasePosts() {
 
   const fetchPosts = async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('posts')
-      .select(`
-        *,
-        profiles (
-          username,
-          full_name,
-          avatar_url,
-          is_traitor,
-          lives
-        ),
-        comments (
-          id,
-          text,
-          created_at,
+    try {
+      const fetchPromise = supabase
+        .from('posts')
+        .select(`
+          *,
           profiles (
             username,
-            avatar_url
+            full_name,
+            avatar_url,
+            is_traitor,
+            lives
+          ),
+          comments (
+            id,
+            text,
+            created_at,
+            profiles (
+              username,
+              avatar_url
+            )
           )
-        )
-      `)
-      .order('created_at', { ascending: false })
-      .limit(50);
+        `)
+        .order('created_at', { ascending: false })
+        .limit(50);
 
-    if (fetchError) {
-      setError(fetchError.message);
-    } else {
-      // Filter out posts where profile is null (meaning the user has been eliminated)
-      const validPosts = (data || []).filter((post: any) => post.profiles !== null);
-      setPosts(validPosts as any[]);
-      localStorage.setItem('supabase_posts_cache', JSON.stringify(validPosts));
+      // 5-second timeout — show cached data instead of hanging forever
+      const timeoutPromise = new Promise<{ data: null; error: { message: string } }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: { message: 'Posts fetch timed out' } }), 5000)
+      );
+
+      const { data, error: fetchError } = await Promise.race([fetchPromise, timeoutPromise]);
+
+      if (fetchError) {
+        setError(fetchError.message);
+      } else {
+        // Filter out posts where profile is null (meaning the user has been eliminated)
+        const validPosts = (data || []).filter((post: any) => post.profiles !== null);
+        setPosts(validPosts as any[]);
+        localStorage.setItem('supabase_posts_cache', JSON.stringify(validPosts));
+      }
+    } catch (err: any) {
+      console.warn('fetchPosts error:', err);
+      setError(err?.message || 'fetch failed');
     }
     setLoading(false);
   };
