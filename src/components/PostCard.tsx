@@ -325,9 +325,12 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
           />
         ) : (
           <img 
-            src={image} 
+            src={image || "/custom-empty-profile.png"} 
             alt="Post content" 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/custom-empty-profile.png';
+            }}
           />
         )}
       </div>

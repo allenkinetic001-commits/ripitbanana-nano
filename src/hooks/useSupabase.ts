@@ -226,49 +226,67 @@ export async function fetchProfileByUsername(username: string) {
 
 // Upload media file to Supabase Storage, return the public URL
 export async function uploadPostMedia(userId: string, file: File): Promise<{ url: string | null; error: any }> {
-  const ext = (file?.name || '').split('.').pop() || (file?.type?.includes('video') ? 'mp4' : 'jpg');
-  const fileName = `${userId}/${Date.now()}.${ext}`;
+  try {
+    const ext = (file?.name || '').split('.').pop() || (file?.type?.includes('video') ? 'mp4' : 'jpg');
+    const fileName = `${userId}/${Date.now()}.${ext}`;
 
-  const { data, error } = await supabase.storage
-    .from('posts')
-    .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false,
-      contentType: file.type,
-    });
+    const uploadPromise = supabase.storage
+      .from('posts')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type || 'image/jpeg',
+      });
 
-  if (error) return { url: null, error };
+    const timeoutPromise = new Promise<{ data: null; error: any }>((_, reject) =>
+      setTimeout(() => reject(new Error('Storage upload timed out')), 6000)
+    );
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('posts')
-    .getPublicUrl(data.path);
+    const res = await Promise.race([uploadPromise, timeoutPromise]) as any;
+    if (res?.error) return { url: null, error: res.error };
 
-  return { url: publicUrl, error: null };
+    const { data: { publicUrl } } = supabase.storage
+      .from('posts')
+      .getPublicUrl(res.data.path);
+
+    return { url: publicUrl, error: null };
+  } catch (err: any) {
+    return { url: null, error: err };
+  }
 }
 
 // Create a new post — imageUrl should be a public storage URL (not base64)
 export async function createPost(userId: string, caption: string, imageUrl: string, id?: string) {
-  const payload: any = {
-    user_id: userId,
-    caption,
-    image_url: imageUrl,
-  };
-  if (id) payload.id = id;
+  try {
+    const payload: any = {
+      user_id: userId,
+      caption,
+      image_url: imageUrl,
+    };
+    if (id) payload.id = id;
 
-  const { data, error } = await supabase
-    .from('posts')
-    .insert(payload)
-    .select(`
-      *,
-      profiles (
-        username,
-        full_name,
-        avatar_url
-      )
-    `)
-    .single();
+    const insertPromise = supabase
+      .from('posts')
+      .insert(payload)
+      .select(`
+        *,
+        profiles (
+          username,
+          full_name,
+          avatar_url
+        )
+      `)
+      .single();
 
-  return { data: data as SupabasePost | null, error };
+    const timeoutPromise = new Promise<{ data: null; error: any }>((_, reject) =>
+      setTimeout(() => reject(new Error('Post creation timed out')), 6000)
+    );
+
+    const res = await Promise.race([insertPromise, timeoutPromise]) as any;
+    return { data: res?.data as SupabasePost | null, error: res?.error };
+  } catch (err: any) {
+    return { data: null, error: err };
+  }
 }
 
 // Delete a post
@@ -389,24 +407,33 @@ export function getTimeAgo(dateStr?: string): string {
 
 // Upload avatar file to Supabase Storage, return the public URL
 export async function uploadAvatar(userId: string, file: File): Promise<{ url: string | null; error: any }> {
-  const ext = file.name.split('.').pop() || 'jpg';
-  const fileName = `${userId}/${Date.now()}.${ext}`;
+  try {
+    const ext = file.name.split('.').pop() || 'jpg';
+    const fileName = `${userId}/${Date.now()}.${ext}`;
 
-  const { data, error } = await supabase.storage
-    .from('avatars')
-    .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: true,
-      contentType: file.type,
-    });
+    const uploadPromise = supabase.storage
+      .from('avatars')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: file.type || 'image/jpeg',
+      });
 
-  if (error) return { url: null, error };
+    const timeoutPromise = new Promise<{ data: null; error: any }>((_, reject) =>
+      setTimeout(() => reject(new Error('Avatar upload timed out')), 6000)
+    );
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('avatars')
-    .getPublicUrl(data.path);
+    const res = await Promise.race([uploadPromise, timeoutPromise]) as any;
+    if (res?.error) return { url: null, error: res.error };
 
-  return { url: publicUrl, error: null };
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(res.data.path);
+
+    return { url: publicUrl, error: null };
+  } catch (err: any) {
+    return { url: null, error: err };
+  }
 }
 
 // Update profile row on the Supabase backend

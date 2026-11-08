@@ -131,19 +131,15 @@ const Profile = () => {
       }
 
       // 1. Upload to Storage
-      const { url: avatarUrl, error: uploadErr } = await uploadAvatar(session.user.id, file);
-      if (uploadErr || !avatarUrl) {
-        console.error("Avatar upload failed:", uploadErr);
-        alert("Failed to upload avatar: " + (uploadErr?.message || "Storage error"));
-        return;
-      }
-
-      // 2. Update Database
-      const { error: updateErr } = await updateUserProfile(session.user.id, { avatarUrl });
-      if (updateErr) {
-        console.error("Profile update failed:", updateErr);
-        alert("Failed to save avatar to profile: " + updateErr.message);
-        return;
+      let avatarUrl = URL.createObjectURL(file);
+      try {
+        const { url: uploadedUrl, error: uploadErr } = await uploadAvatar(session.user.id, file);
+        if (!uploadErr && uploadedUrl) {
+          avatarUrl = uploadedUrl;
+          await updateUserProfile(session.user.id, { avatarUrl });
+        }
+      } catch (err) {
+        console.warn("Avatar upload fallback to local:", err);
       }
 
       // 3. Update Context & Local State
@@ -172,15 +168,16 @@ const Profile = () => {
 
       let avatarUrl = editForm.avatar;
 
-      // 1. If there's a new avatar file, upload it first
+      // 1. If there's a new avatar file, upload it
       if (avatarFile) {
-        const { url, error: uploadErr } = await uploadAvatar(session.user.id, avatarFile);
-        if (uploadErr || !url) {
-          console.error("Avatar upload failed:", uploadErr);
-          alert("Failed to upload avatar: " + (uploadErr?.message || "Storage error"));
-          return;
+        try {
+          const { url, error: uploadErr } = await uploadAvatar(session.user.id, avatarFile);
+          if (!uploadErr && url) {
+            avatarUrl = url;
+          }
+        } catch (err) {
+          console.warn("Avatar upload fallback to local:", err);
         }
-        avatarUrl = url;
       }
 
       // 2. Save profile details to Supabase database
