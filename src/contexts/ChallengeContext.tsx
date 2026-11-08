@@ -5410,12 +5410,12 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       // Start with the incoming formatted posts from DB
       const newMerged: any[] = [...formattedPosts];
       
-      // Preserve ONLY optimistic posts (opt- prefix) that haven't landed in DB yet.
+      // Preserve local posts (opt- and post- prefixed) that haven't landed in DB yet.
       // Real-ID posts that differ from DB version are dropped (DB wins).
       prevAll.forEach(p => {
         const idStr = String(p.id);
-        if (!dbMap.has(idStr) && idStr.startsWith('opt-')) {
-          // Keep active optimistic upload posts in memory (stale blob URLs are stripped during load/save to localStorage)
+        if (!dbMap.has(idStr) && (idStr.startsWith('opt-') || idStr.startsWith('post-'))) {
+          // Keep active optimistic/local upload posts in memory
           if (p.image) {
             newMerged.unshift(p);
           }
@@ -5461,7 +5461,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           const alreadyInDb = dbComments.some((dbC: any) => 
             dbC.text === localC.text && dbC.username === localC.username
           );
-          if (!alreadyInDb && String(localC.id).startsWith('opt-')) {
+          if (!alreadyInDb && (String(localC.id).startsWith('opt-') || String(localC.id).startsWith('post-'))) {
             merged.push(localC);
           }
         });

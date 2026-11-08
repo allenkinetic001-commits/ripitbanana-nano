@@ -20,16 +20,16 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
   };
 
   return (
-    <div 
+    <div
       onClick={() => navigate(`/user/${user.username}`)}
       className="flex items-center p-3 hover:bg-zinc-50 transition-colors w-full text-left cursor-pointer"
     >
       <div className="relative shrink-0">
         <div className="w-12 h-12 rounded-full border border-zinc-200 overflow-hidden bg-zinc-50">
-          <img 
-            src={user.avatar || "/custom-empty-profile.png"} 
-            alt={user.username} 
-            className="w-full h-full object-cover" 
+          <img
+            src={user.avatar || "/custom-empty-profile.png"}
+            alt={user.username}
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
@@ -51,17 +51,17 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
             }}
             className="animate-pop-in transition-all active:scale-95 flex items-center justify-center p-1"
           >
-            <img 
+            <img
               key="traitor-icon"
-              src="/traitor.png" 
-              alt="Traitor" 
-              className="h-6 w-auto object-contain animate-pop-in" 
+              src="/traitor.png"
+              alt="Traitor"
+              className="h-6 w-auto object-contain animate-pop-in"
             />
           </button>
         ) : (
           <div className="flex items-center space-x-2">
             {user.username !== userProfile?.username && (
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   addEnemy(user);
@@ -69,17 +69,17 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
                 className="active:scale-95 drop-shadow-sm"
               >
                 {hasActed ? (
-                  <img 
+                  <img
                     key="added"
-                    src="/btn-added.png" 
-                    alt="Added" 
+                    src="/btn-added.png"
+                    alt="Added"
                     className="h-7 w-auto object-contain animate-pop-in"
                   />
                 ) : (
-                  <img 
+                  <img
                     key="add"
-                    src="/add-enemy.png" 
-                    alt="Add Enemy" 
+                    src="/add-enemy.png"
+                    alt="Add Enemy"
                     className="h-8 w-auto object-contain animate-pop-in"
                   />
                 )}
@@ -115,7 +115,7 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
           </div>
         )}
         {!hasActed && (
-          <div 
+          <div
             onClick={(e) => {
               e.stopPropagation();
               toggleTraitor(e);
@@ -131,15 +131,15 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
 });
 
 const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUsers, navigate, handleVote, selectedRoundId, isHistoryView, isChallengeEnded }: any) => {
-  const isVideo = survivor.type === 'video' || 
-    survivor.image?.startsWith('data:video/') || 
+  const isVideo = survivor.type === 'video' ||
+    survivor.image?.startsWith('data:video/') ||
     /\.(mp4|mov|webm|ogg)(\?|$)/i.test(survivor.image || '');
 
   return (
     <div className="mx-4 mb-4 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-2xl transition-all text-left">
       {/* Header Info */}
       <div className="flex items-center justify-between p-4">
-        <div 
+        <div
           className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate(`/user/${survivor.username}`)}
         >
@@ -148,10 +148,10 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
               <img src={survivor.avatar || "/custom-empty-profile.png"} alt={survivor.username} className="w-full h-full object-cover" />
             </div>
             <div className="absolute -bottom-2 -right-2">
-              <img 
-                src="/pley-badge.png" 
-                alt="Status" 
-                className="w-8 h-8 object-contain drop-shadow-md" 
+              <img
+                src="/pley-badge.png"
+                alt="Status"
+                className="w-8 h-8 object-contain drop-shadow-md"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
@@ -176,14 +176,14 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
           </div>
         </div>
 
-        <button 
+        <button
           onClick={() => toggleFollow(survivor.username)}
           className="transition-all active:scale-90 hover:scale-110"
         >
-          <img 
-            src={followedUsers.includes(survivor.username) ? "/btn-following.png" : "/btn-follow.png"} 
-            alt="Follow Action" 
-            className="h-8 w-auto object-contain" 
+          <img
+            src={followedUsers.includes(survivor.username) ? "/btn-following.png" : "/btn-follow.png"}
+            alt="Follow Action"
+            className="h-8 w-auto object-contain"
             style={{ imageRendering: '-webkit-optimize-contrast' }}
           />
         </button>
@@ -192,27 +192,27 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
       {/* Main Visual */}
       <div className="aspect-[4/5] bg-zinc-50 overflow-hidden relative group mx-2 rounded-[1.8rem]">
         {isVideo ? (
-          <video 
-            src={survivor.image} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 bg-zinc-50" 
-            controls 
-            loop 
-            muted 
+          <video
+            src={survivor.image}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 bg-zinc-50"
+            controls
+            loop
+            muted
             playsInline
             autoPlay
           />
         ) : (
           <img src={survivor.image} alt="Survival Proof" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
         )}
-        
+
         {/* Status Badge Overlays */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
-           <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full shadow-lg border border-white/50 flex items-center gap-2">
-              <img src="/duration-alarm.png" alt="" className="h-4 w-auto object-contain" />
-              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-900">
-                {isHistoryView ? "Legacy Record" : "Live Survivor"}
-              </span>
-           </div>
+          <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full shadow-lg border border-white/50 flex items-center gap-2">
+            <img src="/duration-alarm.png" alt="" className="h-4 w-auto object-contain" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-900">
+              {isHistoryView ? "Legacy Record" : "Live Survivor"}
+            </span>
+          </div>
         </div>
 
         <div className="absolute bottom-4 right-4 z-50">
@@ -221,10 +221,10 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
               Terminated
             </span>
           ) : (
-            <img 
-              src="/survived_btn.png" 
-              alt="Survived" 
-              className="h-8 w-auto object-contain drop-shadow-md hover:scale-110 transition-transform active:scale-95 cursor-pointer" 
+            <img
+              src="/survived_btn.png"
+              alt="Survived"
+              className="h-8 w-auto object-contain drop-shadow-md hover:scale-110 transition-transform active:scale-95 cursor-pointer"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           )}
@@ -237,13 +237,13 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
           <div className="flex items-center gap-3">
             {handleVote && (
               <div className="flex items-center gap-1 bg-zinc-100/80 p-1 rounded-full border border-zinc-200/50">
-                <button 
+                <button
                   onClick={() => handleVote(survivor.id, null, 'up')}
                   className={cn("p-1.5 rounded-full transition-all", survivor.userVote === 'up' ? "bg-white shadow-sm scale-110" : "opacity-40 hover:opacity-100")}
                 >
                   <ArrowBigUp size={20} fill={survivor.userVote === 'up' ? "#22c55e" : "black"} stroke="none" />
                 </button>
-                <button 
+                <button
                   onClick={() => handleVote(survivor.id, null, 'down')}
                   className={cn("p-1.5 rounded-full transition-all", survivor.userVote === 'down' ? "bg-white shadow-sm scale-110" : "opacity-40 hover:opacity-100")}
                 >
@@ -252,14 +252,14 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
               </div>
             )}
 
-            <button 
+            <button
               onClick={() => navigate(`/post/${survivor.id}`)}
               className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-10 w-10 rounded-full transition-all active:scale-90"
             >
               <img src="/locator.png" alt="Comment" className="h-5 w-5 object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
-            
-            <button 
+
+            <button
               onClick={() => navigate(`/chat/${survivor.username}`)}
               className="flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 h-10 w-10 rounded-full transition-all active:scale-90"
             >
@@ -272,10 +272,10 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
               <p className="text-[7px] font-black text-zinc-300 uppercase tracking-widest leading-none">Vibe Check</p>
               <p className="text-[10px] font-black text-zinc-900 mt-0.5">ELITE STATUS</p>
             </div>
-            <img 
-              src="/elite_status_icon.png" 
-              alt="Elite" 
-              className="w-10 h-10 object-contain drop-shadow-sm" 
+            <img
+              src="/elite_status_icon.png"
+              alt="Elite"
+              className="w-10 h-10 object-contain drop-shadow-sm"
             />
           </div>
         </div>
@@ -298,7 +298,7 @@ const SearchContent = ({ searchQuery, allPosts, navigate }: { searchQuery: strin
 
   useEffect(() => {
     if (searchQuery.length < 1) return;
-    
+
     const searchRemote = async () => {
       setLoading(true);
       const { data, error } = await supabase
@@ -306,7 +306,7 @@ const SearchContent = ({ searchQuery, allPosts, navigate }: { searchQuery: strin
         .select('id, username, full_name, avatar_url')
         .ilike('username', `%${searchQuery}%`)
         .limit(10);
-      
+
       if (!error && data) {
         setRemoteUsers(data.map(u => ({
           id: u.id,
@@ -339,7 +339,7 @@ const SearchContent = ({ searchQuery, allPosts, navigate }: { searchQuery: strin
   const mergedResults = useMemo(() => {
     const results = [...localResults];
     const seenUsernames = new Set(results.map(r => r.username.toLowerCase()));
-    
+
     remoteUsers.forEach(ru => {
       if (!seenUsernames.has(ru.username.toLowerCase())) {
         results.push(ru);
@@ -351,14 +351,14 @@ const SearchContent = ({ searchQuery, allPosts, navigate }: { searchQuery: strin
   return (
     <div className="p-2 space-y-1">
       {mergedResults.map((user) => (
-        <HomeUserItem 
-          key={user.id} 
-          user={user} 
-          navigate={navigate} 
-          isSearch={true} 
+        <HomeUserItem
+          key={user.id}
+          user={user}
+          navigate={navigate}
+          isSearch={true}
         />
       ))}
-      
+
       {loading && mergedResults.length === 0 && (
         <div className="py-12 text-center">
           <div className="w-8 h-8 rounded-full border-2 border-zinc-200 border-t-zinc-800 animate-spin mx-auto mb-2" />
@@ -408,7 +408,7 @@ const Home = () => {
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Supabase posts are now managed globally in ChallengeContext
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
   useEffect(() => {
@@ -451,7 +451,10 @@ const Home = () => {
         setSelectedFile(dataUrl);
       } else {
         setRawFile(file);
-        setSelectedFile(URL.createObjectURL(file));
+        // Use blob URL for video preview (data URLs for large videos would be too big)
+        // but we'll still keep the rawFile reference for upload
+        const blobUrl = URL.createObjectURL(file);
+        setSelectedFile(blobUrl);
       }
 
       setUploadModalOpen(true);
@@ -478,7 +481,7 @@ const Home = () => {
     // Save the raw File and local preview before clearing modal state
     const currentRawFile = rawFile;
     const currentSelectedFile = selectedFile;
-    
+
     // Generate an optimistic ID
     const optimisticId = 'opt-' + Date.now();
 
@@ -502,7 +505,7 @@ const Home = () => {
           if (session?.user?.id) {
             userId = session.user.id;
           }
-        } catch {}
+        } catch { }
 
         // If authenticated user, attempt cloud sync in background
         if (userId !== 'guest-user') {
@@ -577,14 +580,14 @@ const Home = () => {
     ...Object.keys(userLives).filter(uname => userLives[uname] <= 0)
   ]), [eliminated, userLives]);
 
-  const unswipedPosts = useMemo(() => 
+  const unswipedPosts = useMemo(() =>
     allPosts
       .filter(p => !swipedIds.has(p.id) && !eliminatedUsernames.has(p.username) && localStorage.getItem(`user_eliminated_${p.username}`) !== 'true')
       .map(p => ({
         ...p,
         globalLives: typeof userLives[p.username] === 'number' ? userLives[p.username] : p.globalLives
       })),
-  [allPosts, swipedIds, eliminatedUsernames, userLives]);
+    [allPosts, swipedIds, eliminatedUsernames, userLives]);
 
   // Deterministic feed synchronization: Ensures the feed always matches new posts minus swiped ones
   useEffect(() => {
@@ -593,14 +596,14 @@ const Home = () => {
       if (visiblePosts.length > 0) setVisiblePosts([]);
       return;
     }
-    
+
     if (allPosts.length === 0) return;
 
     // Fast and reliable comparison of actual feed content to avoid unnecessary re-renders
     // while ensuring any new or removed posts instantly reflect.
     const visibleSimplified = visiblePosts.map((p: any) => `${p.id}-${p.avatar}-${p.username}-${p.isTraitorGlobal}-${p.globalLives}-${p.comments?.length || 0}`);
     const unswipedSimplified = unswipedPosts.map((p: any) => `${p.id}-${p.avatar}-${p.username}-${p.isTraitorGlobal}-${p.globalLives}-${p.comments?.length || 0}`);
-    
+
     if (JSON.stringify(visibleSimplified) !== JSON.stringify(unswipedSimplified)) {
       setVisiblePosts(unswipedPosts);
     }
@@ -652,7 +655,7 @@ const Home = () => {
   const handleTabClick = (tab: string) => {
     if (timeLeft > 0) {
       if (userSelection) return; // Locked
-      
+
       // Immediate submission for active challenge
       setClickCounts(prev => ({
         ...prev,
@@ -663,7 +666,7 @@ const Home = () => {
         if (!prev[tab]) return { ...prev, [tab]: Date.now() };
         return prev;
       });
-      
+
       setVariantDurations(prev => {
         if (!prev[tab]) return { ...prev, [tab]: timeLeft };
         return prev;
@@ -688,8 +691,8 @@ const Home = () => {
   const handleDeletePost = (postId: number | string) => {
     try {
       const activeMode = userSelection || majorityVariant;
-      
-      const eliminatedPost = visiblePosts.find(post => String(post.id) === String(postId)) 
+
+      const eliminatedPost = visiblePosts.find(post => String(post.id) === String(postId))
         || allPosts.find(post => String(post.id) === String(postId));
 
       if (eliminatedPost) {
@@ -713,7 +716,7 @@ const Home = () => {
           comments: eliminatedPost.comments || [],
           madeIt: false
         });
-        
+
         // Wipe out all posts from this eliminated user completely
         setVisiblePosts(prev => prev.filter(post => post.username !== eliminatedPost.username));
         setAllPosts(prev => prev.filter(post => post.username !== eliminatedPost.username));
@@ -721,7 +724,7 @@ const Home = () => {
         setVisiblePosts(prev => prev.filter(post => String(post.id) !== String(postId)));
         setAllPosts(prev => prev.filter(post => String(post.id) !== String(postId)));
       }
-      
+
       // Track eliminations for the current active mode
       if (activeMode && Object.prototype.hasOwnProperty.call(eliminationCounts, activeMode)) {
         setEliminationCounts(prev => ({
@@ -742,15 +745,15 @@ const Home = () => {
 
     const passedPost = visiblePosts.find(p => p.id === postId);
     setVisiblePosts(prev => prev.filter(post => post.id !== postId));
-    
+
     // Add to survivors list if they passed
     if (passedPost) {
       setSurvivors(prev => {
         const existingIds = new Set(prev.map(s => s.id));
         if (existingIds.has(passedPost.id)) return prev;
-        return [...prev, { 
+        return [...prev, {
           id: passedPost.id,
-          username: passedPost.username, 
+          username: passedPost.username,
           avatar: passedPost.avatar,
           image: passedPost.image,
           caption: passedPost.caption,
@@ -775,26 +778,26 @@ const Home = () => {
       {/* Upload Post Modal */}
       {uploadModalOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center px-4">
-          <div 
+          <div
             className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm"
             onClick={handleCloseModal}
           />
           <div className="bg-white w-full max-w-md max-h-[90vh] flex flex-col rounded-3xl overflow-hidden shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
             <div className="p-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50 shrink-0">
-              <img 
-                src="/modal-new-post.png" 
-                alt={t('home_upload_modal_title')} 
+              <img
+                src="/modal-new-post.png"
+                alt={t('home_upload_modal_title')}
                 className="h-6 w-auto object-contain ml-2"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
-              <button 
+              <button
                 onClick={handleCloseModal}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 text-zinc-400 hover:text-zinc-900 transition-all"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-4 space-y-4 overflow-y-auto flex-1">
               {/* Media Preview */}
               <div id="preview-container" className="aspect-square w-full bg-zinc-50 rounded-2xl flex items-center justify-center overflow-hidden relative min-h-[300px]">
@@ -804,19 +807,19 @@ const Home = () => {
                     <span className="text-white/30 text-xs">Loading preview...</span>
                   </div>
                 ) : fileType === 'video' ? (
-                  <video 
-                    src={selectedFile} 
-                    className="w-full h-full object-contain relative z-20" 
-                    controls 
-                    autoPlay 
-                    muted 
-                    loop 
+                  <video
+                    src={selectedFile}
+                    className="w-full h-full object-contain relative z-20"
+                    controls
+                    autoPlay
+                    muted
+                    loop
                   />
                 ) : (
-                  <img 
-                    src={selectedFile} 
-                    alt="Preview" 
-                    className="w-full h-full object-contain relative z-20" 
+                  <img
+                    src={selectedFile}
+                    alt="Preview"
+                    className="w-full h-full object-contain relative z-20"
                   />
                 )}
               </div>
@@ -824,10 +827,10 @@ const Home = () => {
               {/* Caption Input */}
               <div className="flex gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-zinc-200 bg-zinc-50">
-                  <img 
-                    src={userProfile?.avatar || "/custom-empty-profile.png"} 
-                    alt={userProfile?.username || "Me"} 
-                    className="w-full h-full object-cover" 
+                  <img
+                    src={userProfile?.avatar || "/custom-empty-profile.png"}
+                    alt={userProfile?.username || "Me"}
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <textarea
@@ -858,11 +861,11 @@ const Home = () => {
                     <div className="w-5 h-5 rounded-full border-[3px] border-red-500/20 border-t-red-600 animate-spin shadow-sm" />
                   </div>
                 ) : null}
-                <img 
-                  src="/btn-post-modal.png" 
-                  alt={t('home_upload_post')} 
+                <img
+                  src="/btn-post-modal.png"
+                  alt={t('home_upload_post')}
                   className={cn(
-                    "h-9 w-auto object-contain drop-shadow-md transition-all duration-300", 
+                    "h-9 w-auto object-contain drop-shadow-md transition-all duration-300",
                     isUploading && "grayscale opacity-80"
                   )}
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
@@ -876,13 +879,13 @@ const Home = () => {
       {/* Info Modal */}
       {showInfo && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-          <div 
+          <div
             className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm"
             onClick={() => setShowPillsInfo(false)}
           />
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             {/* Decorative doodle background pattern — ultra-faint, WhatsApp-style */}
-            <div 
+            <div
               className="absolute inset-0 pointer-events-none z-0"
               style={{
                 backgroundImage: "url('/solo.png')",
@@ -898,16 +901,16 @@ const Home = () => {
             <div className="p-6 border-b border-zinc-100/50 flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 flex items-center justify-center">
-                  <img 
-                    src="/nav-news-v3.png" 
-                    alt="" 
-                    className="w-full h-full object-contain" 
+                  <img
+                    src="/nav-news-v3.png"
+                    alt=""
+                    className="w-full h-full object-contain"
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />
                 </div>
                 <img src="/ripit-rules-header.png" alt="Rip It Rules" className="h-10 w-auto object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               </div>
-              <button 
+              <button
                 onClick={() => setShowPillsInfo(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 text-zinc-400 hover:text-zinc-900 transition-all"
               >
@@ -932,15 +935,15 @@ const Home = () => {
                   <span className="text-base text-red-600 font-black uppercase tracking-wider">
                     You
                   </span>
-                  <img 
-                    src="/header-logo-hydrant.png" 
-                    alt="Hydrant" 
-                    className="h-11 w-auto object-contain" 
+                  <img
+                    src="/header-logo-hydrant.png"
+                    alt="Hydrant"
+                    className="h-11 w-auto object-contain"
                   />
-                  <img 
-                    src="/header-logo-text.png" 
-                    alt="RipIt" 
-                    className="h-6 w-auto object-contain mt-0.5" 
+                  <img
+                    src="/header-logo-text.png"
+                    alt="RipIt"
+                    className="h-6 w-auto object-contain mt-0.5"
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />
                 </div>
@@ -948,7 +951,7 @@ const Home = () => {
             </div>
 
             <div className="p-4 bg-zinc-50/80 border-t border-zinc-100 flex justify-center relative z-10">
-              <button 
+              <button
                 onClick={() => setShowPillsInfo(false)}
                 className="transition-all hover:scale-105 active:scale-95"
               >
@@ -963,7 +966,7 @@ const Home = () => {
       <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
         <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between relative overflow-hidden bg-[#F9F9FB]">
           {/* Decorative background pattern */}
-          <div 
+          <div
             className="absolute inset-0 pointer-events-none z-0"
             style={{
               backgroundImage: "url('/doodle-pattern-colored.png')",
@@ -973,48 +976,48 @@ const Home = () => {
               opacity: 0.1, // 8-10% opacity
             }}
           />
-          
+
           <div className="flex items-center gap-0 relative z-10">
-            <button 
+            <button
               onClick={() => setShowMustache(!showMustache)}
               className="transition-all active:scale-95 flex items-center gap-0"
               title="Toggle Menu"
             >
               <img src="/header-logo-hydrant.png" alt="Logo" className="h-[60px] w-auto object-contain" />
             </button>
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="transition-all active:scale-95"
               onClick={() => {
                 setShowBottomNav(prev => !prev);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
-              <img 
-                src="/header-logo-text.png" 
-                alt="RipIt" 
-                className="h-6 w-auto object-contain ml-0 mt-1" 
+              <img
+                src="/header-logo-text.png"
+                alt="RipIt"
+                className="h-6 w-auto object-contain ml-0 mt-1"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </Link>
           </div>
           <div className="flex items-center gap-4 relative z-10">
-            <button 
+            <button
               onClick={() => {
                 setActiveTab('pley');
                 setShowPills(!showPills);
               }}
               className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
             >
-              <img 
+              <img
                 key={showPills ? 'mustache-active' : 'mustache-inactive'}
                 src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"}
-                alt="Create" 
+                alt="Create"
                 className="h-[44px] w-[44px] object-contain transition-all duration-200 animate-pop-in"
                 style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
               />
             </button>
-            <button 
+            <button
               onClick={() => navigate('/chat')}
               className="text-zinc-700 hover:text-zinc-400 transition-colors relative"
             >
@@ -1025,26 +1028,26 @@ const Home = () => {
                 </div>
               )}
             </button>
-            <button 
+            <button
               onClick={() => fileInputRef.current?.click()}
               className="text-zinc-700 hover:text-zinc-400 transition-colors"
             >
               <img src="/nav-camera-v3.png" alt="Camera" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              style={{ display: 'none' }} 
-              accept="image/*,video/*" 
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+              accept="image/*,video/*"
             />
-            <button 
+            <button
               className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
               onClick={() => setShowPillsInfo(true)}
             >
               <img src="/nav-news-v3.png" alt="News" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
-            <button 
+            <button
               className="text-zinc-700 transition-all active:scale-90 hover:opacity-70"
               onClick={() => {
                 setShowSearchModal(true);
@@ -1059,7 +1062,7 @@ const Home = () => {
         {/* Search Modal */}
         {showSearchModal && (
           <div className="fixed inset-0 z-[120] flex items-start justify-center pt-10 px-4">
-            <div 
+            <div
               className="absolute inset-0 bg-zinc-900/40 backdrop-blur-sm"
               onClick={() => {
                 setShowSearchModal(false);
@@ -1069,14 +1072,14 @@ const Home = () => {
             />
             <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-in slide-in-from-top-4 duration-300">
               <div className="p-4 border-b border-zinc-100 flex items-center gap-2">
-                <img 
-                  src="/search-input-icon.png" 
-                  alt="" 
-                  className="h-7 w-auto object-contain opacity-50" 
+                <img
+                  src="/search-input-icon.png"
+                  alt=""
+                  className="h-7 w-auto object-contain opacity-50"
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
                 <div className="flex-1 relative flex items-center">
-                  <input 
+                  <input
                     autoFocus
                     type="text"
                     value={searchQuery}
@@ -1084,15 +1087,15 @@ const Home = () => {
                     className="w-full bg-transparent border-none outline-none text-zinc-900 font-medium placeholder:text-transparent"
                   />
                   {!searchQuery && (
-                    <img 
-                      src="/search-placeholder.png" 
-                      alt="" 
-                      className="absolute left-0 top-1/2 -translate-y-1/2 h-[35px] w-auto object-contain pointer-events-none opacity-40 ml-1" 
+                    <img
+                      src="/search-placeholder.png"
+                      alt=""
+                      className="absolute left-0 top-1/2 -translate-y-1/2 h-[35px] w-auto object-contain pointer-events-none opacity-40 ml-1"
                       style={{ imageRendering: '-webkit-optimize-contrast' }}
                     />
                   )}
                 </div>
-                <button 
+                <button
                   onClick={() => {
                     setShowSearchModal(false);
                     setShowBottomNav(true);
@@ -1153,10 +1156,10 @@ const Home = () => {
                     !isEliminationRoundActive && "hover:scale-105 active:scale-95"
                   )}
                 >
-                  <img 
+                  <img
                     src={isEliminationRoundActive ? "/btn-submitted.png" : "/btn-start-elimination.png"}
                     alt={isEliminationRoundActive ? "Submitted" : "Start Elimination"}
-                    className="h-10 w-auto object-contain drop-shadow-md" 
+                    className="h-10 w-auto object-contain drop-shadow-md"
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />
                 </button>
@@ -1184,10 +1187,10 @@ const Home = () => {
                       <div className="text-center">
                         <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest block">{t('home_calendar')}</span>
                         <span className="text-sm font-black text-zinc-900 leading-tight">
-                          {new Date().toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-GB', { 
-                            day: '2-digit', 
-                            month: '2-digit', 
-                            year: 'numeric' 
+                          {new Date().toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
                           })}
                         </span>
                       </div>
@@ -1213,7 +1216,7 @@ const Home = () => {
                       <img src="/alligator-logo.png" alt="Croc" className="h-[64px] w-auto object-contain mt-8" />
                       <img src="/worse-than-death.png" alt="Worse Than Death" className="h-[64px] w-auto object-contain" />
                     </div>
-                    
+
                     <div className="flex justify-center items-center gap-8 -mt-2">
                       <div className="flex flex-col items-center">
                         <span className="text-xl font-black text-rose-600">
@@ -1234,7 +1237,7 @@ const Home = () => {
 
                     <div className="flex items-center justify-center w-full px-6 text-center">
                       <p className="text-[11px] font-bold text-zinc-500 italic leading-relaxed">
-                        Round reshuflled automatically at midnight.<br/>All survivors archived to Hall of Fame.
+                        Round reshuflled automatically at midnight.<br />All survivors archived to Hall of Fame.
                       </p>
                     </div>
                   </div>
@@ -1258,18 +1261,18 @@ const Home = () => {
           <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] animate-in fade-in zoom-in duration-1000 px-6 text-center pb-20 relative overflow-hidden">
             {/* Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-purple-100/30 blur-[100px] rounded-full -z-10" />
-            
+
             <div className="space-y-6 mb-12 animate-in slide-in-from-top-12 duration-1000">
               <div className="relative inline-block">
-                <img 
-                  src="/the-end.png" 
-                  alt={t('home_the_end')} 
-                  className="h-24 w-auto object-contain mx-auto relative z-10" 
+                <img
+                  src="/the-end.png"
+                  alt={t('home_the_end')}
+                  className="h-24 w-auto object-contain mx-auto relative z-10"
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
                 <div className="absolute -inset-4 bg-white/50 blur-xl rounded-full -z-10" />
               </div>
-              
+
               <div className="flex flex-col items-center gap-4">
                 <div className="h-[3px] w-32 bg-gradient-to-r from-transparent via-zinc-900 to-transparent" />
                 <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-tighter italic">
@@ -1285,11 +1288,11 @@ const Home = () => {
               <div className="w-full max-w-sm mb-12 animate-in slide-in-from-bottom-12 duration-1000 delay-300">
                 <div className="flex items-center justify-between mb-4 px-4">
                   <div className="flex items-center gap-2">
-                    <img 
-                      src="/round-trophy.png" 
-                      alt="Survival" 
-                      className="h-6 w-auto object-contain" 
-                      style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                    <img
+                      src="/round-trophy.png"
+                      alt="Survival"
+                      className="h-6 w-auto object-contain"
+                      style={{ imageRendering: '-webkit-optimize-contrast' }}
                     />
                     <span className="text-[11px] font-black uppercase tracking-widest text-zinc-900">Hall of Fame</span>
                   </div>
@@ -1297,12 +1300,12 @@ const Home = () => {
                     {survivors.length} SURVIVORS
                   </span>
                 </div>
-                
+
                 <div className="max-h-[500px] overflow-y-auto w-full pr-1 scrollbar-thin">
                   {survivors.slice(0, 10).map((survivor) => (
-                    <SurvivorRow 
-                      key={`survivor-${survivor.id}`} 
-                      survivor={{ ...survivor, madeIt: true }} 
+                    <SurvivorRow
+                      key={`survivor-${survivor.id}`}
+                      survivor={{ ...survivor, madeIt: true }}
                       isSurvivor={isSurvivor}
                       toggleFollow={toggleFollow}
                       followedUsers={followedUsers}
@@ -1315,7 +1318,7 @@ const Home = () => {
                   ))}
                   {survivors.length > 10 && (
                     <div className="p-4 text-center">
-                      <button 
+                      <button
                         onClick={() => navigate('/search')}
                         className="text-[10px] font-black text-purple-600 uppercase tracking-widest hover:underline"
                       >
@@ -1352,7 +1355,7 @@ const Home = () => {
                 <span className="text-[10px] font-black text-zinc-900 uppercase tracking-[0.2em]">View Results</span>
                 <ChevronRight size={14} className="text-zinc-300 group-hover:translate-x-1 transition-transform" />
               </button>
-              
+
               <button
                 onClick={() => {
                   startNewChallenge();
@@ -1362,10 +1365,10 @@ const Home = () => {
                 }}
                 className="transition-all hover:scale-105 active:scale-95"
               >
-                <img 
-                  src="/artisan-lobster.png" 
-                  alt="New Round" 
-                  className="h-28 w-auto object-contain drop-shadow-lg" 
+                <img
+                  src="/artisan-lobster.png"
+                  alt="New Round"
+                  className="h-28 w-auto object-contain drop-shadow-lg"
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               </button>
@@ -1374,9 +1377,9 @@ const Home = () => {
         ) : (visiblePosts.length > 0 || unswipedPosts.length > 0) ? (
           /* ── Posts feed ── */
           (visiblePosts.length > 0 ? visiblePosts : unswipedPosts).map((post) => (
-            <PostCard 
-              key={post.id} 
-              {...post} 
+            <PostCard
+              key={post.id}
+              {...post}
               gameMode={isEliminationRoundActive ? (userSelection || majorityVariant || 'pley') : null}
               onDelete={() => handleDeletePost(post.id)}
               onPass={() => handlePassPost(post.id)}
@@ -1384,7 +1387,7 @@ const Home = () => {
           ))
         ) : (
           /* ── Empty feed ── */
-          <EmptyFeed 
+          <EmptyFeed
             className="min-h-[60vh]"
             title={allPosts.length === 0 ? "It's Quiet Here" : "All Caught Up"}
             subtitle={allPosts.length === 0 ? "No posts have been made yet" : "You have swiped all available posts"}
@@ -1394,10 +1397,10 @@ const Home = () => {
                   onClick={() => setUploadModalOpen(true)}
                   className="transition-all active:scale-95 hover:scale-105"
                 >
-                  <img 
-                    src="/btn-post-first.png" 
-                    alt="Post First" 
-                    className="h-14 w-auto object-contain drop-shadow-md" 
+                  <img
+                    src="/btn-post-first.png"
+                    alt="Post First"
+                    className="h-14 w-auto object-contain drop-shadow-md"
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />
                 </button>
