@@ -43,8 +43,8 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
 
   return (
     <div className={cn(
-      "absolute bottom-0 w-full bg-white border-t border-zinc-100 px-2 py-2 flex justify-around items-center z-50",
-      "transition-all duration-300 ease-in-out",
+      "fixed sm:absolute bottom-0 left-0 right-0 max-w-md mx-auto w-full bg-white border-t border-zinc-100 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex justify-around items-center z-50",
+      "transition-all duration-300 ease-in-out shadow-sm",
       visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-full pointer-events-none"
     )}>
       {navItems.map((item) => {
@@ -55,18 +55,18 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
             key={item.path}
             onClick={() => handleNavClick(item.path)}
             className={cn(
-              "flex flex-col items-center transition-colors relative",
+              "flex flex-col items-center justify-center transition-colors relative flex-1 py-1",
               "text-zinc-900"
             )}
           >
-            <div className="h-14 flex items-center justify-center mb-1">
+            <div className="h-10 sm:h-12 flex items-center justify-center mb-0.5">
               {item.isImage ? (
                 <div className="relative">
                   <img 
                     src={item.icon as string} 
                     alt={item.label}
                     className={cn(
-                      item.size || "h-11 w-11",
+                      item.size || "h-9 w-9 sm:h-11 sm:w-11",
                       "object-contain transition-all duration-300", 
                       isActive ? "scale-110" : "scale-100",
                       isBouncing && "animate-nav-bounce",
@@ -93,13 +93,13 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                 </div>
               )}
             </div>
-            <div className="h-7 flex items-center justify-center -mt-1">
+            <div className="h-4 sm:h-5 flex items-center justify-center">
               {item.path === '/' ? (
                 <img 
                   src="/nav-home-text.png" 
                   alt="Home" 
                   className={cn(
-                    "h-full w-auto object-contain transition-all duration-300", 
+                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100 font-extrabold"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
@@ -109,7 +109,7 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                   src="/nav-search-text.png" 
                   alt="Search" 
                   className={cn(
-                    "h-[12px] w-auto object-contain transition-all duration-300", 
+                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
@@ -119,7 +119,7 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                   src="/nav-activity-text.png" 
                   alt="Activity" 
                   className={cn(
-                    "h-full w-auto object-contain transition-all duration-300", 
+                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
@@ -129,14 +129,14 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                   src="/nav-profile-text.png" 
                   alt="Profile" 
                   className={cn(
-                    "h-full w-auto object-contain transition-all duration-300", 
+                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
                     isActive ? "scale-110" : "scale-100"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : (
                 <span className={cn(
-                  "text-[10px] font-bold tracking-tighter uppercase transition-all", 
+                  "text-[9px] sm:text-[10px] font-bold tracking-tighter uppercase transition-all", 
                   isActive ? "text-zinc-900 scale-110" : "text-zinc-400 scale-100"
                 )}>
                   {item.label}
@@ -144,7 +144,7 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
               )}
             </div>
             {isActive && (
-              <span className="absolute -bottom-1 w-1 h-1 bg-zinc-900 rounded-full animate-in zoom-in" />
+              <span className="absolute -bottom-0.5 sm:-bottom-1 w-1 h-1 bg-zinc-900 rounded-full animate-in zoom-in" />
             )}
           </button>
         );

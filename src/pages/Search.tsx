@@ -420,29 +420,29 @@ const SearchPage = () => {
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-24 bg-[#FAFAFA]">
       {/* Header */}
-      <div className="px-4 py-6 bg-white flex items-center border-b border-zinc-100 justify-between shadow-sm">
+      <div className="px-4 py-4 sm:py-6 bg-white flex items-center border-b border-zinc-100 justify-between shadow-sm">
         <img 
           src="/globe_head.png" 
           alt="Globe Head" 
-          className="h-14 w-auto object-contain flex-shrink-0" 
+          className="h-11 sm:h-14 w-auto object-contain flex-shrink-0" 
         />
         <h1 className="text-xl font-black text-zinc-900 uppercase tracking-tighter italic flex-1 flex justify-center">
           {viewMode === 'hall_of_fame' ? (
             <img 
               src="/hall_of_fame_title.png" 
               alt="Hall of Fame" 
-              className="h-8 w-auto object-contain" 
+              className="h-7 sm:h-8 w-auto object-contain" 
             />
           ) : (
             <img 
               src="/round_history_title.png" 
               alt="Round History" 
-              className="h-8 w-auto object-contain" 
+              className="h-7 sm:h-8 w-auto object-contain" 
             />
           )}
         </h1>
         {/* Spacer to keep title perfectly centered */}
-        <div className="w-10"></div>
+        <div className="w-11 sm:w-14 flex-shrink-0"></div>
       </div>
 
       {/* Search Bar */}

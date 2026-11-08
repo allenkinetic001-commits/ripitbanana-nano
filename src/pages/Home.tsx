@@ -964,7 +964,7 @@ const Home = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-zinc-100 flex flex-col">
-        <div className="px-4 py-3 min-h-[4rem] flex items-center justify-between relative overflow-hidden bg-[#F9F9FB]">
+        <div className="px-3 sm:px-4 py-2 sm:py-3 min-h-[3.5rem] sm:min-h-[4rem] flex items-center justify-between relative overflow-hidden bg-[#F9F9FB]">
           {/* Decorative background pattern */}
           <div
             className="absolute inset-0 pointer-events-none z-0"
@@ -977,13 +977,13 @@ const Home = () => {
             }}
           />
 
-          <div className="flex items-center gap-0 relative z-10">
+          <div className="flex items-center gap-0 relative z-10 shrink-0">
             <button
               onClick={() => setShowMustache(!showMustache)}
               className="transition-all active:scale-95 flex items-center gap-0"
               title="Toggle Menu"
             >
-              <img src="/header-logo-hydrant.png" alt="Logo" className="h-[60px] w-auto object-contain" />
+              <img src="/header-logo-hydrant.png" alt="Logo" className="h-[46px] sm:h-[60px] w-auto object-contain" />
             </button>
             <Link
               to="/"
@@ -996,43 +996,43 @@ const Home = () => {
               <img
                 src="/header-logo-text.png"
                 alt="RipIt"
-                className="h-6 w-auto object-contain ml-0 mt-1"
+                className="h-5 sm:h-6 w-auto object-contain ml-0 mt-0.5"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </Link>
           </div>
-          <div className="flex items-center gap-4 relative z-10">
+          <div className="flex items-center gap-2 sm:gap-4 relative z-10 shrink-0">
             <button
               onClick={() => {
                 setActiveTab('pley');
                 setShowPills(!showPills);
               }}
-              className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[44px] h-[44px]"
+              className="relative flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95 w-[36px] h-[36px] sm:w-[44px] sm:h-[44px] shrink-0"
             >
               <img
                 key={showPills ? 'mustache-active' : 'mustache-inactive'}
                 src={showPills ? "/nav-mustache-active.png" : "/nav-mustache.png"}
                 alt="Create"
-                className="h-[44px] w-[44px] object-contain transition-all duration-200 animate-pop-in"
+                className="h-[36px] w-[36px] sm:h-[44px] sm:w-[44px] object-contain transition-all duration-200 animate-pop-in"
                 style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)' }}
               />
             </button>
             <button
               onClick={() => navigate('/chat')}
-              className="text-zinc-700 hover:text-zinc-400 transition-colors relative"
+              className="text-zinc-700 hover:text-zinc-400 transition-colors relative shrink-0"
             >
-              <img src="/nav-chat-v3.png" alt="Chat" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+              <img src="/nav-chat-v3.png" alt="Chat" className="h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
               {unreadMessageCount > 0 && (
-                <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full flex items-center justify-center text-[10px] font-black text-white border-2 border-white animate-pop-in">
+                <div className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 bg-red-500 rounded-full flex items-center justify-center text-[9px] font-black text-white border border-white animate-pop-in">
                   {unreadMessageCount > 9 ? '9+' : unreadMessageCount}
                 </div>
               )}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="text-zinc-700 hover:text-zinc-400 transition-colors"
+              className="text-zinc-700 hover:text-zinc-400 transition-colors shrink-0"
             >
-              <img src="/nav-camera-v3.png" alt="Camera" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+              <img src="/nav-camera-v3.png" alt="Camera" className="h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             <input
               type="file"
@@ -1042,19 +1042,19 @@ const Home = () => {
               accept="image/*,video/*"
             />
             <button
-              className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70"
+              className="flex items-center justify-center transition-all active:scale-90 hover:opacity-70 shrink-0"
               onClick={() => setShowPillsInfo(true)}
             >
-              <img src="/nav-news-v3.png" alt="News" className="h-[38px] w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+              <img src="/nav-news-v3.png" alt="News" className="h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
             <button
-              className="text-zinc-700 transition-all active:scale-90 hover:opacity-70"
+              className="text-zinc-700 transition-all active:scale-90 hover:opacity-70 shrink-0"
               onClick={() => {
                 setShowSearchModal(true);
                 setShowBottomNav(false);
               }}
             >
-              <img src="/header-search-v3.png" alt="Search" className="h-[26px] w-[26px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+              <img src="/header-search-v3.png" alt="Search" className="h-[22px] w-[22px] sm:h-[26px] sm:w-[26px] object-contain" style={{ imageRendering: '-webkit-optimize-contrast' }} />
             </button>
           </div>
         </div>
@@ -1129,10 +1129,10 @@ const Home = () => {
           <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="bg-zinc-50/50 rounded-[2rem] border border-zinc-100 p-4 space-y-5 shadow-sm">
               {/* Asset Section */}
-              <div className="flex items-center justify-center relative w-full h-[52px]">
-                <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[48px] w-auto object-contain absolute left-0 opacity-80" />
-                <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[52px] w-auto object-contain relative z-10" />
-                <img src="/pley-challenge-garage.png" alt="Challenge Garage" className="h-[50px] w-auto object-contain absolute right-0 opacity-80" />
+              <div className="flex items-center justify-between relative w-full h-[52px] px-2">
+                <img src="/pley-challenge-logo.png" alt="Challenge House" className="h-[40px] sm:h-[48px] w-auto object-contain opacity-80 shrink-0" />
+                <img src="/pley-challenge-car.png" alt="Challenge Car" className="h-[44px] sm:h-[52px] w-auto object-contain relative z-10 shrink-0" />
+                <img src="/pley-challenge-garage.png" alt="Challenge Garage" className="h-[42px] sm:h-[50px] w-auto object-contain opacity-80 shrink-0" />
               </div>
 
               <div className="h-px w-full bg-zinc-100/80" />
