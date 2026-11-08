@@ -254,7 +254,7 @@ const SearchPage = () => {
     isChallengeEnded, survivors, eliminated, survivorHistory, roundHistory, isActive, 
     startNewChallenge, clearAllHistory, updateHistoryVote, getVariantDisplayName,
     toggleFollow, followedUsers, isLegend, setShowPills, activeTab, setActiveTab, isSurvivor, t,
-    setRoundHistory, isAuthenticated, historyLoading
+    setRoundHistory, isAuthenticated, historyLoading, fetchHistory
   } = useChallenge();
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useState<'hall_of_fame' | 'round_logs'>(() => 
@@ -262,8 +262,19 @@ const SearchPage = () => {
   );
   const [selectedRoundId, setSelectedRoundId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Set historyLoading to false is now handled by context status
+
+  // Always fetch latest round history on mount and when challenge ends
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
+
+  // When timer runs out and challenge ends, update viewMode to hall_of_fame and reload history
+  useEffect(() => {
+    if (isChallengeEnded) {
+      setViewMode('hall_of_fame');
+      fetchHistory();
+    }
+  }, [isChallengeEnded, fetchHistory]);
 
   // Use context data directly since it is now optimistically updated
   const mergedRounds = roundHistory;

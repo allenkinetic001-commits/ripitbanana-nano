@@ -132,7 +132,7 @@ const UserDetail = () => {
       username: userProfile.username,
       avatar_url: userProfile.avatar,
       bio: userProfile.bio || 'Surviving the round ?',
-      lives: userLives[userProfile.username] || 3
+      lives: userLives[userProfile.username] || 1
     };
     
     if (checkIsEliminated(username)) return null;
@@ -331,7 +331,7 @@ const UserDetail = () => {
     setIsTraitor(!isTraitor);
   };
 
-  const globalLives = (username && userLives[username] !== undefined) ? userLives[username] : (profileData?.lives ?? 3);
+  const globalLives = (username && userLives[username] !== undefined) ? userLives[username] : (profileData?.lives ?? 1);
 
   const { handlers: enemyLongPress } = useLongPress(() => {
     setIsSwornLocal(prev => !prev);

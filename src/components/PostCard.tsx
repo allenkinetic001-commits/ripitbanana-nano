@@ -26,7 +26,7 @@ interface PostProps {
   globalLives?: number;
 }
 
-const PostCard = React.memo(({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments, isTraitorGlobal, globalLives = 3 }: PostProps) => {
+const PostCard = React.memo(({ id, username, avatar, image, caption, time, type = 'image', gameMode, onDelete, onPass, comments, isTraitorGlobal, globalLives = 1 }: PostProps) => {
   const { 
     addEnemy, addSwornEnemy, removeEnemy, enemies, addComment, userProfile, 
     postComments, isLegend, isSurvivor, toggleFollow, followedUsers, t, 
@@ -51,13 +51,13 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
   // Post vote state
   const userVote = userVotes[id] !== undefined ? userVotes[id] : 0;
   
-  // Current active lives for this user: Context userLives > localStorage > optimisticLives > globalLives > 3
+  // Current active lives for this user: Context userLives > localStorage > optimisticLives > globalLives > 1
   const currentLives = (() => {
     if (typeof userLives[username] === 'number') return userLives[username];
     const saved = localStorage.getItem(`lives_${username}`);
     if (saved !== null && !isNaN(Number(saved))) return Number(saved);
     if (typeof globalLives === 'number' && globalLives >= 0) return globalLives;
-    return 3;
+    return 1;
   })();
 
   const [optimisticLives, setOptimisticLives] = useState(currentLives);
@@ -139,11 +139,11 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
         if (saved !== null && !isNaN(Number(saved))) return Number(saved);
         if (typeof optimisticLives === 'number' && optimisticLives >= 0) return optimisticLives;
         if (typeof globalLives === 'number' && globalLives >= 0) return globalLives;
-        return 3;
+        return 1;
       })();
 
       if (activeLives <= 0) {
-        // User has already lost all 3 lives
+        // User has already lost their life
         return;
       }
 
@@ -363,8 +363,8 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
               >
                 <ArrowBigDown 
                   size={22} 
-                  fill={currentLives < 3 ? "#DC143C" : "transparent"} 
-                  stroke={currentLives < 3 ? "#DC143C" : "black"}
+                  fill={currentLives < 1 ? "#DC143C" : "transparent"} 
+                  stroke={currentLives < 1 ? "#DC143C" : "black"}
                   strokeWidth={2}
                 />
               </button>

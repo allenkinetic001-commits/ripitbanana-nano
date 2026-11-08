@@ -13,8 +13,8 @@ import EmptyFeed from '../components/Empty';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { 
-    enemies, removeEnemy, userProfile, setUserProfile, 
+  const {
+    enemies, removeEnemy, userProfile, setUserProfile,
     followedUsers, toggleFollow, isLegend, survivorHistory,
     wallPosts, addWallPost, allPosts, userLives,
     t
@@ -28,11 +28,11 @@ const Profile = () => {
   // Supabase data with caching
   const [profileData, setProfileData] = useState<any>(() => {
     // Priority: Context > Cache > Null
-    if (userProfile.username) return { 
+    if (userProfile.username) return {
       username: userProfile.username,
       avatar_url: userProfile.avatar,
       bio: userProfile.bio || 'Surviving the round ?',
-      lives: 3 // Default
+      lives: 1 // Default
     };
     return null;
   });
@@ -42,7 +42,7 @@ const Profile = () => {
     const cached = localStorage.getItem(`user_posts_cache_${userProfile.username}`);
     return cached ? JSON.parse(cached) : [];
   });
-  
+
   const [loadingPosts, setLoadingPosts] = useState(!userProfile?.username || userPosts.length === 0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -57,23 +57,23 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfileAndPosts = async () => {
       if (!userProfile?.username) return;
-      
+
       // If we have posts cached, we don't need to show a blocking loader
       const cachedPosts = localStorage.getItem(`user_posts_cache_${userProfile.username}`);
       if (!cachedPosts) setLoadingPosts(true);
-      
+
       // Fetch profile for latest lives count
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('username', userProfile.username)
         .single();
-      
+
       if (profile) {
         setProfileData(profile);
         try {
           localStorage.setItem(`user_profile_cache_${userProfile.username}`, JSON.stringify(profile));
-        } catch(e) {
+        } catch (e) {
           console.warn('Profile cache quota exceeded');
         }
       }
@@ -84,7 +84,7 @@ const Profile = () => {
         setUserPosts(formatted);
         try {
           localStorage.setItem(`user_posts_cache_${userProfile.username}`, JSON.stringify(formatted));
-        } catch(e) {
+        } catch (e) {
           console.warn('Posts cache quota exceeded');
         }
       }
@@ -96,9 +96,9 @@ const Profile = () => {
     // Subscribe to self profile updates
     const channel = supabase
       .channel(`self-profile:${userProfile.username}`)
-      .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
         table: 'profiles',
         filter: `username=eq.${userProfile.username}`
       }, (payload) => {
@@ -150,7 +150,7 @@ const Profile = () => {
       const updatedProfile = { ...userProfile, avatar: avatarUrl };
       setUserProfile(updatedProfile);
       setProfileData(prev => ({ ...prev, avatar_url: avatarUrl }));
-      
+
       // Update cache
       localStorage.setItem(`profile_v2_${session.user.id}`, JSON.stringify(updatedProfile));
       localStorage.setItem(`user_profile_cache_${userProfile.username}`, JSON.stringify({ ...profileData, avatar_url: avatarUrl }));
@@ -203,7 +203,7 @@ const Profile = () => {
         ...editForm,
         avatar: avatarUrl
       };
-      
+
       setUserProfile(finalProfile);
       setProfileData(prev => ({
         ...prev,
@@ -258,7 +258,7 @@ const Profile = () => {
 
   // Merge context posts with DB posts to ensure local optimistic posts are shown instantly
   const contextPosts = allPosts.filter((p: any) => p.username === userProfile.username);
-  
+
   // Dedup contextPosts to ensure we don't carry over optimistic duplicates if a DB post exists
   const uniqueContextPosts = contextPosts.filter(cp => {
     const isOptimistic = typeof cp.id === 'number' && cp.id > 1000000000000;
@@ -276,19 +276,19 @@ const Profile = () => {
   mergedPosts.sort((a, b) => b.id - a.id);
 
   const hasActed = false; // Mock for own profile
-  const toggleTraitor = () => {}; // Mock for own profile
+  const toggleTraitor = () => { }; // Mock for own profile
 
   const getEnemiesOfCount = (targetUsername: string | undefined) => {
     if (!targetUsername) return 0;
     let count = 0;
     const currentUsername = userProfile?.username;
-    
+
     // 1. Check if current user has targetUsername as enemy
     const currentHasAdded = enemies.some((e: any) => e.username === targetUsername);
     if (currentHasAdded) {
       count++;
     }
-    
+
     // 2. Scan other users' stored enemy lists in localStorage
     try {
       const currentUserKey = currentUsername ? `enemies_v7_${currentUsername}` : null;
@@ -307,7 +307,7 @@ const Profile = () => {
     } catch (e) {
       console.error('Error scanning enemies list:', e);
     }
-    
+
     return count;
   };
 
@@ -351,19 +351,19 @@ const Profile = () => {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-white">
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={handleImageChange} 
-        accept="image/*" 
-        className="hidden" 
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageChange}
+        accept="image/*"
+        className="hidden"
       />
       <header className="px-4 h-14 flex items-center justify-between border-b border-zinc-100 sticky top-0 bg-white z-10">
         <div className="flex items-center gap-1">
           <h1 className="text-lg font-bold">@{userProfile.username || 'user'}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setViewMode(viewMode === 'enemies' ? 'posts' : 'enemies')}
             className={cn(
               "transition-all duration-300",
@@ -371,9 +371,9 @@ const Profile = () => {
             )}
             title={viewMode === 'enemies' ? "Back to Posts" : "View Enemies"}
           >
-            <img 
-              src="/ballad.png" 
-              alt="Enemies" 
+            <img
+              src="/ballad.png"
+              alt="Enemies"
               className={cn(
                 "w-7 h-7 object-contain transition-all duration-300",
                 viewMode === 'enemies' ? "brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" : "opacity-40"
@@ -381,7 +381,7 @@ const Profile = () => {
             />
           </button>
           <div className="relative">
-            <button 
+            <button
               onClick={() => navigate('/settings')}
               className="text-zinc-700 hover:text-zinc-400 transition-colors"
             >
@@ -399,9 +399,9 @@ const Profile = () => {
               <X size={24} />
             </button>
             <h2 className="font-bold">Edit Profile</h2>
-            <button 
-              onClick={handleSaveProfile} 
-              disabled={isSaving} 
+            <button
+              onClick={handleSaveProfile}
+              disabled={isSaving}
               className={cn("text-zinc-900 font-bold transition-opacity", isSaving && "opacity-50 pointer-events-none")}
             >
               {isSaving ? (
@@ -411,15 +411,15 @@ const Profile = () => {
               )}
             </button>
           </header>
-          
+
           <div className="p-6 space-y-6 overflow-y-auto">
             <div className="flex flex-col items-center gap-4">
-              <div 
+              <div
                 onClick={() => fileInputRef.current?.click()}
                 className="relative group cursor-pointer"
               >
-                <img 
-                  src={editForm.avatar || "/custom-empty-profile.png"} 
+                <img
+                  src={editForm.avatar || "/custom-empty-profile.png"}
                   className={cn(
                     "w-24 h-24 rounded-full object-cover border border-zinc-200 shadow-sm",
                     !editForm.avatar && "p-0 bg-white"
@@ -430,7 +430,7 @@ const Profile = () => {
                   <Camera size={24} className="text-white" />
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => fileInputRef.current?.click()}
                 className="text-zinc-900 text-sm font-bold underline"
               >
@@ -441,37 +441,37 @@ const Profile = () => {
             <div className="space-y-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={editForm.fullName}
-                  onChange={(e) => setEditEditForm({...editForm, fullName: e.target.value})}
+                  onChange={(e) => setEditEditForm({ ...editForm, fullName: e.target.value })}
                   className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-zinc-900 transition-colors"
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Username</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={editForm.username}
-                  onChange={(e) => setEditEditForm({...editForm, username: e.target.value})}
+                  onChange={(e) => setEditEditForm({ ...editForm, username: e.target.value })}
                   className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-zinc-900 transition-colors"
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Website</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={editForm.website}
-                  onChange={(e) => setEditEditForm({...editForm, website: e.target.value})}
+                  onChange={(e) => setEditEditForm({ ...editForm, website: e.target.value })}
                   className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-zinc-900 transition-colors"
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Bio</label>
-                <textarea 
+                <textarea
                   rows={3}
                   value={editForm.bio}
-                  onChange={(e) => setEditEditForm({...editForm, bio: e.target.value})}
+                  onChange={(e) => setEditEditForm({ ...editForm, bio: e.target.value })}
                   className="w-full py-2 border-b border-zinc-100 outline-none text-sm font-medium focus:border-rose-600 transition-colors resize-none"
                 />
               </div>
@@ -483,11 +483,11 @@ const Profile = () => {
       {/* Profile Info */}
       <div className="p-4 space-y-4">
         <div className="flex items-center space-x-8">
-          <div 
+          <div
             onClick={() => fileInputRef.current?.click()}
             className="w-24 h-24 rounded-full border-4 border-white overflow-hidden relative group shadow-lg cursor-pointer"
           >
-            <img 
+            <img
               src={userProfile.avatar || "/custom-empty-profile.png"}
               alt="Profile"
               className={cn(
@@ -502,10 +502,10 @@ const Profile = () => {
             )}
             {isLegend(userProfile.username) && (
               <div className="absolute -bottom-3 -right-3 flex items-center justify-center pointer-events-none">
-                <img 
-                  src="/pley-badge.png" 
-                  alt="Survivor" 
-                  className="w-12 h-12 object-contain" 
+                <img
+                  src="/pley-badge.png"
+                  alt="Survivor"
+                  className="w-12 h-12 object-contain"
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               </div>
@@ -514,14 +514,14 @@ const Profile = () => {
           <div className="flex-1 flex justify-around">
             <div className="flex flex-col items-center">
               <span className="font-bold">{mergedPosts.length}</span>
-              <img 
-                src="/posts-title.png" 
-                alt="Posts" 
-                className="h-3 w-auto object-contain opacity-40" 
+              <img
+                src="/posts-title.png"
+                alt="Posts"
+                className="h-3 w-auto object-contain opacity-40"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
-            <div 
+            <div
               onClick={() => {
                 setViewMode('enemies');
                 setEnemiesSubTab('added_me');
@@ -529,31 +529,31 @@ const Profile = () => {
               className="flex flex-col items-center cursor-pointer group"
             >
               <span className="font-bold text-rose-600">{enemiesOfCount}</span>
-              <img 
-                src="/enemies-title.png" 
-                alt="Enemies" 
-                className="h-3 w-auto object-contain brightness-90 group-hover:brightness-100 transition-all" 
+              <img
+                src="/enemies-title.png"
+                alt="Enemies"
+                className="h-3 w-auto object-contain brightness-90 group-hover:brightness-100 transition-all"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
-            <div 
+            <div
               onClick={() => setViewMode('following')}
               className="flex flex-col items-center cursor-pointer"
             >
               <span className="font-bold">{followedUsers.length}</span>
-              <img 
-                src="/following-title.png" 
-                alt="Following" 
-                className="h-3.5 w-auto object-contain opacity-40" 
+              <img
+                src="/following-title.png"
+                alt="Following"
+                className="h-3.5 w-auto object-contain opacity-40"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold">0</span>
-              <img 
-                src="/followers-title.png" 
-                alt="Followers" 
-                className="h-3 w-auto object-contain opacity-40" 
+              <img
+                src="/followers-title.png"
+                alt="Followers"
+                className="h-3 w-auto object-contain opacity-40"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </div>
@@ -566,7 +566,7 @@ const Profile = () => {
               {userProfile.fullName || (userProfile.username ? `@${userProfile.username}` : 'Loading...')}
             </h2>
             <div className="flex items-center gap-0.5">
-              <ProfileHeartsToggle isVisible={true} lives={userLives[userProfile.username] ?? profileData?.lives ?? 3} />
+              <ProfileHeartsToggle isVisible={true} lives={userLives[userProfile.username] ?? profileData?.lives ?? 1} />
             </div>
           </div>
           <p className="text-sm text-zinc-600">{userProfile.bio}</p>
@@ -574,30 +574,29 @@ const Profile = () => {
         </div>
 
         <div className="flex space-x-2">
-          <button 
+          <button
             onClick={() => {
               setEditEditForm(userProfile);
               setIsEditing(true);
             }}
             className="flex-1 bg-zinc-100 py-1.5 rounded-lg flex items-center justify-center transition-all hover:bg-zinc-200 active:scale-95"
           >
-            <img 
-              src="/edit-profile-title.png" 
-              alt="Edit Profile" 
-              className="h-4 w-auto object-contain" 
+            <img
+              src="/edit-profile-title.png"
+              alt="Edit Profile"
+              className="h-4 w-auto object-contain"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </button>
-          <button 
+          <button
             onClick={() => setViewMode('enemies')}
-            className={`flex-1 py-1.5 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md border flex items-center justify-center ${
-              viewMode === 'enemies' ? 'bg-rose-600 border-rose-500' : 'bg-white border-red-100 hover:bg-red-50'
-            }`}
+            className={`flex-1 py-1.5 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md border flex items-center justify-center ${viewMode === 'enemies' ? 'bg-rose-600 border-rose-500' : 'bg-white border-red-100 hover:bg-red-50'
+              }`}
           >
-            <img 
-              src="/enemies-title.png" 
-              alt="Enemies" 
-              className={`h-4 w-auto object-contain ${viewMode === 'enemies' ? 'brightness-0 invert' : ''}`} 
+            <img
+              src="/enemies-title.png"
+              alt="Enemies"
+              className={`h-4 w-auto object-contain ${viewMode === 'enemies' ? 'brightness-0 invert' : ''}`}
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </button>
@@ -607,14 +606,14 @@ const Profile = () => {
       </div>
 
       <div className="flex border-t border-zinc-100 mt-4 items-center">
-        <button 
+        <button
           onClick={() => setViewMode('posts')}
           className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'posts' ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-400'}`}
         >
           <Grid size={24} />
         </button>
         {!hasActed && (
-          <div 
+          <div
             onClick={toggleTraitor}
             className="w-20 h-12 flex items-center justify-center cursor-pointer transition-all duration-200 rounded-xl hover:bg-zinc-100/50 active:scale-95"
             title="Traitor Toggle"
@@ -622,27 +621,27 @@ const Profile = () => {
             <div className="w-2 h-2 rounded-full bg-zinc-200/40" />
           </div>
         )}
-        <button 
+        <button
           onClick={() => setViewMode('enemies')}
           className={`flex-1 flex items-center justify-center h-12 border-b-2 transition-colors ${viewMode === 'enemies' ? 'border-rose-600' : 'border-transparent text-zinc-400'}`}
         >
-          <img 
-            src="/ballad.png" 
-            alt="Enemies" 
+          <img
+            src="/ballad.png"
+            alt="Enemies"
             className={cn(
               "w-7 h-7 object-contain transition-all duration-300",
               viewMode === 'enemies' ? "brightness-0 invert-[.13] sepia-[.91] saturate-[74.13] hue-rotate-[354deg] brightness-[.89] contrast-[1.24]" : "opacity-40"
             )}
           />
         </button>
-        <button 
+        <button
           className="flex-1 flex items-center justify-center h-12 border-b-2 border-transparent opacity-20 cursor-not-allowed"
           title="Trophies coming soon"
         >
-          <img 
-            src="/trophy-icon.png" 
-            alt="Trophies" 
-            className="w-6 h-6 object-contain" 
+          <img
+            src="/trophy-icon.png"
+            alt="Trophies"
+            className="w-6 h-6 object-contain"
             style={{ imageRendering: '-webkit-optimize-contrast' }}
           />
         </button>
@@ -657,17 +656,17 @@ const Profile = () => {
         ) : mergedPosts.length > 0 ? (
           <div className="grid grid-cols-3 gap-0.5 pb-4">
             {mergedPosts.map((post, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 onClick={() => navigate(`/post/${post.id}`)}
                 className="relative aspect-square bg-zinc-100 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
               >
                 {post.type === 'video' ? (
                   <div className="relative w-full h-full">
-                    <video 
-                      src={post.image} 
-                      className="w-full h-full object-cover pointer-events-none" 
-                      muted 
+                    <video
+                      src={post.image}
+                      className="w-full h-full object-cover pointer-events-none"
+                      muted
                       playsInline
                       preload="metadata"
                     />
@@ -682,19 +681,19 @@ const Profile = () => {
             ))}
           </div>
         ) : (
-            <EmptyFeed className="min-h-[40vh] pt-36" subtitle="Nobody yet" />
+          <EmptyFeed className="min-h-[40vh] pt-36" subtitle="Nobody yet" />
         )
       ) : viewMode === 'enemies' ? (
         <div className="flex-1 bg-zinc-50/50 p-4">
           {/* Sub Tabs */}
           <div className="flex bg-zinc-100 p-0.5 rounded-lg mb-4">
-            <button 
+            <button
               onClick={() => setEnemiesSubTab('added_them')}
               className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${enemiesSubTab === 'added_them' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
             >
               Added by Me
             </button>
-            <button 
+            <button
               onClick={() => setEnemiesSubTab('added_me')}
               className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${enemiesSubTab === 'added_me' ? 'bg-rose-600 text-white shadow-sm' : 'text-zinc-500 hover:text-rose-600'}`}
             >
@@ -707,18 +706,18 @@ const Profile = () => {
               enemies.length > 0 ? (
                 enemies.map((enemy) => (
                   <div key={enemy.id} className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between">
-                    <div 
+                    <div
                       onClick={() => navigate(`/user/${enemy.username}`)}
                       className="flex items-center space-x-3 cursor-pointer hover:opacity-85 transition-opacity"
                     >
-                      <img 
-                        src={enemy.avatar || "/custom-empty-profile.png"} 
-                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover animate-pop-in" 
-                        alt={enemy.username} 
+                      <img
+                        src={enemy.avatar || "/custom-empty-profile.png"}
+                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover animate-pop-in"
+                        alt={enemy.username}
                       />
                       <span className="font-bold text-sm">@{enemy.username}</span>
                     </div>
-                    <button 
+                    <button
                       onClick={() => removeEnemy(enemy.id)}
                       className="text-xs text-rose-600 font-bold hover:text-rose-700 transition-colors p-1"
                     >
@@ -727,24 +726,24 @@ const Profile = () => {
                   </div>
                 ))
               ) : (
-                <EmptyFeed 
-                  className="min-h-[30vh] pt-12" 
-                  subtitle="Nobody yet" 
+                <EmptyFeed
+                  className="min-h-[30vh] pt-12"
+                  subtitle="Nobody yet"
                 />
               )
             ) : (
               getAddedByList(userProfile.username).length > 0 ? (
                 getAddedByList(userProfile.username).map((enemy: any) => (
-                  <div 
-                    key={enemy.id} 
+                  <div
+                    key={enemy.id}
                     onClick={() => navigate(`/user/${enemy.username}`)}
                     className="bg-white rounded-xl p-3 border border-red-50 shadow-sm flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 active:scale-[0.99] transition-all animate-in fade-in duration-200"
                   >
                     <div className="flex items-center space-x-3">
-                      <img 
-                        src={enemy.avatar || "/custom-empty-profile.png"} 
-                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover" 
-                        alt={enemy.username} 
+                      <img
+                        src={enemy.avatar || "/custom-empty-profile.png"}
+                        className="w-10 h-10 rounded-full border border-zinc-50 object-cover"
+                        alt={enemy.username}
                       />
                       <span className="font-bold text-sm">@{enemy.username}</span>
                     </div>
@@ -754,9 +753,9 @@ const Profile = () => {
                   </div>
                 ))
               ) : (
-                <EmptyFeed 
-                  className="min-h-[30vh] pt-12" 
-                  subtitle="Nobody yet" 
+                <EmptyFeed
+                  className="min-h-[30vh] pt-12"
+                  subtitle="Nobody yet"
                 />
               )
             )}
@@ -771,7 +770,7 @@ const Profile = () => {
                   <img src="/custom-empty-profile.png" className="w-10 h-10 rounded-full border border-zinc-50" alt={username} />
                   <span className="font-bold text-sm">@{username}</span>
                 </div>
-                <button 
+                <button
                   onClick={() => toggleFollow(username)}
                   className="text-xs text-rose-600 font-black uppercase tracking-widest"
                 >
@@ -786,7 +785,7 @@ const Profile = () => {
       ) : (
         <EmptyFeed className="min-h-[40vh] pt-16" subtitle="Nobody yet" />
       )}
-      </div>
+    </div>
   );
 };
 

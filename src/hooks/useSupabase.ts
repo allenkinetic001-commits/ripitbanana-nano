@@ -363,7 +363,7 @@ export function formatPostForUI(post: any) {
     image: url,
     type: isVideo ? 'video' : 'image',
     caption: post.caption || '',
-    globalLives: post.profiles?.lives ?? 3,
+    globalLives: post.profiles?.lives ?? 1,
     time: timeAgo,
     createdAt: post.created_at,
     comments: formattedComments,
