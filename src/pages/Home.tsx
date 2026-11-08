@@ -6,13 +6,9 @@ import { useChallenge } from '../contexts/ChallengeContext';
 import { useSupabasePosts, createPost, uploadPostMedia, formatPostForUI } from '../hooks/useSupabase';
 import { supabase } from '../lib/supabase';
 import { cn } from '../utils';
-import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
-import { useLongPress } from '../hooks/useLongPress';
 import EmptyFeed from '../components/Empty';
 
 const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: any) => {
-  const [showHearts, setShowHearts] = useState(false);
-  const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
   const { followedUsers, toggleFollow, isSurvivor, addEnemy, enemies, userProfile } = useChallenge();
   const isFollowing = followedUsers.includes(user.username);
   const [isTraitor, setIsTraitor] = useState(false);
@@ -135,9 +131,6 @@ const HomeUserItem = React.memo(({ user, index, navigate, isSearch = false }: an
 });
 
 const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUsers, navigate, handleVote, selectedRoundId, isHistoryView, isChallengeEnded }: any) => {
-  const [showHearts, setShowHearts] = useState(false);
-  const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
-
   const isVideo = survivor.type === 'video' || 
     survivor.image?.startsWith('data:video/') || 
     /\.(mp4|mov|webm|ogg)(\?|$)/i.test(survivor.image || '');
@@ -145,7 +138,7 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
   return (
     <div className="mx-4 mb-4 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-2xl transition-all text-left">
       {/* Header Info */}
-      <div className="flex items-center justify-between p-4" {...heartsHandlers}>
+      <div className="flex items-center justify-between p-4">
         <div 
           className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate(`/user/${survivor.username}`)}
@@ -166,7 +159,6 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-black text-zinc-900 italic tracking-tight">@{survivor.username}</span>
-              <ProfileHeartsToggle isVisible={showHearts} heartClassName="w-7 h-7" />
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">
@@ -612,8 +604,13 @@ const Home = () => {
   ]), [eliminated, userLives]);
 
   const unswipedPosts = useMemo(() => 
-    allPosts.filter(p => !swipedIds.has(p.id) && !eliminatedUsernames.has(p.username)),
-  [allPosts, swipedIds, eliminatedUsernames]);
+    allPosts
+      .filter(p => !swipedIds.has(p.id) && !eliminatedUsernames.has(p.username) && localStorage.getItem(`user_eliminated_${p.username}`) !== 'true')
+      .map(p => ({
+        ...p,
+        globalLives: typeof userLives[p.username] === 'number' ? userLives[p.username] : p.globalLives
+      })),
+  [allPosts, swipedIds, eliminatedUsernames, userLives]);
 
   // Deterministic feed synchronization: Ensures the feed always matches new posts minus swiped ones
   useEffect(() => {

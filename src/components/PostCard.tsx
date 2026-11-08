@@ -37,7 +37,6 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
   // Derived state from context
   const [isSwornLocal, setIsSwornLocal] = useState(false);
   const [quickComment, setQuickComment] = useState('');
-  const [showHearts, setShowHearts] = useState(false);
   const [isTraitor, setIsTraitor] = useState(false);
   const navigate = useNavigate();
   const hasActed = enemies.some(e => e.username === username);
@@ -52,10 +51,14 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
   // Post vote state
   const userVote = userVotes[id] !== undefined ? userVotes[id] : 0;
   
-  // Current active lives for this user: Context userLives > optimisticLives > globalLives > 3
-  const currentLives = userLives[username] !== undefined 
-    ? userLives[username] 
-    : (typeof globalLives === 'number' && globalLives > 0 ? globalLives : 3);
+  // Current active lives for this user: Context userLives > localStorage > optimisticLives > globalLives > 3
+  const currentLives = (() => {
+    if (typeof userLives[username] === 'number') return userLives[username];
+    const saved = localStorage.getItem(`lives_${username}`);
+    if (saved !== null && !isNaN(Number(saved))) return Number(saved);
+    if (typeof globalLives === 'number' && globalLives >= 0) return globalLives;
+    return 3;
+  })();
 
   const [optimisticLives, setOptimisticLives] = useState(currentLives);
   
@@ -63,10 +66,6 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
   React.useEffect(() => {
     setOptimisticLives(currentLives);
   }, [currentLives]);
-
-  const { handlers: heartsHandlers } = useLongPress(() => {
-    setShowHearts(prev => !prev);
-  }, 400);
 
   const isEnemy = enemies.some(e => e.username === username);
   const isSwornEnemy = enemies.find(e => e.username === username)?.isSworn || false;
@@ -133,10 +132,15 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
     }
 
     if (vote === -1) {
-      // Fetch active lives (prioritizing context, fallback to optimistic or global)
-      const activeLives = userLives[username] !== undefined 
-        ? userLives[username] 
-        : (typeof optimisticLives === 'number' && optimisticLives >= 0 ? optimisticLives : (globalLives ?? 3));
+      // Fetch active lives (prioritizing context, fallback to localStorage, optimistic, or global)
+      const activeLives = (() => {
+        if (typeof userLives[username] === 'number') return userLives[username];
+        const saved = localStorage.getItem(`lives_${username}`);
+        if (saved !== null && !isNaN(Number(saved))) return Number(saved);
+        if (typeof optimisticLives === 'number' && optimisticLives >= 0) return optimisticLives;
+        if (typeof globalLives === 'number' && globalLives >= 0) return globalLives;
+        return 3;
+      })();
 
       if (activeLives <= 0) {
         // User has already lost all 3 lives
@@ -149,7 +153,6 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
       // 1. Immediately update context & local state for instant UI reaction
       setUserLivesForUser(username, nextLives);
       setOptimisticLives(nextLives);
-      setShowHearts(true);
       setUserVoteForPost(id, -1);
 
       // 2. Sync all posts from this user in both feeds so lives stay consistent
@@ -166,7 +169,7 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
         console.error('Failed to decrement lives in Supabase:', err);
       }
 
-      // 5. If all 3 lives are clicked down (nextLives === 0), the user ceases to exist on the platform
+      // 5. ONLY obliterate the person's account when there are NO MORE lives remaining (nextLives === 0)
       if (nextLives <= 0) {
         localStorage.setItem(`user_eliminated_${username}`, 'true');
         localStorage.setItem(`isEliminated_${username}`, 'true');
@@ -192,7 +195,6 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
         <div 
           onClick={() => navigate(`/user/${username}`)}
           className="flex flex-col cursor-pointer group"
-          {...heartsHandlers}
         >
           <div className="flex items-center space-x-3 h-8">
             <div className="relative">
@@ -217,11 +219,6 @@ const PostCard = React.memo(({ id, username, avatar, image, caption, time, type 
               <ProfileHeartsToggle isVisible={true} lives={currentLives} heartClassName="w-5 h-5" />
             </div>
           </div>
-          {showHearts && (
-            <div className="flex items-center gap-0.5 mt-2 ml-11">
-              <ProfileHeartsToggle isVisible={showHearts} lives={currentLives} heartClassName="w-8 h-8" />
-            </div>
-          )}
         </div>
         <div className="flex items-center space-x-2 h-8">
             {isTraitorGlobal || isTraitor ? (

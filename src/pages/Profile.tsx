@@ -5,7 +5,6 @@ import { useChallenge } from '../contexts/ChallengeContext';
 import { cn } from '../utils';
 import { PixelHeart } from '../components/PixelHeart';
 import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
-import { useLongPress } from '../hooks/useLongPress';
 import { supabase } from '../lib/supabase';
 import { fetchPostsByUsername, formatPostForUI, uploadAvatar, updateUserProfile } from '../hooks/useSupabase';
 import EmptyFeed from '../components/Empty';
@@ -14,7 +13,6 @@ import EmptyFeed from '../components/Empty';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [showHearts, setShowHearts] = useState(false);
   const { 
     enemies, removeEnemy, userProfile, setUserProfile, 
     followedUsers, toggleFollow, isLegend, survivorHistory,
@@ -22,9 +20,6 @@ const Profile = () => {
     t
   } = useChallenge();
 
-  const { handlers: heartsHandlers } = useLongPress(() => {
-    setShowHearts(prev => !prev);
-  }, 400);
   const [viewMode, setViewMode] = useState<'posts' | 'wall' | 'enemies' | 'following'>('posts');
   const [enemiesSubTab, setEnemiesSubTab] = useState<'added_them' | 'added_me'>('added_them');
   const [wallInput, setWallInput] = useState('');
@@ -565,7 +560,7 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="flex flex-col" {...heartsHandlers}>
+        <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
             <h2 className="text-sm font-bold">
               {userProfile.fullName || (userProfile.username ? `@${userProfile.username}` : 'Loading...')}

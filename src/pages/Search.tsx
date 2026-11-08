@@ -3,8 +3,6 @@ import { Skull, Trophy, Sparkles, Bookmark, MoreHorizontal, ArrowBigUp, ArrowBig
 import { useNavigate, Link } from 'react-router-dom';
 import { useChallenge } from '../contexts/ChallengeContext';
 import { cn, formatDate } from '../lib/utils';
-import { ProfileHeartsToggle } from '../components/ProfileHeartsToggle';
-import { useLongPress } from '../hooks/useLongPress';
 import EmptyFeed from '../components/Empty';
 import { supabase } from '../lib/supabase';
 
@@ -23,9 +21,6 @@ const VariantPill = ({ variant }: { variant: string | null | undefined }) => {
 };
 
 const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUsers, navigate, handleVote, selectedRoundId, isHistoryView, isChallengeEnded }: any) => {
-  const [showHearts, setShowHearts] = useState(false);
-  const { handlers: heartsHandlers } = useLongPress(() => setShowHearts(!showHearts), 400);
-
   const isVideo = survivor.type === 'video' || 
     survivor.image?.startsWith('data:video/') || 
     /\.(mp4|mov|webm|ogg)(\?|$)/i.test(survivor.image || '');
@@ -33,7 +28,7 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
   return (
     <div className="mx-4 mb-4 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-zinc-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-2xl transition-all">
       {/* Header Info */}
-      <div className="flex items-center justify-between p-4" {...heartsHandlers}>
+      <div className="flex items-center justify-between p-4">
         <div 
           className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate(`/user/${survivor.username}`)}
@@ -54,7 +49,6 @@ const SurvivorRow = React.memo(({ survivor, isSurvivor, toggleFollow, followedUs
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-black text-zinc-900 italic tracking-tight">@{survivor.username}</span>
-              <ProfileHeartsToggle isVisible={showHearts} heartClassName="w-7 h-7" />
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">
@@ -326,7 +320,7 @@ const SearchPage = () => {
     });
   }, [mergedRounds]);
 
-  // Build Hall of Fame from mergedRounds — show ALL winning content
+  // Build Hall of Fame from mergedRounds - show ALL winning content
   const localSurvivorHistory = useMemo(() => {
     const result: any[] = [];
     const seenUsernames = new Set<string>();
@@ -499,7 +493,7 @@ const SearchPage = () => {
       {/* Content Section */}
       <div className="flex-1">
         {selectedRoundId ? (
-          /* ── Selected Round Detail View ── */
+          /* ?? Selected Round Detail View ?? */
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="px-6 mb-6 flex items-center justify-between">
               <button 
@@ -570,7 +564,7 @@ const SearchPage = () => {
             </div>
           </div>
         ) : viewMode === 'hall_of_fame' ? (
-          /* ── All Time Hall of Fame ── */
+          /* ?? All Time Hall of Fame ?? */
           displaySurvivors.length > 0 ? (
             <div className="space-y-4">
               {displaySurvivors.map((survivor: any) => (
@@ -596,7 +590,7 @@ const SearchPage = () => {
             null
           )
         ) : (
-          /* ── Round History (Stacks) ── */
+          /* ?? Round History (Stacks) ?? */
           displayLogs.length > 0 ? (
             <div className="animate-in fade-in slide-in-from-left-4 duration-500">
               {displayLogs.map((round: any) => (
@@ -614,7 +608,7 @@ const SearchPage = () => {
         {!selectedRoundId && (
           <>
             {totalElimination ? (
-              /* ── TOTAL TERMINATION STATE ── */
+              /* ?? TOTAL TERMINATION STATE ?? */
               <div className="flex flex-col items-center justify-center p-8 pt-12 animate-in fade-in zoom-in duration-700">
                 <div className="flex flex-col items-center gap-8 bg-rose-50 p-12 rounded-[3rem] border border-rose-100 shadow-sm relative overflow-hidden group w-full max-w-sm">
                   <div className="relative">

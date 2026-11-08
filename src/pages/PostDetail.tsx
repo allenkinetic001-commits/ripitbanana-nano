@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, MessageCircle, X } from 'lucide-react';
 import { cn } from '../utils';
 import { useChallenge } from '../contexts/ChallengeContext';
-import { useLongPress } from '../hooks/useLongPress';
 import { supabase } from '../lib/supabase';
 import { fetchComments, getTimeAgo } from '../hooks/useSupabase';
 
@@ -135,7 +134,7 @@ const PostDetail = () => {
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
 
-      {/* ── Header ── */}
+      {/* ?? Header ?? */}
       <header className="shrink-0 sticky top-0 z-40 bg-white border-b border-zinc-100 px-4 h-12 flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="text-zinc-800 hover:text-zinc-500 transition-colors">
           <ArrowLeft size={22} />
@@ -143,7 +142,7 @@ const PostDetail = () => {
         <img src="/comments-header.png" alt="Comments" className="h-5 w-auto object-contain" />
       </header>
 
-      {/* ── Scrollable area ── */}
+      {/* ?? Scrollable area ?? */}
       <div className="flex-1 overflow-y-auto pb-24">
 
         {/* Post media */}
@@ -247,7 +246,7 @@ const PostDetail = () => {
         </div>
       </div>
 
-      {/* ── Sticky comment bar ── */}
+      {/* ?? Sticky comment bar ?? */}
       <div className="shrink-0 fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-4 pt-2 pb-4 safe-area-pb">
         {replyingTo && (
           <div className="flex items-center justify-between bg-zinc-50 px-3 py-1.5 mb-2 rounded-lg border border-zinc-100 animate-in fade-in duration-150">
@@ -277,7 +276,7 @@ const PostDetail = () => {
             <input
               ref={inputRef}
               type="text"
-              placeholder="Add a comment…"
+              placeholder="Add a comment."
               className="flex-1 bg-transparent outline-none text-sm placeholder:text-zinc-400"
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}

@@ -12,7 +12,6 @@ import EmptyFeed from '../components/Empty';
 const UserDetail = () => {
   const { username } = useParams();
   const navigate = useNavigate();
-  const [showHearts, setShowHearts] = useState(false);
   const { 
     addEnemy, addSwornEnemy, enemies, removeEnemy, wallPosts, addWallPost, userProfile,
     toggleFollow, followedUsers, isLegend, isSurvivor, allPosts, userLives, eliminated, roundHistory
@@ -332,10 +331,6 @@ const UserDetail = () => {
     setIsTraitor(!isTraitor);
   };
 
-  const { handlers: heartsHandlers } = useLongPress(() => {
-    setShowHearts(prev => !prev);
-  }, 400);
-
   const globalLives = (username && userLives[username] !== undefined) ? userLives[username] : (profileData?.lives ?? 3);
 
   const { handlers: enemyLongPress } = useLongPress(() => {
@@ -497,7 +492,7 @@ const UserDetail = () => {
         </div>
 
         <div className="flex items-start justify-between">
-          <div className="space-y-1" {...heartsHandlers}>
+          <div className="space-y-1">
             <div className="flex items-center gap-1.5">
               <h2 className="text-sm font-bold">{username}</h2>
               <div className="flex items-center gap-0.5">
