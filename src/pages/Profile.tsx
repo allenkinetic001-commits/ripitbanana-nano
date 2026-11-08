@@ -31,7 +31,7 @@ const Profile = () => {
     if (userProfile.username) return {
       username: userProfile.username,
       avatar_url: userProfile.avatar,
-      bio: userProfile.bio || 'Surviving the round ?',
+      bio: userProfile.bio || 'Surviving the round ⚡',
       lives: 1 // Default
     };
     return null;

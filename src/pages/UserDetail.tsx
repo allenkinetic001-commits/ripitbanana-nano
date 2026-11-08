@@ -131,7 +131,7 @@ const UserDetail = () => {
       id: (userProfile as any)?.id || userProfile?.username || 'me',
       username: userProfile.username,
       avatar_url: userProfile.avatar,
-      bio: userProfile.bio || 'Surviving the round ?',
+      bio: userProfile.bio || 'Surviving the round ⚡',
       lives: userLives[userProfile.username] || 1
     };
     
@@ -284,7 +284,7 @@ const UserDetail = () => {
         table: 'profiles',
         filter: `username=eq.${username}`
       }, () => {
-        // Profile was deleted - show eliminated screen instead of navigating away
+        // Profile was deleted — show eliminated screen instead of navigating away
         localStorage.removeItem(`user_profile_cache_${username}`);
         localStorage.removeItem(`user_posts_cache_${username}`);
         localStorage.setItem(`user_eliminated_${username}`, 'true');
@@ -404,7 +404,7 @@ const UserDetail = () => {
           />
           <div className="space-y-3 max-w-sm">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tighter">
-              Oops. this user doesn't exist here anymore.
+              Oops… this user doesn't exist here anymore.
             </h1>
             <p className="text-zinc-500 text-sm leading-relaxed">
               Their profile, posts, and interactions have been wiped from the system. They have been eliminated.
@@ -499,7 +499,7 @@ const UserDetail = () => {
                 <ProfileHeartsToggle isVisible={true} lives={globalLives} />
               </div>
             </div>
-            <p className="text-sm text-zinc-600">{profileData?.bio || 'Surviving the round ?'}</p>
+            <p className="text-sm text-zinc-600">{profileData?.bio || 'Surviving the round ⚡'}</p>
           </div>
           <div className="flex items-center space-x-2">
             {profileData?.is_traitor || isTraitor ? (

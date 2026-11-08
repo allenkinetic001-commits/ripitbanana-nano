@@ -331,7 +331,7 @@ const SearchPage = () => {
     });
   }, [mergedRounds]);
 
-  // Build Hall of Fame from mergedRounds - show ALL winning content
+  // Build Hall of Fame from mergedRounds — show ALL winning content
   const localSurvivorHistory = useMemo(() => {
     const result: any[] = [];
     const seenUsernames = new Set<string>();
@@ -504,7 +504,7 @@ const SearchPage = () => {
       {/* Content Section */}
       <div className="flex-1">
         {selectedRoundId ? (
-          /* ?? Selected Round Detail View ?? */
+          /* ── Selected Round Detail View ── */
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="px-6 mb-6 flex items-center justify-between">
               <button 
@@ -575,7 +575,7 @@ const SearchPage = () => {
             </div>
           </div>
         ) : viewMode === 'hall_of_fame' ? (
-          /* ?? All Time Hall of Fame ?? */
+          /* ── All Time Hall of Fame ── */
           displaySurvivors.length > 0 ? (
             <div className="space-y-4">
               {displaySurvivors.map((survivor: any) => (
@@ -601,7 +601,7 @@ const SearchPage = () => {
             null
           )
         ) : (
-          /* ?? Round History (Stacks) ?? */
+          /* ── Round History (Stacks) ── */
           displayLogs.length > 0 ? (
             <div className="animate-in fade-in slide-in-from-left-4 duration-500">
               {displayLogs.map((round: any) => (
@@ -619,7 +619,7 @@ const SearchPage = () => {
         {!selectedRoundId && (
           <>
             {totalElimination ? (
-              /* ?? TOTAL TERMINATION STATE ?? */
+              /* ── TOTAL TERMINATION STATE ── */
               <div className="flex flex-col items-center justify-center p-8 pt-12 animate-in fade-in zoom-in duration-700">
                 <div className="flex flex-col items-center gap-8 bg-rose-50 p-12 rounded-[3rem] border border-rose-100 shadow-sm relative overflow-hidden group w-full max-w-sm">
                   <div className="relative">
