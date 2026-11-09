@@ -23,14 +23,14 @@ const EliminatedPage = () => {
       
       <div className="space-y-4 max-w-sm">
         <h1 className="text-2xl font-black text-zinc-900 tracking-tighter">
-          Oops. you don't exist here anymore.
+          Oops… you don’t exist here anymore.
         </h1>
         <p className="text-zinc-500 text-sm leading-relaxed">
           Your profile, your posts, and your interactions have been wiped from the system. You have been eliminated.
         </p>
       </div>
 
-      <div className="mt-12 space-y-3">
+      <div className="mt-12 space-y-4">
         <button 
           onClick={handleLogout}
           className="transition-all active:scale-95 hover:opacity-90"
@@ -43,7 +43,16 @@ const EliminatedPage = () => {
           />
         </button>
         
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pt-4">
+        <div>
+          <button 
+            onClick={() => navigate('/settings')}
+            className="text-xs font-bold text-zinc-500 hover:text-zinc-900 underline transition-colors"
+          >
+            Go to Settings & Preferences
+          </button>
+        </div>
+        
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pt-2">
           Existence Terminated
         </p>
       </div>
