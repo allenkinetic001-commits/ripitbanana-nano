@@ -501,7 +501,7 @@ const SettingsPage = () => {
             </div>
 
             <div className="space-y-5 text-xs text-zinc-600 overflow-y-auto flex-1 min-h-0 pr-1">
-              {/* Partnership Section */}
+              {/* Utility of TAMIYANOIA CAT Section */}
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-zinc-900 uppercase tracking-wide border-b border-zinc-100 pb-1">
                   {t('partnership_title')}

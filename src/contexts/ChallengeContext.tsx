@@ -299,7 +299,7 @@ const translations: Record<string, Record<string, string>> = {
     'contact_email_or': 'or',
     'contact_footer': 'We’ll get back to you as fast as a Pley timer counting down.',
     'contact_close': 'Close',
-    'partnership_title': 'Partnership',
+    'partnership_title': 'Utility of TAMIYANOIA CAT',
     'partnership_desc': 'We have officially decided to partner with TAMIYANOIA CAT token, and TAMIYANOIA CAT ($TAMIYANOIA) will serve as the future crypto payment for our app and other future projects in perpetuity.',
     'partnership_check_us_out': 'Official Token & Ecosystem',
     'partnership_token_name': 'TAMIYANOIA CAT ($TAMIYANOIA)',
