@@ -34,30 +34,40 @@ export default function Login() {
         });
 
         if (signInError) throw signInError;
-        
-        // After successful auth, check if the profile exists and is active
-        // If it doesn't exist or has 0 lives, it means the user was eliminated
+
+        // After successful auth, record user ID
+        localStorage.setItem('supabaseUserId', data.user.id);
+
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id, has_onboarded, lives')
           .eq('id', data.user.id)
           .single();
-          
-        if (!profile || profileError || (profile.lives !== undefined && profile.lives !== null && profile.lives <= 0)) {
-          // Profile missing or 0 lives = Eliminated
+
+        if (!profile || profileError) {
+          // If profile row is missing, create a default profile so the user isn't locked out
+          const username = data.user.user_metadata?.username || data.user.email?.split('@')[0] || 'user';
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            username,
+            full_name: data.user.user_metadata?.full_name || '',
+            lives: 3,
+            has_onboarded: true,
+          });
+          localStorage.setItem(`isEliminated_${data.user.id}`, 'false');
+          navigate('/');
+          return;
+        }
+
+        if (profile.lives !== undefined && profile.lives !== null && profile.lives <= 0) {
+          // User is currently eliminated - do NOT sign them out; allow access to settings/eliminated screen
           localStorage.setItem(`isEliminated_${data.user.id}`, 'true');
-          await supabase.auth.signOut();
-          setError("Oops… you don’t exist here anymore.");
+          navigate('/');
           return;
         }
 
-        // Double check local storage block flag for safety
-        if (localStorage.getItem(`isEliminated_${data.user.id}`) === 'true') {
-          await supabase.auth.signOut();
-          setError("Oops… you don’t exist here anymore.");
-          return;
-        }
-
+        // User is active and has lives
+        localStorage.setItem(`isEliminated_${data.user.id}`, 'false');
         if (profile.has_onboarded) {
           navigate('/');
         } else {
@@ -82,17 +92,17 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-500">
         <div className="text-center mb-10">
           <div className="flex items-center justify-center mb-6">
-            <img 
-              src="/welcome-back-hydrant.png" 
-              alt="Welcome Back" 
+            <img
+              src="/welcome-back-hydrant.png"
+              alt="Welcome Back"
               className="w-56 h-auto object-contain drop-shadow-2xl animate-in fade-in slide-in-from-bottom duration-700"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </div>
           <div className="flex justify-center mb-2">
-            <img 
-              src="/login-welcome-logo.png" 
-              alt="RiPit" 
+            <img
+              src="/login-welcome-logo.png"
+              alt="RiPit"
               className="h-16 w-auto object-contain animate-in fade-in zoom-in duration-500"
               style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
@@ -123,9 +133,8 @@ export default function Login() {
                   setEmail(e.target.value);
                   setError('');
                 }}
-                className={`w-full bg-zinc-50 border rounded-2xl py-4 pl-12 pr-4 font-medium outline-none transition-all placeholder:text-zinc-400 ${
-                  error ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10' : 'border-zinc-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10'
-                }`}
+                className={`w-full bg-zinc-50 border rounded-2xl py-4 pl-12 pr-4 font-medium outline-none transition-all placeholder:text-zinc-400 ${error ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10' : 'border-zinc-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10'
+                  }`}
                 placeholder="Enter your email"
                 autoComplete="off"
                 required

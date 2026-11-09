@@ -20,7 +20,7 @@ interface BottomNavProps {
 const BottomNav = ({ visible = true }: BottomNavProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-    const { t, unreadMessageCount } = useChallenge();
+  const { t, unreadMessageCount } = useChallenge();
   const [clickedPath, setClickedPath] = useState<string | null>(null);
 
   const handleNavClick = (path: string) => {
@@ -33,10 +33,10 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
     { icon: '/nav-home-v3.png', label: t('nav_home'), path: '/', isImage: true },
     { icon: '/nav-chair-v3.png', label: t('nav_search'), path: '/search', isImage: true },
     { icon: '/nav-phone-v3.png', label: t('nav_notifications'), path: '/notifications', isImage: true },
-    { 
-      icon: '/nav-profile-v3.png', 
-      label: t('nav_profile'), 
-      path: '/profile', 
+    {
+      icon: '/nav-profile-v3.png',
+      label: t('nav_profile'),
+      path: '/profile',
       isImage: true
     },
   ];
@@ -62,17 +62,17 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
             <div className="h-10 sm:h-12 flex items-center justify-center mb-0.5">
               {item.isImage ? (
                 <div className="relative">
-                  <img 
-                    src={item.icon as string} 
+                  <img
+                    src={item.icon as string}
                     alt={item.label}
                     className={cn(
                       item.size || "h-9 w-9 sm:h-11 sm:w-11",
-                      "object-contain transition-all duration-300", 
+                      "object-contain transition-all duration-300",
                       isActive ? "scale-110" : "scale-100",
                       isBouncing && "animate-nav-bounce",
                       "opacity-100",
                       item.className
-                    )} 
+                    )}
                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />
                   {item.path === '/notifications' && unreadMessageCount > 0 && (
@@ -85,8 +85,8 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                 <div className={cn(isBouncing && "animate-nav-bounce")}>
                   {(() => {
                     const Icon = item.icon as any;
-                    return <Icon 
-                      size={24} 
+                    return <Icon
+                      size={24}
                       className={cn("transition-all duration-300", isActive && "scale-110")}
                     />;
                   })()}
@@ -95,48 +95,48 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
             </div>
             <div className="h-6 sm:h-7 flex items-center justify-center overflow-visible">
               {item.path === '/' ? (
-                <img 
-                  src="/nav-home-text.png" 
-                  alt="Home" 
+                <img
+                  src="/nav-home-text.png"
+                  alt="Home"
                   className={cn(
-                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110", 
+                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110",
                     isActive ? "scale-125" : "scale-110 font-extrabold"
-                  )} 
+                  )}
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : item.path === '/search' ? (
-                <img 
-                  src="/nav-search-text.png" 
-                  alt="Search" 
+                <img
+                  src="/nav-search-text.png"
+                  alt="Search"
                   className={cn(
-                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
+                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300",
                     isActive ? "scale-110" : "scale-100"
-                  )} 
+                  )}
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : item.path === '/notifications' ? (
-                <img 
-                  src="/nav-activity-text.png" 
-                  alt="Activity" 
+                <img
+                  src="/nav-activity-text.png"
+                  alt="Activity"
                   className={cn(
-                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110", 
+                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110",
                     isActive ? "scale-125" : "scale-110"
-                  )} 
+                  )}
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : item.path === '/profile' ? (
-                <img 
-                  src="/nav-profile-text.png" 
-                  alt="Profile" 
+                <img
+                  src="/nav-profile-text.png"
+                  alt="Profile"
                   className={cn(
-                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110", 
+                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110",
                     isActive ? "scale-125" : "scale-110"
-                  )} 
+                  )}
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : (
                 <span className={cn(
-                  "text-[10px] sm:text-xs font-black tracking-tighter uppercase transition-all", 
+                  "text-[10px] sm:text-xs font-black tracking-tighter uppercase transition-all",
                   isActive ? "text-zinc-900 scale-110" : "text-zinc-400 scale-100"
                 )}>
                   {item.label}

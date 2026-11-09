@@ -120,7 +120,7 @@ export function useSupabasePosts() {
             `)
             .eq('id', payload.new.id)
             .single();
-            
+
           if (data) {
             newPostWithProfile = data;
             break;
@@ -128,7 +128,7 @@ export function useSupabasePosts() {
           // wait 500ms before retrying
           await new Promise(r => setTimeout(r, 500));
         }
-          
+
         if (newPostWithProfile && newPostWithProfile.profiles !== null) {
           setPosts(prev => {
             const next = [newPostWithProfile as SupabasePost, ...prev];
@@ -373,7 +373,7 @@ export function formatPostForUI(post: any) {
   const isVideo =
     url.startsWith('data:video/') ||
     /\.(mp4|mov|webm|ogg)(\?|$)/i.test(url);
-  
+
   // Format comments from database
   const formattedComments = (post.comments || []).map((c: any) => ({
     id: c.id,
@@ -407,7 +407,7 @@ export function getTimeAgo(dateStr?: string): string {
   if (isNaN(date.getTime())) return 'Just now';
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  
+
   if (diffMins < 1) return 'Just now';
   if (diffMins < 60) return `${diffMins}m ago`;
   const diffHours = Math.floor(diffMins / 60);
@@ -450,7 +450,7 @@ export async function uploadAvatar(userId: string, file: File): Promise<{ url: s
 
 // Update profile row on the Supabase backend
 export async function updateUserProfile(
-  userId: string, 
+  userId: string,
   profile: { username?: string, fullName?: string, bio?: string, website?: string, avatarUrl?: string }
 ) {
   const payload: any = {};

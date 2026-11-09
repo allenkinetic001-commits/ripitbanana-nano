@@ -20,7 +20,7 @@ import { useChallenge } from "./contexts/ChallengeContext";
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, authLoading, isEliminated } = useChallenge();
   const location = useLocation();
-  
+
   if (authLoading && !isAuthenticated && !window.location.search.includes('preview') && localStorage.getItem('isAuthenticated') !== 'true') {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-zinc-50">
@@ -29,18 +29,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  
+
   // Allow viewing if authenticated, or in preview mode, or if guest preview flag is present
   const isGuestOrPreview = window.location.search.includes('preview') || localStorage.getItem('isAuthenticated') === 'true';
   if (!isAuthenticated && !isGuestOrPreview) {
     return <Navigate to="/login" replace />;
   }
-  
+
   // Settings is ALWAYS accessible regardless of eliminated state
   if (isEliminated && location.pathname !== '/settings') {
     return <EliminatedPage />;
   }
-  
+
   return <>{children}</>;
 };
 

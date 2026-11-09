@@ -5544,7 +5544,16 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (data && !error) {
       // Check if lives <= 0 (Fail-safe)
       if (data.lives <= 0) {
-        eliminateSelf();
+        setIsEliminated(true);
+        localStorage.setItem(`isEliminated_${userId}`, 'true');
+        const fullProfile = {
+          username: data.username || '',
+          fullName: data.full_name || '',
+          bio: data.bio || '',
+          avatar: data.avatar_url || '',
+          website: data.website || ''
+        };
+        setUserProfile(fullProfile);
         return;
       }
       const fullProfile = {
@@ -5561,19 +5570,18 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     } else if (error && authUser) {
       // PGRST116 means no rows found -> POTENTIALLY Eliminated
       if (error.code === 'PGRST116') {
-        const createdAt = authUser?.created_at ? new Date(authUser.created_at).getTime() : 0;
-        const now = new Date().getTime();
-        const ageInSeconds = (now - createdAt) / 1000;
-        
-        if (createdAt > 0 && ageInSeconds < 30) {
-          setTimeout(() => fetchUserProfile(userId, authUser), 2000);
-          setIsEliminated(false);
-          localStorage.setItem(`isEliminated_${userId}`, 'false');
-        } else {
-          setIsEliminated(true);
-          localStorage.setItem(`isEliminated_${userId}`, 'true');
-          eliminateSelf(); // Clean up client states and sign out
-        }
+        const username = authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user';
+        Promise.resolve(
+          supabase.from('profiles').upsert({
+            id: userId,
+            username,
+            full_name: authUser.user_metadata?.full_name || '',
+            lives: 3,
+            has_onboarded: true,
+          })
+        ).catch(() => {});
+        setIsEliminated(false);
+        localStorage.setItem(`isEliminated_${userId}`, 'false');
       }
       setUserProfile((prev: any) => ({
         ...prev,
@@ -5663,11 +5671,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
       if (session?.user) {
-        // ── CRITICAL: Block eliminated users immediately before any state loads ──
+        // Set eliminated flag if stored, but keep user authenticated so Settings is accessible
         if (localStorage.getItem(`isEliminated_${session.user.id}`) === 'true') {
           setIsEliminated(true);
-          eliminateSelf();
-          return;
         }
 
         fetchUserProfile(session.user.id, session.user);
@@ -5752,7 +5758,6 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
           if (session?.user && payload.old.id === session.user.id) {
             setIsEliminated(true);
             localStorage.setItem(`isEliminated_${session.user.id}`, 'true');
-            eliminateSelf(); // Full cleanup & sign out
           }
         });
       })
@@ -5767,7 +5772,9 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
             if (payload.new.lives <= 0) {
               setIsEliminated(true);
               localStorage.setItem(`isEliminated_${session.user.id}`, 'true');
-              eliminateSelf(); // Full cleanup & sign out
+            } else {
+              setIsEliminated(false);
+              localStorage.setItem(`isEliminated_${session.user.id}`, 'false');
             }
           }
         });
@@ -6312,35 +6319,7 @@ export const ChallengeProvider: React.FC<{ children: ReactNode }> = ({ children 
       console.error('Error setting lives to 0:', err);
     }
 
-    // ── 5. Delete posts, comments, messages and profile from Supabase ──
-    try {
-      // Delete comments on user's posts first
-      const { data: userPosts } = await supabase.from('posts').select('id').eq('user_id', userId);
-      if (userPosts && userPosts.length > 0) {
-        const postIds = userPosts.map(p => p.id);
-        await supabase.from('comments').delete().in('post_id', postIds);
-      }
-      
-      // Delete comments made by user
-      await supabase.from('comments').delete().eq('user_id', userId);
-      
-      // Delete user's posts
-      await supabase.from('posts').delete().eq('user_id', userId);
-      
-      // Delete user's messages
-      await supabase.from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
-      
-      // Delete user profile
-      const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
-      if (profileError) {
-        console.error('Database profile deletion failed:', profileError.message);
-      }
-    } catch (err) {
-      console.error('Error deleting profile/posts/comments/messages during elimination:', err);
-    }
-
-    // ── 6. Sign out the Supabase auth session completely so they cannot come back on reload ──
-    await supabase.auth.signOut();
+    // ── 5. Do NOT delete user profile or signOut so user can still access settings and revive ──
   };
 
   return (
