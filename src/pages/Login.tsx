@@ -47,14 +47,14 @@ export default function Login() {
           // Profile missing or 0 lives = Eliminated
           localStorage.setItem(`isEliminated_${data.user.id}`, 'true');
           await supabase.auth.signOut();
-          setError("Oops. you don't exist here anymore.");
+          setError("Oops… you don’t exist here anymore.");
           return;
         }
 
         // Double check local storage block flag for safety
         if (localStorage.getItem(`isEliminated_${data.user.id}`) === 'true') {
           await supabase.auth.signOut();
-          setError("Oops. you don't exist here anymore.");
+          setError("Oops… you don’t exist here anymore.");
           return;
         }
 
@@ -72,7 +72,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] w-full bg-white flex flex-col items-center justify-center p-6 py-12 relative overflow-y-auto">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-purple-200 rounded-full blur-[100px] opacity-20" />
@@ -173,7 +173,7 @@ export default function Login() {
             {loading ? (
               <div className="h-16 flex items-center justify-center gap-3 bg-zinc-100 rounded-2xl w-full">
                 <Loader2 size={20} className="animate-spin text-zinc-500" />
-                <span className="text-zinc-500 font-bold text-sm">Signing in.</span>
+                <span className="text-zinc-500 font-bold text-sm">Signing in…</span>
               </div>
             ) : (
               <img
@@ -203,7 +203,7 @@ export default function Login() {
                 const guestProfile = {
                   username: 'guest_survivor',
                   fullName: 'Guest Survivor',
-                  bio: 'Exploring RipIt ?',
+                  bio: 'Exploring RipIt ⚡',
                   avatar: '/custom-empty-profile.png',
                   website: ''
                 };
@@ -213,7 +213,7 @@ export default function Login() {
               }}
               className="text-xs font-bold text-zinc-600 hover:text-zinc-900 uppercase tracking-widest px-5 py-2.5 rounded-full border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 transition-all shadow-sm active:scale-95"
             >
-              ?? Explore App (Guest Mode)
+              👀 Explore App (Guest Mode)
             </button>
           </div>
         </div>

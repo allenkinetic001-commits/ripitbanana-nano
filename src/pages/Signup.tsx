@@ -140,7 +140,7 @@ export default function Signup() {
   const canSubmit = !loading && usernameStatus !== 'taken' && usernameStatus !== 'invalid' && usernameStatus !== 'checking' && username && fullName && email && password;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] w-full bg-white flex flex-col items-center justify-center p-4 py-12 relative overflow-y-auto">
       {/* Background blobs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-green-200 rounded-full blur-[100px] opacity-20" />

@@ -93,14 +93,14 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                 </div>
               )}
             </div>
-            <div className="h-4 sm:h-5 flex items-center justify-center">
+            <div className="h-6 sm:h-7 flex items-center justify-center overflow-visible">
               {item.path === '/' ? (
                 <img 
                   src="/nav-home-text.png" 
                   alt="Home" 
                   className={cn(
-                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
-                    isActive ? "scale-110" : "scale-100 font-extrabold"
+                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110", 
+                    isActive ? "scale-125" : "scale-110 font-extrabold"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
@@ -119,8 +119,8 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                   src="/nav-activity-text.png" 
                   alt="Activity" 
                   className={cn(
-                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
-                    isActive ? "scale-110" : "scale-100"
+                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110", 
+                    isActive ? "scale-125" : "scale-110"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
@@ -129,14 +129,14 @@ const BottomNav = ({ visible = true }: BottomNavProps) => {
                   src="/nav-profile-text.png" 
                   alt="Profile" 
                   className={cn(
-                    "h-3 sm:h-3.5 w-auto object-contain transition-all duration-300", 
-                    isActive ? "scale-110" : "scale-100"
+                    "h-6 sm:h-7 w-auto object-contain transition-all duration-300 scale-110", 
+                    isActive ? "scale-125" : "scale-110"
                   )} 
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
               ) : (
                 <span className={cn(
-                  "text-[9px] sm:text-[10px] font-bold tracking-tighter uppercase transition-all", 
+                  "text-[10px] sm:text-xs font-black tracking-tighter uppercase transition-all", 
                   isActive ? "text-zinc-900 scale-110" : "text-zinc-400 scale-100"
                 )}>
                   {item.label}
