@@ -514,7 +514,12 @@ const SettingsPage = () => {
                     Official Token & Ecosystem
                   </span>
                   <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-amber-50/90 via-orange-50/60 to-yellow-50/90 rounded-2xl border border-amber-200 shadow-sm">
-                    <span className="text-2xl select-none flex-shrink-0 mt-0.5">🐱</span>
+                    <img
+                      src="/tanmi.png"
+                      alt="TAMIYANOIA CAT"
+                      className="w-12 h-12 rounded-xl object-contain flex-shrink-0 mt-0.5 shadow-sm border border-amber-200/60 bg-white"
+                      style={{ imageRendering: '-webkit-optimize-contrast' }}
+                    />
                     <div className="flex flex-col min-w-0 flex-1 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-black text-zinc-900 text-sm tracking-tight">TAMIYANOIA CAT</span>
@@ -562,7 +567,7 @@ const SettingsPage = () => {
                   <img src="/gmail.png" className="w-5 h-5 object-contain flex-shrink-0" alt="" />
                   <div className="flex flex-col">
                     <span className="font-bold text-zinc-900">{t('contact_email_label')}</span>
-                    <a href="mailto:tamiyonoiacat01@gmail.com" className="text-blue-600 hover:underline break-all font-semibold">tamiyonoiacat01@gmail.com</a>
+                    <a href="mailto:tamiyanoiacat01@gmail.com" className="text-blue-600 hover:underline break-all font-semibold">tamiyanoiacat01@gmail.com</a>
                   </div>
                 </div>
               </div>
