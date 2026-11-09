@@ -511,67 +511,42 @@ const SettingsPage = () => {
                 </p>
                 <div className="space-y-2">
                   <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider block pt-1.5">
-                    {t('partnership_check_us_out')}
+                    Official Token & Ecosystem
                   </span>
-                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <img src="/threads.png" className="w-3.5 h-3.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-bold text-zinc-900">{t('partnership_threads_label')}</span>
-                      <span className="text-zinc-700 font-semibold break-all">{t('partnership_threads_value')}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-black fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-bold text-zinc-900">{t('partnership_x_label')}</span>
-                      <span className="text-zinc-700 font-semibold break-all">{t('partnership_x_value')}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-bold text-zinc-900">{t('partnership_instagram_label')}</span>
-                      <span className="text-zinc-700 font-semibold break-all">{t('partnership_instagram_value')}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-orange-600" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="#FF4500" /><circle cx="9" cy="12" r="1.5" fill="white" /><circle cx="15" cy="12" r="1.5" fill="white" /><path d="M9 15c1 1 5 1 6 0" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" /></svg>
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-bold text-zinc-900">{t('partnership_reddit_label')}</span>
-                      <span className="text-zinc-700 font-semibold break-all">{t('partnership_reddit_value')}</span>
-                    </div>
-                  </div>
                   <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-amber-50/90 via-orange-50/60 to-yellow-50/90 rounded-2xl border border-amber-200 shadow-sm">
                     <span className="text-2xl select-none flex-shrink-0 mt-0.5">🐱</span>
                     <div className="flex flex-col min-w-0 flex-1 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-black text-zinc-900 text-sm tracking-tight">TAMIYANOIA CAT</span>
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">Whitepaper</span>
+                        <span className="text-[10px] font-black uppercase tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">$TAMIYANOIA</span>
+                        <span className="text-[10px] font-black uppercase tracking-wider bg-orange-200/80 text-orange-900 px-2 py-0.5 rounded-full">BNB Chain</span>
                       </div>
                       <p className="text-xs font-bold text-zinc-700">
                         From Africa to the World. 🌍🐱
                       </p>
-                      <p className="text-[11px] text-zinc-500 font-medium leading-relaxed">
-                        Read the official whitepaper, vision, and project documentation for TAMIYANOIA CAT.
+                      <p className="text-[11px] text-zinc-600 font-medium leading-relaxed">
+                        A community-driven Web3 ecosystem built around culture, creativity, entertainment, and decentralized participation.
                       </p>
-                      <div className="pt-1">
+                      <div className="pt-2 flex items-center gap-2 flex-wrap">
                         <a
                           href="https://www.tamiyanoiacat.fun/"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all group"
+                          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all group"
                         >
-                          <span>Read Whitepaper</span>
+                          <span>Whitepaper</span>
                           <span className="group-hover:translate-x-0.5 transition-transform">→</span>
                         </a>
+                        <a
+                          href="https://x.com/TAMIYANOIA_Cat"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 rounded-xl font-bold text-xs shadow-sm active:scale-95 transition-all"
+                        >
+                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                          <span>@TAMIYANOIA_Cat</span>
+                        </a>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2.5 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <img src="/youtube.png" className="w-3.5 h-3.5 object-contain flex-shrink-0 mt-0.5 rounded" alt="" />
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="font-bold text-zinc-900">{t('partnership_youtube_label')}</span>
-                      <span className="text-zinc-700 font-semibold break-all">{t('partnership_youtube_value')}</span>
                     </div>
                   </div>
                 </div>
@@ -587,7 +562,7 @@ const SettingsPage = () => {
                   <img src="/gmail.png" className="w-5 h-5 object-contain flex-shrink-0" alt="" />
                   <div className="flex flex-col">
                     <span className="font-bold text-zinc-900">{t('contact_email_label')}</span>
-                    <a href="mailto:ripit90210@gmail.com" className="text-blue-600 hover:underline break-all">ripit90210@gmail.com</a>
+                    <a href="mailto:tamiyonoiacat01@gmail.com" className="text-blue-600 hover:underline break-all font-semibold">tamiyonoiacat01@gmail.com</a>
                   </div>
                 </div>
               </div>

@@ -300,29 +300,10 @@ const translations: Record<string, Record<string, string>> = {
     'contact_footer': 'We’ll get back to you as fast as a Pley timer counting down.',
     'contact_close': 'Close',
     'partnership_title': 'Partnership',
-    'partnership_desc': 'We ripit team have officially decided to partner with Mayor of $67DOGE and $67DOGE will serve as the future crypto payment for our app and other future projects in Perpetuity under ripit company no matter what official handle of ripit and co partners and friend',
-    'partnership_check_us_out': 'Find Us On',
-    'partnership_threads_label': '1. Threads handle',
-    'partnership_threads_value': '@ripit_app',
-    'partnership_x_label': '2. X twitter handle',
-    'partnership_x_value': '@OfficialRipit01 and @Officialripit ( Mayor of $67DOGE)',
-    'partnership_instagram_label': '3. instagram',
-    'partnership_instagram_value': 'ripit_app and redyeti_ripit',
-    'partnership_reddit_label': '4. reddit',
-    'partnership_reddit_value': 'ripit_ai',
-    'partnership_pump_label': '5. pump.fun',
-    'partnership_pump_value': 'G59uYtk9rbVroVV5dn4FUsYqDuCZDz8qYNwdTuCupump',
-    'partnership_youtube_label': '6. YouTube',
-    'partnership_youtube_value': '@ripit_app',
-    'partnership_pump_lock_desc': '91.37% of total supply based on Solscan for the token of $67DOGE is fully locked in Stakepoint for the next 6 years',
-    'partnership_pump_lock_id': '#1779950463162',
-    'partnership_pump_pool_id': '#1000',
-    'partnership_pump_created': '28 May 2026 07:41',
-    'partnership_pump_token_mint': 'G59uYtk9rbVroVV5dn4FUsYqDuCZDz8qYNwdTuCupump',
-    'partnership_pump_creator_wallet': '5gPtFmqXwPrjX2HTVsS8pcmTfg5k1w8q6qfJAAaDJ62C',
-    'partnership_pump_mcap_label': 'Market Cap',
-    'partnership_pump_mcap_value': 'Starts at $251',
-    'partnership_pump_stakepoint_search': 'Search the token name and every info there on Stakepoint.app',
+    'partnership_desc': 'We have officially decided to partner with TAMIYANOIA CAT token, and TAMIYANOIA CAT ($TAMIYANOIA) will serve as the future crypto payment for our app and other future projects in perpetuity.',
+    'partnership_check_us_out': 'Official Token & Ecosystem',
+    'partnership_token_name': 'TAMIYANOIA CAT ($TAMIYANOIA)',
+    'partnership_token_desc': 'A community-driven Web3 ecosystem built around culture, creativity, entertainment, and decentralized participation. From Africa to the World. 🌍🐱',
 
     // Model Modal
     'model_title': 'Rip It – App Model',
@@ -422,7 +403,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'We may update these Terms periodically. Significant changes will be communicated in-app.',
     'terms_s10_title': '10. Contact',
     'terms_s10_desc': 'Questions or concerns?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   ko: {
     // Settings
@@ -681,7 +662,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': '우리는 주기적으로 이 약관을 업데이트할 수 있습니다. 주요 변경 사항은 앱 내에서 공지됩니다.',
     'terms_s10_title': '10. 문의',
     'terms_s10_desc': '질문이나 우려 사항이 있으신가요?',
-    'terms_s10_email': '이메일: ripit90210@gmail.com'
+    'terms_s10_email': '이메일: tamiyonoiacat01@gmail.com'
   },
   ja: {
     // Settings
@@ -942,7 +923,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': '規約は定期的に更新される場合があります。重要な変更はアプリ内で通知されます。',
     'terms_s10_title': '10. お問い合わせ',
     'terms_s10_desc': '質問や懸念がありますか？',
-    'terms_s10_email': 'メール: ripit90210@gmail.com',
+    'terms_s10_email': 'メール: tamiyonoiacat01@gmail.com',
 
     // Extra
     'timer_rule': 'ルール',
@@ -1210,7 +1191,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Nous pouvons mettre à jour ces conditions périodiquement. Les modifications importantes seront communiquées dans l\'application.',
     'terms_s10_title': '10. Contact',
     'terms_s10_desc': 'Questions ou préoccupations ?',
-    'terms_s10_email': 'E-mail : ripit90210@gmail.com'
+    'terms_s10_email': 'E-mail : tamiyonoiacat01@gmail.com'
   },
   hi: {
     // Settings
@@ -1463,7 +1444,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'हम समय-समय पर इन शर्तों को अपडेट कर सकते हैं। महत्वपूर्ण बदलावों की सूचना ऐप में दी जाएगी।',
     'terms_s10_title': '10. संपर्क',
     'terms_s10_desc': 'प्रश्न या चिंताएं?',
-    'terms_s10_email': 'ईमेल: ripit90210@gmail.com'
+    'terms_s10_email': 'ईमेल: tamiyonoiacat01@gmail.com'
   },
   zh: {
     // Settings
@@ -1712,7 +1693,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': '我们可能会定期更新这些条款。重大变更将在应用内传达。',
     'terms_s10_title': '10. 联系方式',
     'terms_s10_desc': '有疑问或担忧吗？',
-    'terms_s10_email': '电子邮件：ripit90210@gmail.com'
+    'terms_s10_email': '电子邮件：tamiyonoiacat01@gmail.com'
   },
   de: {
     // Settings
@@ -1971,7 +1952,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Wir können diese Bedingungen regelmäßig aktualisieren. Wesentliche Änderungen werden in der App bekannt gegeben.',
     'terms_s10_title': '10. Kontakt',
     'terms_s10_desc': 'Fragen oder Bedenken?',
-    'terms_s10_email': 'E-Mail: ripit90210@gmail.com'
+    'terms_s10_email': 'E-Mail: tamiyonoiacat01@gmail.com'
   },
   uk: {
     // Settings
@@ -2230,7 +2211,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Ми можемо періодично оновлювати ці Умови. Про суттєві зміни буде повідомлено в додатку.',
     'terms_s10_title': '10. Контакти',
     'terms_s10_desc': 'Запитання чи занепокоєння?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   ru: {
     // Settings
@@ -2489,7 +2470,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Мы можем периодически обновлять эти Условия. О существенных изменениях будет объявлено в приложении.',
     'terms_s10_title': '10. Контакты',
     'terms_s10_desc': 'Вопросы или опасения?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   it: {
     'settings': 'Impostazioni',
@@ -2727,7 +2708,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Potremmo aggiornare questi Termini periodicamente. Le modifiche significative saranno comunicate nell\'app.',
     'terms_s10_title': '10. Contatto',
     'terms_s10_desc': 'Domande o dubbi?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   pt: {
     'settings': 'Configurações',
@@ -2965,7 +2946,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Podemos atualizar estes Termos periodicamente. Alterações significativas serão comunicadas no app.',
     'terms_s10_title': '10. Contato',
     'terms_s10_desc': 'Perguntas ou preocupações?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   vi: {
     'settings': 'Cài đặt',
@@ -3203,7 +3184,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Chúng tôi có thể cập nhật các Điều khoản này định kỳ. Các thay đổi quan trọng sẽ được thông báo trong ứng dụng.',
     'terms_s10_title': '10. Liên hệ',
     'terms_s10_desc': 'Câu hỏi hoặc thắc mắc?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   th: {
     'settings': 'การตั้งค่า',
@@ -3441,7 +3422,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'เราอาจอัปเดตข้อกำหนดเหล่านี้เป็นระยะ การเปลี่ยนแปลงสำคัญจะได้รับการแจ้งเตือนภายในแอป',
     'terms_s10_title': '10. ติดต่อ',
     'terms_s10_desc': 'คำถามหรือข้อสงสัย?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   ar: {
     // Settings
@@ -3700,7 +3681,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'قد نقوم بتحديث هذه الشروط بشكل دوري. سيتم إبلاغك بالتغييرات الجوهرية داخل التطبيق.',
     'terms_s10_title': '10. الاتصال',
     'terms_s10_desc': 'أسئلة أو استفسارات؟',
-    'terms_s10_email': 'البريد الإلكتروني: ripit90210@gmail.com'
+    'terms_s10_email': 'البريد الإلكتروني: tamiyonoiacat01@gmail.com'
   },
   id: {
     // Settings
@@ -3957,7 +3938,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Kami mungkin memperbarui Ketentuan ini secara berkala. Perubahan signifikan akan diumumkan di dalam aplikasi.',
     'terms_s10_title': '10. Kontak',
     'terms_s10_desc': 'Pertanyaan atau kekhawatiran?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   },
   ur: {
     // Settings
@@ -4215,7 +4196,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'ہم وقتاً فوقتاً ان شرائط کو اپ ڈیٹ کر سکتے ہیں۔ بڑی تبدیلیوں کا اعلان ایپ میں کیا جائے گا۔',
     'terms_s10_title': '10. رابطہ',
     'terms_s10_desc': 'سوالات یا خدشات؟',
-    'terms_s10_email': 'ای میل: ripit90210@gmail.com'
+    'terms_s10_email': 'ای میل: tamiyonoiacat01@gmail.com'
   },
   fa: {
     // Settings
@@ -4472,7 +4453,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'ما ممکن است این شرایط را به صورت دوره‌ای به‌روزرسانی کنیم. تغییرات مهم در اپلیکیشن اعلام خواهد شد.',
     'terms_s10_title': '۱۰. تماس',
     'terms_s10_desc': 'سوالی دارید؟',
-    'terms_s10_email': 'ایمیل: ripit90210@gmail.com'
+    'terms_s10_email': 'ایمیل: tamiyonoiacat01@gmail.com'
   },
   es: {
     // Settings
@@ -4731,7 +4712,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Podemos actualizar estos Términos periódicamente. Los cambios significativos se comunicarán en la aplicación.',
     'terms_s10_title': '10. Contacto',
     'terms_s10_desc': '¿Preguntas o inquietudes?',
-    'terms_s10_email': 'Correo electrónico: ripit90210@gmail.com'
+    'terms_s10_email': 'Correo electrónico: tamiyonoiacat01@gmail.com'
   },
   tl: {
     // Settings
@@ -4991,7 +4972,7 @@ const translations: Record<string, Record<string, string>> = {
     'terms_s9_desc': 'Maaari naming i-update ang mga Kasunduang ito pana-panahon. Ang mga makabuluhang pagbabago ay ipapaalam sa loob ng app.',
     'terms_s10_title': '10. Pakikipag-ugnayan',
     'terms_s10_desc': 'May mga katanungan o alalahanin?',
-    'terms_s10_email': 'Email: ripit90210@gmail.com'
+    'terms_s10_email': 'Email: tamiyonoiacat01@gmail.com'
   }
 };
 
