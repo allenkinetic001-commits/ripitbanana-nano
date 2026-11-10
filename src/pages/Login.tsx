@@ -9,7 +9,70 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
+  const [verificationResentMsg, setVerificationResentMsg] = useState('');
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotStatus, setForgotStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [forgotMsg, setForgotMsg] = useState('');
   const navigate = useNavigate();
+
+  const handleResendVerification = async () => {
+    if (!email || !validateEmail(email)) {
+      setError('Please enter your email above to resend the confirmation link.');
+      return;
+    }
+    setResendingVerification(true);
+    setVerificationResentMsg('');
+    try {
+      const { error: resendErr } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim().toLowerCase(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+        },
+      });
+      if (resendErr) throw resendErr;
+      setVerificationResentMsg('Verification email resent! Please check your Inbox and Spam folder.');
+    } catch (err: any) {
+      const msg: string = err?.message || '';
+      if (msg.toLowerCase().includes('rate limit') || err?.code === 'over_email_send_rate_limit') {
+        setVerificationResentMsg('Supabase email limit reached (3-4/hr on free tier). Please wait a few minutes.');
+      } else {
+        setVerificationResentMsg(err?.message || 'Could not resend email. Please try again.');
+      }
+    } finally {
+      setResendingVerification(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetEmail = (forgotEmail || email).trim().toLowerCase();
+    if (!targetEmail || !validateEmail(targetEmail)) {
+      setForgotMsg('Please enter a valid email address.');
+      setForgotStatus('error');
+      return;
+    }
+    setForgotStatus('sending');
+    setForgotMsg('');
+    try {
+      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (resetErr) throw resetErr;
+      setForgotStatus('sent');
+      setForgotMsg('Password reset link sent! Check your Inbox and Spam folder.');
+    } catch (err: any) {
+      setForgotStatus('error');
+      const msg: string = err?.message || '';
+      if (msg.toLowerCase().includes('rate limit') || err?.code === 'over_email_send_rate_limit') {
+        setForgotMsg('Supabase email limit reached. Please wait a few minutes before requesting another reset.');
+      } else {
+        setForgotMsg(err?.message || 'Failed to send reset email.');
+      }
+    }
+  };
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -119,6 +182,38 @@ export default function Login() {
             </div>
           )}
 
+          {error && error.toLowerCase().includes('email not confirmed') && (
+            <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl text-xs space-y-2 animate-in fade-in">
+              <p className="font-semibold text-amber-900">
+                Your email has not been confirmed yet.
+              </p>
+              <p className="text-amber-700 leading-relaxed">
+                Check your Inbox, Spam, or Junk folders for the Supabase confirmation link. Or click below to get a new one.
+              </p>
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={resendingVerification}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm active:scale-95 disabled:opacity-50"
+              >
+                {resendingVerification ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <span>Resend Verification Email</span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {verificationResentMsg && (
+            <div className={`p-3 rounded-xl text-xs font-semibold ${verificationResentMsg.includes('resent') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+              {verificationResentMsg}
+            </div>
+          )}
+
           <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider ml-1">Email</label>
             <div className="relative group">
@@ -169,9 +264,18 @@ export default function Login() {
           </div>
 
           <div className="flex justify-end pt-2">
-            <a href="#" className="text-sm font-bold text-zinc-400 hover:text-purple-600 transition-colors">
+            <button
+              type="button"
+              onClick={() => {
+                setForgotEmail(email);
+                setShowForgotModal(true);
+                setForgotMsg('');
+                setForgotStatus('idle');
+              }}
+              className="text-sm font-bold text-zinc-400 hover:text-purple-600 transition-colors"
+            >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           <button
@@ -227,6 +331,68 @@ export default function Login() {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-4 border border-zinc-100">
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-zinc-900 text-lg">Reset Password</h3>
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(false)}
+                className="text-zinc-400 hover:text-zinc-700 text-xl font-bold px-2 py-1"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              Enter your account email to receive a password reset link. Check your Inbox and Spam folder.
+            </p>
+            <form onSubmit={handleForgotPassword} className="space-y-3">
+              <input
+                type="text"
+                value={forgotEmail}
+                onChange={(e) => {
+                  setForgotEmail(e.target.value);
+                  setForgotMsg('');
+                }}
+                placeholder="Enter your email"
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-purple-500"
+                required
+              />
+              {forgotMsg && (
+                <div className={`p-2.5 rounded-xl text-xs font-semibold ${forgotStatus === 'sent' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                  {forgotMsg}
+                </div>
+              )}
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-zinc-200 text-zinc-600 font-bold text-xs hover:bg-zinc-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={forgotStatus === 'sending'}
+                  className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  {forgotStatus === 'sending' ? (
+                    <>
+                      <Loader2 size={13} className="animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <span>Send Link</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
